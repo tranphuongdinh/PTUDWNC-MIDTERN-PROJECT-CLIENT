@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import jwt from "jsonwebtoken";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import Header from "../components/Header";
 
 const Home = () => {
   const [user, setUser] = useState("");
@@ -27,18 +28,24 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="infoBox">
-      <h1>YOUR INFO</h1>
-      <p>
-        Name: <strong>{user.name}</strong>
-      </p>
-      <p>
-        Email: <strong>{user.email}</strong>
-      </p>
+    <div>
+      <div className="infoBox">
+        <h1>YOUR INFO</h1>
+        <p>
+          Name: <strong>{user.name}</strong>
+        </p>
+        <p>
+          Email: <strong>{user.email}</strong>
+        </p>
 
-      <Button variant="contained" onClick={handleLogout} style={{ margin: "20px auto", display: "block" }}>
-        LOGOUT
-      </Button>
+        <Button
+          variant="contained"
+          onClick={handleLogout}
+          style={{ margin: "20px auto", display: "block" }}
+        >
+          LOGOUT
+        </Button>
+      </div>
     </div>
   );
 };
