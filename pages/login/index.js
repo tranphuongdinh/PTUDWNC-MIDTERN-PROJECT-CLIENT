@@ -1,13 +1,18 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { TextField } from "@mui/material";
+import { Button, TextField } from "@mui/material";
+import { GoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
-import { toast } from "react-toastify";
 import * as yup from "yup";
-import { loginFunc } from "../../client/auth";
+import { loginViaGithub } from "../../client/auth";
+import { AuthContext } from "../../context/authContext";
+
+const responseGoogle = (response) => {
+  console.log(response);
+};
 
 function Login() {
   const router = useRouter();
@@ -22,19 +27,12 @@ function Login() {
     handleSubmit,
   } = useForm({ resolver: yupResolver(schema), mode: "onChange" });
 
-  const { mutate, isLoading } = useMutation(loginFunc, {
-    onSuccess: (data) => {
-      localStorage.setItem("token", data.user || "");
-      toast.success("Login successful!");
-      router.push("/");
-    },
-    onError: () => toast.error("Invalid email or password!"),
-  });
+  const { user, isAuthenticated, login, logout, signup, isLoadingAuth } = useContext(AuthContext);
 
   return (
     <div className="infoBox">
       <h1>LOGIN</h1>
-      <form onSubmit={handleSubmit(mutate)}>
+      <form onSubmit={handleSubmit(login)}>
         <TextField {...register("email")} style={{ marginBottom: 20 }} placeholder="Email" label="Email" size="small" error={!!errors.email} helperText={errors.email?.message} />
 
         <TextField
@@ -47,11 +45,21 @@ function Login() {
           error={!!errors.password}
           helperText={errors.password?.message}
         />
-        <LoadingButton loading={isLoading} variant="contained" type="submit">
+        <LoadingButton loading={isLoadingAuth} variant="contained" type="submit">
           LOGIN
         </LoadingButton>
       </form>
-
+      or login via
+      <Button onClick={loginViaGithub}>GITHUB</Button>
+      <GoogleLogin
+        auto_select
+        onSuccess={(credentialResponse) => {
+          console.log(credentialResponse);
+        }}
+        onError={() => {
+          console.log("Login Failed");
+        }}
+      />
       <p>
         Don&apos;t have an account?{" "}
         <Link href="/register" legacyBehavior>

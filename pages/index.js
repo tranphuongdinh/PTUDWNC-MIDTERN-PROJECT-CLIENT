@@ -1,42 +1,16 @@
 import { Button } from "@mui/material";
-import jwt from "jsonwebtoken";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useContext } from "react";
+import { AuthContext } from "../context/authContext";
 
 const Home = () => {
-  const [user, setUser] = useState("");
-  const router = useRouter();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.replace("/login");
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const user = jwt.decode(token);
-      if (!user) {
-        handleLogout();
-      } else {
-        setUser(user);
-      }
-    } else {
-      handleLogout();
-    }
-  }, []);
+  const { user, isAuthenticated, login, logout, signup, isLoadingAuth } = useContext(AuthContext);
 
   return (
     <div className="infoBox">
       <h1>YOUR INFO</h1>
-      <p>
-        Name: <strong>{user.name}</strong>
-      </p>
-      <p>
-        Email: <strong>{user.email}</strong>
-      </p>
+      {user?.name}
 
-      <Button variant="contained" onClick={handleLogout} style={{ margin: "20px auto", display: "block" }}>
+      <Button variant="contained" onClick={logout} style={{ margin: "20px auto", display: "block" }}>
         LOGOUT
       </Button>
     </div>

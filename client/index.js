@@ -1,15 +1,31 @@
-const API = "https://ptudwnc-btcn04-server.vercel.app/api";
+import axios from "../config/axios";
 
 export const request = async (method, url, data = {}) => {
-  const response = await fetch(API + url, {
-    method: method,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    },
-    body: JSON.stringify(data),
-  });
+  let res = null;
+  switch (method) {
+    case "GET": {
+      res = await axios.get(url, {
+        params: data,
+      });
+      break;
+    }
 
-  const res = await response.json();
-  return res;
+    case "POST": {
+      res = await axios.post(url, data);
+      break;
+    }
+
+    case "PUT": {
+      res = await axios.put(url, data);
+      break;
+    }
+
+    case "DELETE": {
+      res = await axios.delete(url, {
+        params: data,
+      });
+      break;
+    }
+  }
+  return res?.data || null;
 };

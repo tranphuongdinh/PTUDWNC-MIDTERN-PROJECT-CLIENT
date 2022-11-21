@@ -3,11 +3,10 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { TextField } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
-import { toast } from "react-toastify";
 import * as yup from "yup";
-import { registerFunc } from "../../client/auth";
+import { AuthContext } from "../../context/authContext";
 
 function App() {
   const router = useRouter();
@@ -24,18 +23,13 @@ function App() {
     register,
     handleSubmit,
   } = useForm({ resolver: yupResolver(schema), mode: "onChange" });
-  const { mutate, isLoading } = useMutation(registerFunc, {
-    onSuccess: () => {
-      toast.success("Register successful!");
-      router.push("/login");
-    },
-    onError: (res) => toast.error(res.error || "Register failed!"),
-  });
+
+  const { user, isAuthenticated, login, logout, signup, isLoadingAuth } = useContext(AuthContext);
 
   return (
     <div className="infoBox">
       <h1>REGISTER</h1>
-      <form onSubmit={handleSubmit(mutate)}>
+      <form onSubmit={handleSubmit(signup)}>
         <TextField style={{ marginBottom: 20 }} {...register("name")} placeholder="Name" label="Name" size="small" error={!!errors.name} helperText={errors.name?.message} />
         <TextField style={{ marginBottom: 20 }} {...register("email")} placeholder="Email" label="Email" size="small" error={!!errors.email} helperText={errors.email?.message} />
         <TextField
@@ -58,7 +52,7 @@ function App() {
           error={!!errors.confirmPassword}
           helperText={errors.confirmPassword?.message}
         />
-        <LoadingButton loading={isLoading} variant="contained" type="submit">
+        <LoadingButton loading={isLoadingAuth} variant="contained" type="submit">
           REGISTER
         </LoadingButton>
       </form>
