@@ -32,3 +32,9 @@ a {
 p {
     text-align: center;
 }
+
+p {
+    font-size: 16px;
+    font-weight: 400;
+    color: #222222;
+}

@@ -3,7 +3,8 @@ import React, { useContext } from "react";
 import { AuthContext } from "../context/authContext";
 
 const Home = () => {
-  const { user, isAuthenticated, login, logout, signup, isLoadingAuth } = useContext(AuthContext);
+  const { user, isAuthenticated, login, logout, signup, isLoadingAuth } =
+    useContext(AuthContext);
 
   return (
     <div>
@@ -16,7 +17,11 @@ const Home = () => {
           Email: <strong>{user?.email}</strong>
         </p>
 
-        <Button variant="contained" onClick={logout} style={{ margin: "20px auto", display: "block" }}>
+        <Button
+          variant="contained"
+          onClick={logout}
+          style={{ margin: "20px auto", display: "block" }}
+        >
           LOGOUT
         </Button>
       </div>
