@@ -15,12 +15,14 @@ const AuthContextProvider = ({ children }) => {
   const router = useRouter();
 
   const getUser = async () => {
-    setIsLoadingAuth(true);
-    const res = await getUserInfo();
-    if (res?.code === "OK") {
-      setUser(res?.data?.[0]);
-      setIsAuthenticated(true);
-      localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+    if (localStorage?.getItem("access_token")) {
+      setIsLoadingAuth(true);
+      const res = await getUserInfo();
+      if (res?.code === "OK") {
+        setUser(res?.data?.[0]);
+        setIsAuthenticated(true);
+        localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+      }
     }
     setIsLoadingAuth(false);
   };
