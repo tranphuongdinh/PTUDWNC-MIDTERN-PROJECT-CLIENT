@@ -3,7 +3,7 @@ import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { loginFunc, loginGoogleFunc, registerFunc } from "../client/auth";
 import { getUserInfo } from "../client/user";
-import LoadingScreen from "../components/loadingScreen";
+import LoadingScreen from "../components/LoadingScreen";
 
 const AuthContext = createContext();
 
