@@ -4,7 +4,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/material/Avatar";
-import styles from "./styles.module.css";
+import styles from "./styles.module.scss";
 
 const Header = () => {
   const [anchorEllSubMenu, setanchorEllSubMenu] = React.useState(null);
@@ -71,7 +71,7 @@ const Header = () => {
               "aria-labelledby": "basic-button",
             }}
           >
-            <MenuItem onClick={handleCloseAvatar}>Profile</MenuItem>
+            <a href="/profile"><MenuItem onClick={handleCloseAvatar}>Profile</MenuItem></a>
             <MenuItem onClick={handleCloseAvatar}>Logout</MenuItem>
           </Menu>
         </div>
