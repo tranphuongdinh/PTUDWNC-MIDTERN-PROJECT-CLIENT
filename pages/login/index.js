@@ -1,18 +1,13 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { Button, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 import { GoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { loginViaGithub } from "../../client/auth";
 import { AuthContext } from "../../context/authContext";
-
-const responseGoogle = (response) => {
-  console.log(response);
-};
 
 function Login() {
   const router = useRouter();
@@ -27,7 +22,7 @@ function Login() {
     handleSubmit,
   } = useForm({ resolver: yupResolver(schema), mode: "onChange" });
 
-  const { user, isAuthenticated, login, logout, signup, isLoadingAuth } = useContext(AuthContext);
+  const { user, isAuthenticated, login, loginWithGoogle, logout, signup, isLoadingAuth } = useContext(AuthContext);
 
   return (
     <div className="infoBox">
@@ -49,13 +44,9 @@ function Login() {
           LOGIN
         </LoadingButton>
       </form>
-      or login via
-      <Button onClick={loginViaGithub}>GITHUB</Button>
       <GoogleLogin
         auto_select
-        onSuccess={(credentialResponse) => {
-          console.log(credentialResponse);
-        }}
+        onSuccess={(credentialResponse) => loginWithGoogle({ credential: credentialResponse.credential })}
         onError={() => {
           console.log("Login Failed");
         }}
