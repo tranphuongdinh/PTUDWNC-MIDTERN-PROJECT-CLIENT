@@ -19,7 +19,17 @@ const AuthContextProvider = ({ children }) => {
       setIsLoadingAuth(true);
       const res = await getUserInfo();
       if (res?.code === "OK") {
-        setUser(res?.data?.[0]);
+
+        const userInfo = res?.data?.[0];
+
+        // comment cái if lại để dùng tạm user
+        // if (!userInfo.isActive) {
+        //   router.push("/active");
+        //   setIsLoadingAuth(false);
+        //   return;
+        // }
+
+        setUser(userInfo);
         setIsAuthenticated(true);
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
       }
