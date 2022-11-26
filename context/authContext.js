@@ -2,8 +2,10 @@ import { useRouter } from "next/router";
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { loginFunc, loginGoogleFunc, registerFunc } from "../client/auth";
+import { getGroupByIds } from "../client/group";
 import { getUserInfo } from "../client/user";
 import LoadingScreen from "../components/LoadingScreen";
+import React from "react";
 
 const AuthContext = createContext();
 
@@ -21,6 +23,23 @@ const AuthContextProvider = ({ children }) => {
       if (res?.status === "OK") {
         const userInfo = res?.data?.[0];
 
+        const groupListRes = await getGroupByIds([...userInfo.myGroupIds,userInfo.joinedGroupIds]);
+
+        const groupListMap = {};
+
+        groupListRes.data.forEach(
+          (group) => (groupListMap[group._id] = group)
+        );
+
+        userInfo.myGroupIds = userInfo.myGroupIds.map(
+          (code) => groupListMap[code]
+        );
+
+        userInfo.joinedGroupIds = userInfo.joinedGroupIds.map(
+          (code) => groupListMap[code]
+        );
+
+
         // comment cái if lại để dùng tạm user
         // if (!userInfo.isActive) {
         //   router.push("/active");
@@ -30,7 +49,10 @@ const AuthContextProvider = ({ children }) => {
 
         setUser({ ...user, ...userInfo });
         setIsAuthenticated(true);
-        localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+        localStorage.setItem(
+          "access_token",
+          res?.data?.[0]?.access_token || ""
+        );
       }
     }
     setIsLoadingAuth(false);
@@ -48,7 +70,10 @@ const AuthContextProvider = ({ children }) => {
       if (res?.status === "OK") {
         setUser(res?.data?.[0]);
         setIsAuthenticated(true);
-        localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+        localStorage.setItem(
+          "access_token",
+          res?.data?.[0]?.access_token || ""
+        );
         toast.success("Login successful!");
         router.push("/");
       } else {
@@ -68,7 +93,10 @@ const AuthContextProvider = ({ children }) => {
       if (res?.status === "OK") {
         setUser(res?.data?.[0]);
         setIsAuthenticated(true);
-        localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+        localStorage.setItem(
+          "access_token",
+          res?.data?.[0]?.access_token || ""
+        );
         toast.success("Login successful!");
         router.push("/");
       } else {
