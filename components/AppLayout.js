@@ -4,14 +4,14 @@ import Header from "./Header";
 
 const AppLayout = ({ children }) => {
   if (window.location.pathname === "/login") {
-    return <div>{children}</div>;
+    return <>{children}</>;
   }
   return (
-    <div>
+    <>
       <Header />
       {children}
       <Footer />
-    </div>
+    </>
   );
 };
 
