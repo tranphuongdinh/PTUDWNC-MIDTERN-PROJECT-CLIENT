@@ -10,6 +10,4 @@ export const updateRoleInGroup = async (data) => request("POST", "/group/role", 
 
 export const removeFromGroup = async (data) => request("POST", "/group/remove", data);
 
-export const getGroupDetail = async (groupId) => request("POST", `/group/detail/${groupId}`);
-
-
+export const getGroupDetail = async (groupId) => request("GET", `/group/detail/${groupId}`);

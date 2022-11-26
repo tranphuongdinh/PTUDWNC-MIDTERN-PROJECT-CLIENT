@@ -18,8 +18,7 @@ const AuthContextProvider = ({ children }) => {
     if (localStorage?.getItem("access_token")) {
       setIsLoadingAuth(true);
       const res = await getUserInfo();
-      if (res?.code === "OK") {
-
+      if (res?.status === "OK") {
         const userInfo = res?.data?.[0];
 
         // comment cái if lại để dùng tạm user
@@ -29,7 +28,7 @@ const AuthContextProvider = ({ children }) => {
         //   return;
         // }
 
-        setUser(userInfo);
+        setUser({ ...user, ...userInfo });
         setIsAuthenticated(true);
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
       }
@@ -46,14 +45,14 @@ const AuthContextProvider = ({ children }) => {
       setIsLoadingAuth(true);
       const res = await loginFunc(data);
       setIsLoadingAuth(false);
-      if (res?.code === "OK") {
+      if (res?.status === "OK") {
         setUser(res?.data?.[0]);
         setIsAuthenticated(true);
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
         toast.success("Login successful!");
         router.push("/");
       } else {
-        toast.error(res.message);
+        toast.error(res?.message);
       }
     } catch (e) {
       toast.error(e?.response?.data?.message || "Login failed!");
@@ -66,7 +65,7 @@ const AuthContextProvider = ({ children }) => {
       setIsLoadingAuth(true);
       const res = await loginGoogleFunc(data);
       setIsLoadingAuth(false);
-      if (res?.code === "OK") {
+      if (res?.status === "OK") {
         setUser(res?.data?.[0]);
         setIsAuthenticated(true);
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
@@ -86,7 +85,7 @@ const AuthContextProvider = ({ children }) => {
       setIsLoadingAuth(true);
       const res = await registerFunc(data);
       setIsLoadingAuth(false);
-      if (res?.code === "OK") {
+      if (res?.status === "OK") {
         toast.success("Register successful!");
         router.push("/login");
       } else {

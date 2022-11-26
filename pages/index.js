@@ -1,22 +1,37 @@
-import { Button, TextField } from "@mui/material";
-import React, { useContext, useState } from "react";
-import { AuthContext } from "../context/authContext";
+import { Button, Card, Grid, Link, TextField } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
-import { useForm } from "react-hook-form";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import React, { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { createGroup } from "../client/group";
+import { AuthContext } from "../context/authContext";
 
 const Home = () => {
   const { user, isAuthenticated, login, logout, signup, isLoadingAuth } = useContext(AuthContext);
+
+  console.log(user);
 
   const { register, handleSubmit } = useForm({ mode: "onChange", defaultValues: { name: "" } });
 
   const [openCreateGroupForm, setOpenCreateGroupForm] = useState(false);
 
-  const createGroup = async (data) => {
-    console.log(data);
+  const handleCreateGroup = async (data) => {
+    try {
+      const res = await createGroup(data);
+      if (res?.status === "OK") {
+        toast.success("Create group successfully!");
+        user.myGroupIds.push(res.data[0]._id);
+      } else {
+        toast.error(res?.message);
+      }
+    } catch (e) {
+      console.log(e);
+      toast.error(e?.response?.data[0]?.message);
+    }
+    setOpenCreateGroupForm(false);
   };
 
   return (
@@ -30,6 +45,30 @@ const Home = () => {
           Email: <strong>{user?.email}</strong>
         </p>
 
+        <h1>MY GROUPS</h1>
+
+        <Grid container spacing={3}>
+          {user?.myGroupIds?.map((groupCode) => (
+            <Grid item xs={12} md={6} lg={4} xl={3} key={groupCode}>
+              <Card>
+                <Link href={`/group/${groupCode}`}>{groupCode}</Link>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        <h1>JOINED GROUPS</h1>
+
+        <Grid container spacing={3}>
+          {user?.joinedGroupIds?.map((groupCode) => (
+            <Grid item xs={12} md={6} lg={4} xl={3} key={groupCode}>
+              <Card>
+                <Link href={`/group/${groupCode}`}>{groupCode}</Link>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
         <Button variant="contained" onClick={logout} style={{ margin: "20px auto", display: "block" }}>
           LOGOUT
         </Button>
@@ -39,17 +78,21 @@ const Home = () => {
         Create new group
       </Button>
 
+      <Button onClick={() => setOpenCreateGroupForm(true)} variant="contained">
+        Join a group
+      </Button>
+
       <Dialog open={openCreateGroupForm} onClose={() => setOpenCreateGroupForm(false)} style={{ width: "100%" }}>
-        <DialogTitle id="alert-dialog-title">Create new group</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmit(createGroup)}>
+        <form onSubmit={handleSubmit(handleCreateGroup)}>
+          <DialogTitle id="alert-dialog-title">Create new group</DialogTitle>
+          <DialogContent>
             <TextField label="Group's name" placeholder="Enter group's name" {...register("name")} />
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenCreateGroupForm(false)}>Cancel</Button>
-          <Button type="submit">Submit</Button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenCreateGroupForm(false)}>Cancel</Button>
+            <Button type="submit">Submit</Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   );
