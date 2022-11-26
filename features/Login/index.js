@@ -26,19 +26,15 @@ function Login() {
   } = useForm({ resolver: yupResolver(schema), mode: "onChange" });
 
   const {
-    user,
-    isAuthenticated,
     login,
     loginWithGoogle,
-    logout,
-    signup,
     isLoadingAuth,
   } = useContext(AuthContext);
 
   return (
     <div className={styles.wrapper}>
-    <div className={styles.loginwrapper}>
-        <h1 className={styles.loginTitle}>Welcome back</h1>
+      <div className={styles.loginwrapper}>
+        <h2 className={styles.loginTitle}>Welcome back</h2>
         <div className={styles.formWrapper}>
           <form onSubmit={handleSubmit(login)} className={styles.form}>
             <TextField
@@ -84,11 +80,13 @@ function Login() {
           <p>
             Don&apos;t have an account?
             <Link href="/register" legacyBehavior>
-              <a><b>&nbsp;REGISTER</b></a>
+              <a>
+                <b>&nbsp;REGISTER</b>
+              </a>
             </Link>
           </p>
         </div>
-    </div>
+      </div>
     </div>
   );
 }
