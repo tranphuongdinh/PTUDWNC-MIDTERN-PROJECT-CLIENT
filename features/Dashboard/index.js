@@ -58,7 +58,6 @@ const Dashboard = () => {
           <div>
             {user?.myGroupIds.length > 0 ? (
               <Grid container spacing={3}>
-                {" "}
                 {user?.myGroupIds?.map((group) => (
                   <>
                     <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
@@ -75,7 +74,12 @@ const Dashboard = () => {
                 ))}
               </Grid>
             ) : (
-              <p className={styles.emptyText}>Dont have anything</p>
+              <p className={styles.emptyText}>
+                You have not created any group.&nbsp;
+                <a onClick={() => setOpenCreateGroupForm(true)} style={{cursor: "pointer", color: "#1976d2"}}>
+                  Create now!
+                </a>
+              </p>
             )}
           </div>
         </div>
@@ -99,8 +103,12 @@ const Dashboard = () => {
               ))}
             </Grid>
           ) : (
-            <p className={styles.emptyText}>Dont have anything</p>
-          )}
+            <p className={styles.emptyText}>
+                You have not joined any group.&nbsp;
+                <a onClick={() => setOpenCreateGroupForm(true)} style={{cursor: "pointer", color: "#1976d2"}}>
+                  Join now!
+                </a>
+              </p>          )}
         </div>
       </div>
 
