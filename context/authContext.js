@@ -16,37 +16,35 @@ const AuthContextProvider = ({ children }) => {
   const router = useRouter();
 
   const getUser = async () => {
-    if (localStorage?.getItem("access_token")) {
-      setIsLoadingAuth(true);
-      const res = await getUserInfo();
-      if (res?.status === "OK") {
-        const userInfo = res?.data?.[0];
+    try {
+      if (localStorage?.getItem("access_token")) {
+        setIsLoadingAuth(true);
+        const res = await getUserInfo();
+        if (res?.status === "OK") {
+          const userInfo = res?.data?.[0];
 
-        const groupListRes = await getGroupByIds([...userInfo.myGroupIds, ...userInfo.joinedGroupIds]);
+          const groupListRes = await getGroupByIds([...userInfo.myGroupIds, ...userInfo.joinedGroupIds]);
 
-        const groupListMap = {};
+          const groupListMap = {};
 
-        groupListRes.data.forEach((group) => (groupListMap[group._id] = group));
+          groupListRes.data.forEach((group) => (groupListMap[group._id] = group));
 
-        userInfo.myGroupIds = userInfo.myGroupIds.map((code) => groupListMap[code]);
+          userInfo.myGroupIds = userInfo.myGroupIds.map((code) => groupListMap[code]);
 
-        userInfo.joinedGroupIds = userInfo.joinedGroupIds.map((code) => groupListMap[code]);
+          userInfo.joinedGroupIds = userInfo.joinedGroupIds.map((code) => groupListMap[code]);
 
-        console.log(userInfo);
-
-        // comment cái if lại để dùng tạm user
-        // if (!userInfo.isActive) {
-        //   router.push("/active");
-        //   setIsLoadingAuth(false);
-        //   return;
-        // }
-
-        setUser({ ...user, ...userInfo });
-        setIsAuthenticated(true);
-        localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+          setUser({ ...user, ...userInfo });
+          setIsAuthenticated(true);
+          localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+        }
       }
+      setIsLoadingAuth(false);
+    } catch (e) {
+      if (e.code === "ERR_BAD_REQUEST") {
+        router.push("/active");
+      }
+      setIsLoadingAuth(false);
     }
-    setIsLoadingAuth(false);
   };
 
   useEffect(() => {

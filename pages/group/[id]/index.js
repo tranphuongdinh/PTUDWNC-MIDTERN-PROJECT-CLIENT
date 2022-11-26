@@ -1,4 +1,4 @@
-import { Button, TablePagination } from "@mui/material";
+import { Button } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,27 +7,20 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { toast } from "react-toastify";
-import { createInviteLinkGroup, getGroupDetail } from "../../../client/group";
-
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
+import { createInviteLinkGroup, getGroupDetail, removeFromGroup, updateRoleInGroup } from "../../../client/group";
+import { getUserByIds } from "../../../client/user";
+import LoadingScreen from "../../../components/LoadingScreen";
+import { AuthContext } from "../../../context/authContext";
 
 export default function GroupDetailPage() {
   const [group, setGroup] = useState(null);
   const [inviteLink, setInviteLink] = useState("");
   const router = useRouter();
+  const { user } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(true);
 
   const getInviteLink = async (id) => {
     const inviteLinkRes = await createInviteLinkGroup({ groupId: id });
@@ -46,20 +39,56 @@ export default function GroupDetailPage() {
       const res = await getGroupDetail(router.query.id);
       if (res.status === "OK") {
         const groupInfo = res.data[0];
+
+        const userListRes = await getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]);
+        const userListMap = {};
+
+        userListRes?.data?.forEach((user) => (userListMap[user._id] = user));
+
+        groupInfo.owner = userListMap[groupInfo.ownerId];
+        groupInfo.members = groupInfo.memberIds.map((id) => userListMap[id]);
+        groupInfo.coOwners = groupInfo.coOwnerIds.map((id) => userListMap[id]);
+        groupInfo.total = groupInfo.memberIds.length + groupInfo.coOwnerIds.length + 1;
         setGroup(groupInfo);
       } else {
         router.push("/");
       }
     } catch (e) {
       router.push("/");
+      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
     getInfoOfGroup();
   }, []);
 
-  return (
+  const handleUpgradeRole = async (member, isUpgrade) => {
+    try {
+      const data = { memberId: member._id, groupId: group._id, isUpgrade };
+      await updateRoleInGroup(data);
+      toast.success("Update role successfully!");
+      router.reload();
+    } catch (e) {
+      toast.error(e.response?.data?.message);
+    }
+  };
+
+  const handleRemove = async (member) => {
+    try {
+      const data = { userId: member._id, groupId: group._id };
+      await removeFromGroup(data);
+      toast.success(`Remove member ${member.name} successfully!`);
+      router.reload();
+    } catch (e) {
+      toast.error(e.response?.data?.message);
+    }
+  };
+
+  return isLoading ? (
+    <LoadingScreen />
+  ) : (
     <Paper>
       <CopyToClipboard text={inviteLink}>
         <Button variant="contained" onClick={() => getInviteLink(group?._id)}>
@@ -70,37 +99,60 @@ export default function GroupDetailPage() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Dessert (100g serving)</TableCell>
-              <TableCell align="right">Calories</TableCell>
-              <TableCell align="right">Fat&nbsp;(g)</TableCell>
-              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Email</TableCell>
+              <TableCell align="center">Role</TableCell>
+              {user?._id === group?.ownerId && <TableCell align="center">Action</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
+            <TableRow key={group?.ownerId}>
+              <TableCell align="center">{group?.owner.name}</TableCell>
+              <TableCell align="center">{group?.owner.email}</TableCell>
+              <TableCell align="center">OWNER</TableCell>
+              <TableCell align="center"></TableCell>
+            </TableRow>
+
+            {group?.coOwners?.map((coOwner) => (
+              <TableRow key={coOwner._id}>
+                <TableCell align="center">{coOwner.name}</TableCell>
+                <TableCell align="center">{coOwner.email}</TableCell>
+                <TableCell align="center">CO OWNER</TableCell>
+                {user?._id === group?.ownerId && (
+                  <TableCell align="center">
+                    <Button variant="contained" onClick={() => handleUpgradeRole(coOwner, false)}>
+                      Become member
+                    </Button>
+
+                    <Button variant="contained" onClick={() => handleRemove(coOwner)}>
+                      Remove from group
+                    </Button>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+
+            {group?.members?.map((member) => (
+              <TableRow key={member._id}>
+                <TableCell align="center">{member.name}</TableCell>
+                <TableCell align="center">{member.email}</TableCell>
+                <TableCell align="center">MEMBER</TableCell>
+                {user?._id === group?.ownerId && (
+                  <TableCell align="center">
+                    <Button variant="contained" onClick={() => handleUpgradeRole(member, true)}>
+                      Become Co-owner
+                    </Button>
+
+                    <Button variant="contained" onClick={() => handleRemove(member)}>
+                      Remove from group
+                    </Button>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={rows.length}
-        //rowsPerPage={rowsPerPage}
-        //page={page}
-        //onPageChange={handleChangePage}
-        //onRowsPerPageChange={handleChangeRowsPerPage}
-      />{" "}
     </Paper>
   );
 }
