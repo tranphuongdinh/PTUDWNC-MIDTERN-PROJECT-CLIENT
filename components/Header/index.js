@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import React from "react";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
@@ -5,8 +6,11 @@ import MenuItem from "@mui/material/MenuItem";
 import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/material/Avatar";
 import styles from "./styles.module.scss";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
 
 const Header = () => {
+  const { logout } = useContext(AuthContext);
   const [anchorEllSubMenu, setanchorEllSubMenu] = React.useState(null);
   const openSubMenu = Boolean(anchorEllSubMenu);
   const handleClickSubMenu = (event) => {
@@ -50,7 +54,10 @@ const Header = () => {
               <MenuItem onClick={handleCloseSubMenu}>Item 3</MenuItem>
             </Menu>
           </div>
-          <div className={styles.logo} onClick={() => window.location.pathname="/"}>
+          <div
+            className={styles.logo}
+            onClick={() => (window.location.pathname = "/")}
+          >
             <img src="https://th.bing.com/th/id/R.1ebd53870fb65ac9ce03ce3ce647460e?rik=Gl0QstRDjsKQow&riu=http%3a%2f%2fcdn141.picsart.com%2f270660629065211.png&ehk=Psnil56470rY7h3wnrQdN2vsRwL2axzLbbMYQV8GatE%3d&risl=&pid=ImgRaw&r=0" />
             <span>MEOW-CLASSROOM</span>
           </div>
@@ -78,7 +85,14 @@ const Header = () => {
             <a href="/profile">
               <MenuItem onClick={handleCloseAvatar}>Profile</MenuItem>
             </a>
-            <MenuItem onClick={handleCloseAvatar}>Logout</MenuItem>
+            <MenuItem
+              onClick={() => {
+                logout();
+                handleCloseAvatar();
+              }}
+            >
+              Logout
+            </MenuItem>
           </Menu>
         </div>
       </div>
