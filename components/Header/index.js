@@ -58,6 +58,7 @@ const Header = () => {
 
         <div className={styles.rightContent}>
           <Avatar
+            className={styles.avatar}
             aria-controls={openAvatar ? "basic-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={openAvatar ? "true" : undefined}

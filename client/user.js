@@ -1,3 +1,4 @@
 import { request } from "./index";
 
-export const getUserInfo = async () => request("GET", "/user/current-user");
+export const getUserInfo = async() => request("GET", "/user/current-user");
+export const updateUserInfo = async(data) => request("PUT", "/user/update-user", data);
