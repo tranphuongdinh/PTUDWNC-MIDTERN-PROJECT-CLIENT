@@ -1,15 +1,18 @@
-import React from 'react'
-import Footer from './Footer'
-import Header from './Header'
+import React from "react";
+import Footer from "./Footer";
+import Header from "./Header";
 
-const AppLayout = ({children}) => {
+const AppLayout = ({ children }) => {
+  if (window.location.pathname === "/login") {
+    return <div>{children}</div>;
+  }
   return (
     <div>
-        <Header />
-        {children}
-        <Footer />
+      <Header />
+      {children}
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default AppLayout
+export default AppLayout;
