@@ -60,7 +60,6 @@ export default function GroupDetailPage() {
           Copy invite link
         </Button>
       </CopyToClipboard>
-
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
@@ -95,7 +94,7 @@ export default function GroupDetailPage() {
         //page={page}
         //onPageChange={handleChangePage}
         //onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      />{" "}
     </Paper>
   );
 }
