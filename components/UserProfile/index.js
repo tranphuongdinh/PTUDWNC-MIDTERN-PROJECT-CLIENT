@@ -7,11 +7,14 @@ import { toast } from "react-toastify";
 import AuthContext from "../../context/authContext";
 import * as yup from "yup";
 import styles from "./styles.module.scss";
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import SaveIcon from '@mui/icons-material/Save';
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
+import {getUserInfo, updateUserInfo} from "../../client/user";
 
 const UserProfile = ({ user }) => {
   const [updateMode, setUpdateMode] = useState(false);
   const [name, setName] = useState(user?.name || "default-name");
-
   // useEffect(() => {
   //     const getUser = async () => {
   //         try {
@@ -44,24 +47,33 @@ const UserProfile = ({ user }) => {
     handleSubmit,
   } = useForm({ resolver: yupResolver(schema) });
 
-  const handleChangePassword = async (data) => {
-    // if (!updateMode) {
-    //     setUpdateMode(true);
-    // } else {
-    //     const formData = {
-    //         password: data.password,
-    //         newPassword: data.newPassword,
-    //     };
-    //     const res = await getUserClient().updateUserInfo(formData);
-    //     if (res?.message === "OK") {
-    //         toast.success("Đổi mật khẩu thành công");
-    //     } else {
-    //         toast.error(
-    //             "Đã có lỗi xảy ra hoặc mật khẩu hiện tại không đúng"
-    //         );
-    //     }
-    //     setUpdateMode(false);
-    // }
+  const handleUpdateUserInfo = async (data) => {
+    if (!updateMode) {
+        setUpdateMode(true);
+    } else {
+        const formData = {
+            name: data.name,
+            password: data.password,
+            newPassword: data.newPassword,
+        };
+        try {
+          const res = await updateUserInfo(formData);
+          if (res.status === 'OK') {
+            toast.success("Update information successfully!");
+          }
+          else {
+            toast.error(res.message);
+          }
+          setUpdateMode(false);
+
+        }
+        catch(error) {
+          toast.error(error.response.data.message);
+          setUpdateMode(false);
+
+        }
+        
+    }
   };
 
   const handleChangeMode = (mode) => {
@@ -81,17 +93,33 @@ const UserProfile = ({ user }) => {
           component="form"
           noValidate
           autoComplete="off"
-          // onSubmit={handleSubmit((data) =>
-          //     handleChangePassword(data)
-          // )}
+          onSubmit={handleSubmit((data) =>
+              handleUpdateUserInfo(data)
+          )}
         >
           <Box>
-            <TextField
+          <Controller
+              name="name"
+              defaultValue={name}
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  className={styles.infoField}
+                  label="Name"
+                  variant="outlined"
+                  type="name"
+                  disabled={!updateMode}
+                  style={{display: "inline-flex" }}
+                  {...field}
+                />
+              )}
+            />
+              <TextField
               className={styles.infoField}
-              id="name"
-              label="Name"
+              id="email"
+              label="Email"
               variant="outlined"
-              value={name}
+              value={user?.email}
               disabled
             />
             <Controller
@@ -103,7 +131,7 @@ const UserProfile = ({ user }) => {
                   error={!!errors?.password}
                   helperText={errors?.password?.message}
                   className={styles.infoField}
-                  label="Mật khẩu cũ"
+                  label="Current password"
                   variant="outlined"
                   type="password"
                   autoComplete="current-password"
@@ -130,7 +158,7 @@ const UserProfile = ({ user }) => {
                   className={styles.infoField}
                   error={!!errors?.newPassword}
                   helperText={errors?.newPassword?.message}
-                  label="Mật khẩu mới"
+                  label="New password"
                   variant="outlined"
                   type="password"
                   autoComplete="new-password"
@@ -156,7 +184,7 @@ const UserProfile = ({ user }) => {
                   className={styles.infoField}
                   error={!!errors?.confirmedNewPassword}
                   helperText={errors?.confirmedNewPassword?.message}
-                  label="Xác nhận mật khẩu mới"
+                  label="Confirm new password"
                   variant="outlined"
                   type="password"
                   autoComplete="confirm-new-password"
@@ -185,7 +213,7 @@ const UserProfile = ({ user }) => {
                   handleChangeMode(true);
                 }}
               >
-                Đổi mật khẩu
+                <ModeEditIcon />&nbsp;Edit 
               </Button>
             )}
             {updateMode && (
@@ -195,7 +223,7 @@ const UserProfile = ({ user }) => {
                 type="submit"
                 sx={{ marginRight: "20px" }}
               >
-                Lưu thay đổi
+                <SaveIcon />&nbsp;Save
               </Button>
             )}
             {updateMode && (
@@ -207,7 +235,7 @@ const UserProfile = ({ user }) => {
                   handleChangeMode(false);
                 }}
               >
-                Hủy
+               <DisabledByDefaultIcon />&nbsp;Hủy
               </Button>
             )}
           </Box>
