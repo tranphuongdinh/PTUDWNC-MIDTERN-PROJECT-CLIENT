@@ -12,29 +12,6 @@ a {
 
 * {
     box-sizing: border-box;
-}
-
-.infoBox {
-    padding: 20px;
-    min-width: 500px;
-    border-radius: 50px;
-    background: #ffffff;
-}
-
-.infoBox form {
-    display: flex;
-    padding: 20px;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.infoBox h1,
-p {
-    text-align: center;
-}
-
-p {
-    font-size: 16px;
-    font-weight: 400;
-    color: #222222;
+    padding: 0;
+    margin: 0;
 }
