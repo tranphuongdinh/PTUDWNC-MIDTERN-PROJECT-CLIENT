@@ -6,7 +6,9 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import * as React from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { getGroupDetail } from "../../../client/group";
 
 function createData(name, calories, fat, carbs, protein) {
   return { name, calories, fat, carbs, protein };
@@ -21,6 +23,27 @@ const rows = [
 ];
 
 export default function GroupDetailPage() {
+  const [group, setGroup] = useState(null);
+  const router = useRouter();
+
+  const getInfoOfGroup = async () => {
+    try {
+      const res = await getGroupDetail(router.query.id);
+      console.log(res);
+      if (res.status === "OK") {
+        setGroup(res.data[0]);
+      } else {
+        router.push("/");
+      }
+    } catch (e) {
+      router.push("/");
+    }
+  };
+
+  useEffect(() => {
+    getInfoOfGroup();
+  }, []);
+
   return (
     <Paper>
       <TableContainer component={Paper}>

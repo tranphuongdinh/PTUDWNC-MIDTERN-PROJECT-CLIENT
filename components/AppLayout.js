@@ -9,7 +9,7 @@ const AppLayout = ({ children }) => {
   return (
     <>
       <Header />
-      {children}
+      <div style={{ minHeight: "100vh", width: "!00%" }}>{children}</div>
       <Footer />
     </>
   );
