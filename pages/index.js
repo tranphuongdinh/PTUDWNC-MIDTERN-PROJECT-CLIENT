@@ -11,13 +11,8 @@ import { AuthContext } from "../context/authContext";
 
 const Home = () => {
   const { user, isAuthenticated, login, logout, signup, isLoadingAuth } = useContext(AuthContext);
-
-  console.log(user);
-
   const { register, handleSubmit } = useForm({ mode: "onChange", defaultValues: { name: "" } });
-
   const [openCreateGroupForm, setOpenCreateGroupForm] = useState(false);
-
   const handleCreateGroup = async (data) => {
     try {
       const res = await createGroup(data);
