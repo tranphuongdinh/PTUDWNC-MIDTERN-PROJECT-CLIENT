@@ -50,7 +50,7 @@ const Header = () => {
               <MenuItem onClick={handleCloseSubMenu}>Item 3</MenuItem>
             </Menu>
           </div>
-          <div className={styles.logo}>
+          <div className={styles.logo} onClick={() => window.location.pathname="/"}>
             <img src="https://th.bing.com/th/id/R.1ebd53870fb65ac9ce03ce3ce647460e?rik=Gl0QstRDjsKQow&riu=http%3a%2f%2fcdn141.picsart.com%2f270660629065211.png&ehk=Psnil56470rY7h3wnrQdN2vsRwL2axzLbbMYQV8GatE%3d&risl=&pid=ImgRaw&r=0" />
             <span>MEOW-CLASSROOM</span>
           </div>
