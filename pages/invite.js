@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
+import { toast } from "react-toastify";
 import { inviteToGroup } from "../client/group";
 import { AuthContext } from "../context/authContext";
 
@@ -8,10 +9,13 @@ const InvitePage = () => {
   const { user } = useContext(AuthContext);
 
   const handleInvite = async (groupId, code) => {
-    const res = await inviteToGroup({ groupId, code, userId: user._id });
-    if (res?.status === "OK") {
-      router.push("/");
-    }
+    try {
+      const res = await inviteToGroup({ groupId, code, userId: user._id });
+      if (res?.status === "OK") {
+        toast.success("Join group successfully");
+        router.push("/");
+      }
+    } catch (err) {}
   };
 
   useEffect(() => {

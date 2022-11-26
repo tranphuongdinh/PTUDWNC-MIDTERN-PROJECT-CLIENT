@@ -9,6 +9,7 @@ import TableRow from "@mui/material/TableRow";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { toast } from "react-toastify";
 import { createInviteLinkGroup, getGroupDetail } from "../../../client/group";
 
 function createData(name, calories, fat, carbs, protein) {
@@ -30,9 +31,14 @@ export default function GroupDetailPage() {
 
   const getInviteLink = async (id) => {
     const inviteLinkRes = await createInviteLinkGroup({ groupId: id });
-    const { code = "", groupId = "" } = inviteLinkRes?.data[0];
-    const inviteLink = window.location.origin + "/invite?" + "groupId=" + groupId + "&code=" + code;
-    setInviteLink(inviteLink);
+    if (inviteLinkRes?.status === "OK") {
+      const { code = "", groupId = "" } = inviteLinkRes?.data[0];
+      const inviteLink = window.location.origin + "/invite?" + "groupId=" + groupId + "&code=" + code;
+      setInviteLink(inviteLink);
+      toast.success("Invite link copied!");
+    } else {
+      toast.error("Unexpected error");
+    }
   };
 
   const getInfoOfGroup = async () => {
