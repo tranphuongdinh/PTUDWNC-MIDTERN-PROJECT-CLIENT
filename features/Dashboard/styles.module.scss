@@ -1,0 +1,31 @@
+.wrapper {
+    position: relative;
+    padding-top: 50px;
+    .actionButtonWrapper {
+        position: absolute;
+        right: 0;
+        top: 20px;
+        button {
+            margin-left: 20px;
+        }
+    }
+    .groupWrapper {
+        >div {
+            min-height: 300px;
+        }
+        .card {
+            height: 100px;
+            background-color: #1976d211;
+            border: 1px dashed #1976d22b;
+            box-shadow: 1px 1px 1px 2px #1976d20c;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            span {
+                text-decoration: none;
+                font-size: 18px;
+                font-weight: 400;
+            }
+        }
+    }
+}

@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { createGroup } from "../../client/group";
 import { AuthContext } from "../../context/authContext";
 import { getGroupDetail } from "../../client/group";
+import styles from "./styles.module.scss";
 
 const Dashboard = () => {
   const { user, isAuthenticated, login, logout, signup, isLoadingAuth } =
@@ -33,53 +34,64 @@ const Dashboard = () => {
     setOpenCreateGroupForm(false);
   };
 
-
-
   return (
-    <div>
-      <div className="infoBox">
-        <div>
-          <h1>MY GROUPS</h1>
+    <div className={styles.wrapper}>
+      <div className={styles.actionButtonWrapper}>
+        <Button
+          onClick={() => setOpenCreateGroupForm(true)}
+          variant="contained"
+        >
+          Create new group
+        </Button>
+
+        <Button
+          onClick={() => setOpenCreateGroupForm(true)}
+          variant="contained"
+        >
+          Join a group
+        </Button>
+      </div>
+
+      <div className={styles.groupWrapper}>
+        <div className={styles.myGroupWrapper}>
+          <h1>My Groups</h1>
           <div>
             <Grid container spacing={3}>
               {user?.myGroupIds?.map((group) => (
-                <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
-                  <Card>
-                    <Link href={`/group/${group._id}`}>{group.name}</Link>
-                  </Card>
-                </Grid>
+                <>
+                  <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
+                    <div
+                      className={styles.card}
+                      onClick={() =>
+                        (window.location.href = `/group/${group._id}`)
+                      }
+                    >
+                      <span>{group.name}</span>
+                    </div>
+                  </Grid>
+                </>
               ))}
             </Grid>
           </div>
         </div>
-        <h1>JOINED GROUPS</h1>
 
-        <Grid container spacing={3}>
-              {user?.joinedGroupIds?.map((group) => (
-                <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
-                  <Card>
-                    <Link href={`/group/${group._id}`}>{group.name}</Link>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+        <div className={styles.joinedGroupWrapepr}>
+          <h1>Joined Groups</h1>
 
-        <Button
-          variant="contained"
-          onClick={logout}
-          style={{ margin: "20px auto", display: "block" }}
-        >
-          LOGOUT
-        </Button>
+          <Grid container spacing={3}>
+            {user?.joinedGroupIds?.map((group) => (
+              <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
+                <div
+                  className={styles.card}
+                  onClick={() => (window.location.href = `/group/${group._id}`)}
+                >
+                  <span>{group.name}</span>
+                </div>
+              </Grid>
+            ))}
+          </Grid>
+        </div>
       </div>
-
-      <Button onClick={() => setOpenCreateGroupForm(true)} variant="contained">
-        Create new group
-      </Button>
-
-      <Button onClick={() => setOpenCreateGroupForm(true)} variant="contained">
-        Join a group
-      </Button>
 
       <Dialog
         open={openCreateGroupForm}
