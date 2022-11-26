@@ -19,6 +19,8 @@ const Dashboard = () => {
     defaultValues: { name: "" },
   });
   const [openCreateGroupForm, setOpenCreateGroupForm] = useState(false);
+  const [openJoinGroupForm, setOpenJoinGroupForm] = useState(false);
+
   const handleCreateGroup = async (data) => {
     try {
       const res = await createGroup(data);
@@ -33,6 +35,20 @@ const Dashboard = () => {
     }
     setOpenCreateGroupForm(false);
   };
+  const handleJoinGroup = async (data) => {
+    // try {
+    //   const res = await createGroup(data);
+    //   if (res?.status === "OK") {
+    //     toast.success("Create group successfully!");
+    //     user.myGroupIds.push(res.data[0]._id);
+    //   } else {
+    //     toast.error(res?.message);
+    //   }
+    // } catch (e) {
+    //   toast.error(e?.response?.data[0]?.message);
+    // }
+    setOpenJoinGroupForm(false);
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -45,7 +61,7 @@ const Dashboard = () => {
         </Button>
 
         <Button
-          onClick={() => setOpenCreateGroupForm(true)}
+          onClick={() => setOpenJoinGroupForm(true)}
           variant="contained"
         >
           Join a group
@@ -105,7 +121,7 @@ const Dashboard = () => {
           ) : (
             <p className={styles.emptyText}>
                 You have not joined any group.&nbsp;
-                <a onClick={() => setOpenCreateGroupForm(true)} style={{cursor: "pointer", color: "#1976d2"}}>
+                <a onClick={() => setOpenJoinGroupForm(true)} style={{cursor: "pointer", color: "#1976d2"}}>
                   Join now!
                 </a>
               </p>          )}
@@ -128,6 +144,29 @@ const Dashboard = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenCreateGroupForm(false)}>
+              Cancel
+            </Button>
+            <Button type="submit">Submit</Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
+      <Dialog
+        open={openJoinGroupForm}
+        onClose={() => setOpenJoinGroupForm(false)}
+        style={{ width: "100%" }}
+      >
+        <form onSubmit={handleSubmit(handleJoinGroup)}>
+          <DialogTitle id="alert-dialog-title">Enter invite link to join group</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Invite link"
+              placeholder="Enter invite link"
+              {...register("link")}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenJoinGroupForm(false)}>
               Cancel
             </Button>
             <Button type="submit">Submit</Button>
