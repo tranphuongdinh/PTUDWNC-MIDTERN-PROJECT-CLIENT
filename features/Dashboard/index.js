@@ -36,6 +36,9 @@ const Dashboard = () => {
     setOpenCreateGroupForm(false);
   };
   const handleJoinGroup = async (data) => {
+    // const url = new URL(data.link);
+    window.location.href = data.link;
+
     // try {
     //   const res = await createGroup(data);
     //   if (res?.status === "OK") {

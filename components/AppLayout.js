@@ -2,9 +2,13 @@ import React from "react";
 import Footer from "./Footer";
 import Header from "./Header";
 import styles from "./Header/styles.module.scss";
+import { useContext } from "react";
+import { AuthContext } from "../context/authContext";
 
 const AppLayout = ({ children }) => {
-  if (window.location.pathname === "/login" || window.location.pathname === "/register") {
+  const { isAuthenticated } = useContext(AuthContext);
+
+  if (!isAuthenticated) {
     return <>{children}</>;
   }
   return (
