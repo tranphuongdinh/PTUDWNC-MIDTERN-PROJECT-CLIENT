@@ -23,7 +23,6 @@ const Home = () => {
         toast.error(res?.message);
       }
     } catch (e) {
-      console.log(e);
       toast.error(e?.response?.data[0]?.message);
     }
     setOpenCreateGroupForm(false);

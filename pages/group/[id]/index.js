@@ -1,4 +1,4 @@
-import { TablePagination } from "@mui/material";
+import { Button, TablePagination } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,7 +8,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { getGroupDetail } from "../../../client/group";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { createInviteLinkGroup, getGroupDetail } from "../../../client/group";
 
 function createData(name, calories, fat, carbs, protein) {
   return { name, calories, fat, carbs, protein };
@@ -24,14 +25,22 @@ const rows = [
 
 export default function GroupDetailPage() {
   const [group, setGroup] = useState(null);
+  const [inviteLink, setInviteLink] = useState("");
   const router = useRouter();
+
+  const getInviteLink = async (id) => {
+    const inviteLinkRes = await createInviteLinkGroup({ groupId: id });
+    const { code = "", groupId = "" } = inviteLinkRes?.data[0];
+    const inviteLink = window.location.origin + "/invite?" + "groupId=" + groupId + "&code=" + code;
+    setInviteLink(inviteLink);
+  };
 
   const getInfoOfGroup = async () => {
     try {
       const res = await getGroupDetail(router.query.id);
-      console.log(res);
       if (res.status === "OK") {
-        setGroup(res.data[0]);
+        const groupInfo = res.data[0];
+        setGroup(groupInfo);
       } else {
         router.push("/");
       }
@@ -46,6 +55,12 @@ export default function GroupDetailPage() {
 
   return (
     <Paper>
+      <CopyToClipboard text={inviteLink}>
+        <Button variant="contained" onClick={() => getInviteLink(group?._id)}>
+          Copy invite link
+        </Button>
+      </CopyToClipboard>
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>

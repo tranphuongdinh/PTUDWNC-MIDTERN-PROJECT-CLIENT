@@ -4,7 +4,7 @@ export const createGroup = async (data) => request("POST", "/group/create", data
 
 export const inviteToGroup = async (data) => request("POST", "/group/invite", data);
 
-export const createLinkGroup = async (data) => request("POST", "/group/link", data);
+export const createInviteLinkGroup = async (data) => request("POST", "/group/link", data);
 
 export const updateRoleInGroup = async (data) => request("POST", "/group/role", data);
 
