@@ -56,40 +56,51 @@ const Dashboard = () => {
         <div className={styles.myGroupWrapper}>
           <h1>My Groups</h1>
           <div>
-            <Grid container spacing={3}>
-              {user?.myGroupIds?.map((group) => (
-                <>
-                  <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
-                    <div
-                      className={styles.card}
-                      onClick={() =>
-                        (window.location.href = `/group/${group._id}`)
-                      }
-                    >
-                      <span>{group.name}</span>
-                    </div>
-                  </Grid>
-                </>
-              ))}
-            </Grid>
+            {user?.myGroupIds.length > 0 ? (
+              <Grid container spacing={3}>
+                {" "}
+                {user?.myGroupIds?.map((group) => (
+                  <>
+                    <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
+                      <div
+                        className={styles.card}
+                        onClick={() =>
+                          (window.location.href = `/group/${group._id}`)
+                        }
+                      >
+                        <span>{group.name}</span>
+                      </div>
+                    </Grid>
+                  </>
+                ))}
+              </Grid>
+            ) : (
+              <p className={styles.emptyText}>Dont have anything</p>
+            )}
           </div>
         </div>
 
         <div className={styles.joinedGroupWrapepr}>
           <h1>Joined Groups</h1>
 
-          <Grid container spacing={3}>
-            {user?.joinedGroupIds?.map((group) => (
-              <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
-                <div
-                  className={styles.card}
-                  onClick={() => (window.location.href = `/group/${group._id}`)}
-                >
-                  <span>{group.name}</span>
-                </div>
-              </Grid>
-            ))}
-          </Grid>
+          {user?.joinedGroupIds.length > 0 ? (
+            <Grid container spacing={3}>
+              {user?.joinedGroupIds?.map((group) => (
+                <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
+                  <div
+                    className={styles.card}
+                    onClick={() =>
+                      (window.location.href = `/group/${group._id}`)
+                    }
+                  >
+                    <span>{group.name}</span>
+                  </div>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <p className={styles.emptyText}>Dont have anything</p>
+          )}
         </div>
       </div>
 
