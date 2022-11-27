@@ -39,16 +39,16 @@ const AuthContextProvider = ({ children }) => {
           localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
         } else {
           router.push("/login");
+          setIsAuthenticated(false);
         }
       }
       setIsLoadingAuth(false);
     } catch (e) {
       if (e.code === "ERR_BAD_REQUEST") {
         router.push("/active");
-      } else {
-        router.push("/login");
       }
       setIsLoadingAuth(false);
+      setIsAuthenticated(false);
     }
   };
 
@@ -57,6 +57,7 @@ const AuthContextProvider = ({ children }) => {
       getUser();
     } else {
       setIsLoadingAuth(false);
+      setIsAuthenticated(false);
     }
   }, []);
 
@@ -66,7 +67,11 @@ const AuthContextProvider = ({ children }) => {
       const res = await loginFunc(data);
       if (res?.status === "OK") {
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
-        window.location.href = "/";
+        if (!res?.data?.[0]?.isActive) {
+          window.location.href = "/active";
+        } else {
+          window.location.href = "/";
+        }
       } else {
         toast.error(res?.message);
       }

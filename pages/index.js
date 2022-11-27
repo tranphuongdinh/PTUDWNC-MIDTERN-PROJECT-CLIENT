@@ -1,14 +1,16 @@
 import React, { useContext } from "react";
+import LoadingScreen from "../components/LoadingScreen";
 import { AuthContext } from "../context/authContext";
 import Dashboard from "../features/Dashboard";
 
 const Home = () => {
-  const { isAuthenticated, user, getUser } = useContext(AuthContext);
+  const { user, getUser, isLoadingAuth, isAuthenticated } = useContext(AuthContext);
+
   if (!isAuthenticated) {
     window.location.href = "/login";
-    return;
   }
-  return <Dashboard user={user} getUser={getUser} />;
+
+  return isLoadingAuth ? <LoadingScreen /> : <Dashboard user={user} getUser={getUser} />;
 };
 
 export default Home;
