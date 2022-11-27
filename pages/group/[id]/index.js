@@ -66,7 +66,7 @@ export default function GroupDetailPage() {
 
   const handleUpgradeRole = async (member, isUpgrade) => {
     try {
-      const data = { memberId: member._id, groupId: group._id, isUpgrade };
+      const data = { memberId: member._id, groupId: group?._id, isUpgrade };
       await updateRoleInGroup(data);
       toast.success("Update role successfully!");
       router.reload();
@@ -77,7 +77,7 @@ export default function GroupDetailPage() {
 
   const handleRemove = async (member) => {
     try {
-      const data = { userId: member._id, groupId: group._id };
+      const data = { userId: member._id, groupId: group?._id };
       await removeFromGroup(data);
       toast.success(`Remove member ${member.name} successfully!`);
       router.reload();

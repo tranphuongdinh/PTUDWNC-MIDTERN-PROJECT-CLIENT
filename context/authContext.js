@@ -20,6 +20,7 @@ const AuthContextProvider = ({ children }) => {
       if (localStorage?.getItem("access_token")) {
         setIsLoadingAuth(true);
         const res = await getUserInfo();
+
         if (res?.status === "OK") {
           const userInfo = res?.data?.[0];
 
@@ -27,7 +28,7 @@ const AuthContextProvider = ({ children }) => {
 
           const groupListMap = {};
 
-          groupListRes.data.forEach((group) => (groupListMap[group._id] = group));
+          groupListRes.data.forEach((group) => (groupListMap[group?._id] = group));
 
           userInfo.myGroupIds = userInfo.myGroupIds.map((code) => groupListMap[code]);
 
@@ -114,6 +115,7 @@ const AuthContextProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        getUser,
         isAuthenticated,
         login,
         loginWithGoogle,
