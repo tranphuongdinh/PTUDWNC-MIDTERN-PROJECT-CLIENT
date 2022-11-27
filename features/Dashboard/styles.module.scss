@@ -1,9 +1,7 @@
 .wrapper {
-    position: relative;
-    padding-top: 50px;
     .actionButtonWrapper {
         position: absolute;
-        right: 0;
+        right: 100px;
         top: 20px;
         button {
             margin-left: 20px;
@@ -12,6 +10,10 @@
     .groupWrapper {
         >div {
             min-height: 300px;
+            margin-bottom: 30px;
+            h1 {
+                margin-bottom: 10px;
+            }
         }
         .card {
             height: 100px;

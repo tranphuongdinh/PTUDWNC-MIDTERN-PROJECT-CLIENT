@@ -6,11 +6,8 @@ import MenuItem from "@mui/material/MenuItem";
 import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/material/Avatar";
 import styles from "./styles.module.scss";
-import { useContext } from "react";
-import { AuthContext } from "../../context/authContext";
 
-const Header = () => {
-  const { logout } = useContext(AuthContext);
+const Header = ({ logout }) => {
   const [anchorEllSubMenu, setanchorEllSubMenu] = React.useState(null);
   const openSubMenu = Boolean(anchorEllSubMenu);
   const handleClickSubMenu = (event) => {
@@ -49,7 +46,9 @@ const Header = () => {
                 "aria-labelledby": "basic-button",
               }}
             >
-              <MenuItem onClick={() => window.location.href = "/"}>Dashboard</MenuItem>
+              <MenuItem onClick={() => (window.location.href = "/")}>
+                Dashboard
+              </MenuItem>
               <MenuItem onClick={handleCloseSubMenu}>Item 2</MenuItem>
               <MenuItem onClick={handleCloseSubMenu}>Item 3</MenuItem>
             </Menu>
