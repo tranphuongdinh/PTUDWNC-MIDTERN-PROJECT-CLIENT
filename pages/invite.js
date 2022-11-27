@@ -6,16 +6,20 @@ import { AuthContext } from "../context/authContext";
 
 const InvitePage = () => {
   const router = useRouter();
-  const { user } = useContext(AuthContext);
+  const { user, getUser } = useContext(AuthContext);
 
   const handleInvite = async (groupId, code) => {
     try {
       const res = await inviteToGroup({ groupId, code, userId: user._id });
       if (res?.status === "OK") {
+        window.location.href = (`/group/${groupId}`);
         toast.success("Join group successfully");
-        router.push("/");
+        await getUser();
       }
-    } catch (err) {}
+    } catch (err) {
+      router.push("/");
+      toast.error(err);
+    }
   };
 
   useEffect(() => {

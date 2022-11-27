@@ -34,6 +34,7 @@ const Dashboard = ({ user, getUser }) => {
   const handleJoinGroup = async (data) => {
     // const url = new URL(data.link);
     window.location.href = data.link;
+    // await getUser();
 
     // try {
     //   const res = await createGroup(data);
