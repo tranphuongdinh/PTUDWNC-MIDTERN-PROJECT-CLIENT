@@ -49,7 +49,7 @@ const Header = () => {
                 "aria-labelledby": "basic-button",
               }}
             >
-              <MenuItem onClick={handleCloseSubMenu}>Item 1</MenuItem>
+              <MenuItem onClick={() => window.location.href = "/"}>Dashboard</MenuItem>
               <MenuItem onClick={handleCloseSubMenu}>Item 2</MenuItem>
               <MenuItem onClick={handleCloseSubMenu}>Item 3</MenuItem>
             </Menu>

@@ -37,12 +37,16 @@ const AuthContextProvider = ({ children }) => {
           setUser({ ...user, ...userInfo });
           setIsAuthenticated(true);
           localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+        } else {
+          router.push("/login");
         }
       }
       setIsLoadingAuth(false);
     } catch (e) {
       if (e.code === "ERR_BAD_REQUEST") {
         router.push("/active");
+      } else {
+        router.push("/login");
       }
       setIsLoadingAuth(false);
     }

@@ -3,16 +3,13 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { createGroup } from "../../client/group";
-import { AuthContext } from "../../context/authContext";
 import styles from "./styles.module.scss";
 
-const Dashboard = () => {
-  const { user, getUser } = useContext(AuthContext);
-
+const Dashboard = ({ user, getUser }) => {
   const { register, handleSubmit } = useForm({
     mode: "onChange",
     defaultValues: { name: "" },
