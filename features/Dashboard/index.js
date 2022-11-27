@@ -11,9 +11,7 @@ import { AuthContext } from "../../context/authContext";
 import { getGroupDetail } from "../../client/group";
 import styles from "./styles.module.scss";
 
-const Dashboard = () => {
-  const { user, isAuthenticated, login, logout, signup, isLoadingAuth } =
-    useContext(AuthContext);
+const Dashboard = ({user}) => {
   const { register, handleSubmit } = useForm({
     mode: "onChange",
     defaultValues: { name: "" },
@@ -26,7 +24,7 @@ const Dashboard = () => {
       const res = await createGroup(data);
       if (res?.status === "OK") {
         toast.success("Create group successfully!");
-        user.myGroupIds.push(res.data[0]._id);
+        // window.location.reload();
       } else {
         toast.error(res?.message);
       }
@@ -79,14 +77,14 @@ const Dashboard = () => {
               <Grid container spacing={3}>
                 {user?.myGroupIds?.map((group) => (
                   <>
-                    <Grid item xs={12} md={6} lg={4} xl={3} key={group._id}>
+                    <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
                       <div
                         className={styles.card}
                         onClick={() =>
-                          (window.location.href = `/group/${group._id}`)
+                          (window.location.href = `/group/${group?._id}`)
                         }
                       >
-                        <span>{group.name}</span>
+                        <span>{group?.name}</span>
                       </div>
                     </Grid>
                   </>

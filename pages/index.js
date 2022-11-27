@@ -4,13 +4,13 @@ import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
 
 const Home = () => {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, user } = useContext(AuthContext);
   if (!isAuthenticated) {
     window.location.href = "/login";
     return;
   }
   return (
-    <Dashboard />
+    <Dashboard user={user} />
   )
 }
 
