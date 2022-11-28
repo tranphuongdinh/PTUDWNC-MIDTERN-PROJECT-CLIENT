@@ -5,3 +5,5 @@ export const registerFunc = async (data) => await request("POST", "auth/register
 export const loginFunc = async (data) => await request("POST", "auth/login", data);
 
 export const loginGoogleFunc = async (data) => await request("POST", "auth/login/google", data);
+
+export const activeAccount = async (data) => await request("POST", "auth/verify", data);
