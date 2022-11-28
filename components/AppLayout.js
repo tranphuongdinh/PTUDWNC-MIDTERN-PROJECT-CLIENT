@@ -7,8 +7,9 @@ import { AuthContext } from "../context/authContext";
 
 const AppLayout = ({ children }) => {
   const { isAuthenticated, logout } = useContext(AuthContext);
-
-  if (!isAuthenticated) {
+  // hard code 
+  const checkNotLoggedIn = window.location.href === "/active";
+  if (!isAuthenticated || checkNotLoggedIn) {
     return <>{children}</>;
   }
   return (

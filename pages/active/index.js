@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { activeAccount } from "../../client/auth";
+import styles from "../../features/Login/styles.module.scss";
 
 const ActivePage = () => {
   const router = useRouter();
@@ -31,7 +32,15 @@ const ActivePage = () => {
     handleActiveAccount();
   }, []);
 
-  return <div>{isVerifying ? "Please wait while we verify your account..." : "We sent a verification link to your email to verify your email address and activate your account."}</div>;
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.loginwrapper}>
+        {isVerifying
+          ? "Please wait while we verify your account..."
+          : "We sent a verification link to your email to verify your email address and activate your account."}
+      </div>
+    </div>
+  );
 };
 
 export default ActivePage;
