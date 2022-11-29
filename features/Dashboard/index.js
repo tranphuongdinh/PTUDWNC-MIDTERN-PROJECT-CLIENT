@@ -51,8 +51,8 @@ const Dashboard = ({ user, getUser }) => {
   };
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.actionButtonWrapper}>
+    <Grid container spacing={6} className={styles.wrapper}>
+      <Grid item xs={12} className={styles.actionButtonWrapper}>
         <Button onClick={() => setOpenCreateGroupForm(true)} variant="contained">
           Create new group
         </Button>
@@ -60,63 +60,61 @@ const Dashboard = ({ user, getUser }) => {
         <Button onClick={() => setOpenJoinGroupForm(true)} variant="contained">
           Join a group
         </Button>
-      </div>
+      </Grid>
 
-      <div className={styles.groupWrapper}>
-        <div className={styles.myGroupWrapper}>
-          <h1>My Groups</h1>
-          <div>
-            {user?.myGroupIds.length > 0 ? (
-              <Grid container spacing={3}>
-                {user?.myGroupIds?.map((group) => (
-                  <>
-                    <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
-                      <div className={styles.card} onClick={() => (window.location.href = `/group/${group?._id}`)}>
-                        <span>{group?.name}</span>
-                      </div>
-                    </Grid>
-                  </>
-                ))}
-              </Grid>
-            ) : (
-              <p className={styles.emptyText}>
-                You have not created any group.&nbsp;
-                <a onClick={() => setOpenCreateGroupForm(true)} style={{ cursor: "pointer", color: "#1976d2" }}>
-                  Create now!
-                </a>
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.joinedGroupWrapepr}>
-          <h1>Joined Groups</h1>
-
-          {user?.joinedGroupIds.length > 0 ? (
+      <Grid item xs={12} className={styles.groupWrapper}>
+        <h1>My Groups</h1>
+        <div>
+          {user?.myGroupIds.length > 0 ? (
             <Grid container spacing={3}>
-              {user?.joinedGroupIds?.map((group) => (
-                <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
-                  <div className={styles.card} onClick={() => (window.location.href = `/group/${group?._id}`)}>
-                    <span>{group?.name}</span>
-                  </div>
-                </Grid>
+              {user?.myGroupIds?.map((group) => (
+                <>
+                  <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
+                    <div className={styles.card} onClick={() => (window.location.href = `/group/${group?._id}`)}>
+                      <span>{group?.name}</span>
+                    </div>
+                  </Grid>
+                </>
               ))}
             </Grid>
           ) : (
             <p className={styles.emptyText}>
-              You have not joined any group.&nbsp;
-              <a onClick={() => setOpenJoinGroupForm(true)} style={{ cursor: "pointer", color: "#1976d2" }}>
-                Join now!
+              You have not created any group.&nbsp;
+              <a onClick={() => setOpenCreateGroupForm(true)} style={{ cursor: "pointer", color: "#1976d2" }}>
+                Create now!
               </a>
             </p>
           )}
         </div>
-      </div>
+      </Grid>
+
+      <Grid item xs={12} className={styles.groupWrapper}>
+        <h1>Joined Groups</h1>
+
+        {user?.joinedGroupIds.length > 0 ? (
+          <Grid container spacing={3}>
+            {user?.joinedGroupIds?.map((group) => (
+              <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
+                <div className={styles.card} onClick={() => (window.location.href = `/group/${group?._id}`)}>
+                  <span>{group?.name}</span>
+                </div>
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <p className={styles.emptyText}>
+            You have not joined any group.&nbsp;
+            <a onClick={() => setOpenJoinGroupForm(true)} style={{ cursor: "pointer", color: "#1976d2" }}>
+              Join now!
+            </a>
+          </p>
+        )}
+      </Grid>
 
       <Dialog open={openCreateGroupForm} onClose={() => setOpenCreateGroupForm(false)} style={{ width: "100%" }}>
         <form onSubmit={handleSubmit(handleCreateGroup)}>
           <DialogTitle id="alert-dialog-title">Create new group</DialogTitle>
-          <DialogContent>
+          <DialogContent className={styles.groupContent}>
             <TextField label="Group's name" placeholder="Enter group's name" {...register("name")} />
           </DialogContent>
           <DialogActions>
@@ -129,7 +127,7 @@ const Dashboard = ({ user, getUser }) => {
       <Dialog open={openJoinGroupForm} onClose={() => setOpenJoinGroupForm(false)} style={{ width: "100%" }}>
         <form onSubmit={handleSubmit(handleJoinGroup)}>
           <DialogTitle id="alert-dialog-title">Enter invite link to join group</DialogTitle>
-          <DialogContent>
+          <DialogContent className={styles.groupContent}>
             <TextField label="Invite link" placeholder="Enter invite link" {...register("link")} />
           </DialogContent>
           <DialogActions>
@@ -138,7 +136,7 @@ const Dashboard = ({ user, getUser }) => {
           </DialogActions>
         </form>
       </Dialog>
-    </div>
+    </Grid>
   );
 };
 
