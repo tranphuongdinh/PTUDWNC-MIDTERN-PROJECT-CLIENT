@@ -5,6 +5,7 @@ import { loginFunc, loginGoogleFunc, registerFunc } from "../client/auth";
 import { getGroupByIds } from "../client/group";
 import { getUserInfo } from "../client/user";
 import LoadingScreen from "../components/LoadingScreen";
+import { sleep } from "../utils";
 
 const AuthContext = createContext();
 
@@ -67,6 +68,8 @@ const AuthContextProvider = ({ children }) => {
       const res = await loginFunc(data);
       if (res?.status === "OK") {
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
+        toast.success("Login successful!");
+        await sleep(1500);
         if (!res?.data?.[0]?.isActive) {
           window.location.href = "/active";
         } else {
@@ -91,6 +94,7 @@ const AuthContextProvider = ({ children }) => {
         setIsAuthenticated(true);
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
         toast.success("Login successful!");
+        await sleep(1500);
         router.push("/");
       } else {
         toast.error(res.message);
@@ -108,6 +112,7 @@ const AuthContextProvider = ({ children }) => {
       localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
       setIsLoadingAuth(false);
       toast.success("Register successful!");
+      await sleep(1500);
       router.push("/active");
     } catch (e) {
       toast.error(e?.response?.data?.message || "Register failed!");
@@ -118,7 +123,8 @@ const AuthContextProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("access_token");
     setIsAuthenticated(false);
-    router.push("/login");
+    setUser(null);
+    window.location.href = "/login";
   };
 
   return (

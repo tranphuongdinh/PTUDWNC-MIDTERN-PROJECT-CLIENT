@@ -1,21 +1,16 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
+import Logout from "@mui/icons-material/Logout";
+import PersonIcon from "@mui/icons-material/Person";
 import Avatar from "@mui/material/Avatar";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Container } from "@mui/system";
+import Link from "next/link";
 import React from "react";
 import styles from "./styles.module.scss";
 
-const Header = ({ logout }) => {
-  const [anchorEllSubMenu, setanchorEllSubMenu] = React.useState(null);
-  const openSubMenu = Boolean(anchorEllSubMenu);
-  const handleClickSubMenu = (event) => {
-    setanchorEllSubMenu(event.currentTarget);
-  };
-  const handleCloseSubMenu = () => {
-    setanchorEllSubMenu(null);
-  };
-
+const Header = ({ logout, user }) => {
   const [anchorEllAvatar, setanchorEllAvatar] = React.useState(null);
   const openAvatar = Boolean(anchorEllAvatar);
   const handleClickAvatar = (event) => {
@@ -28,36 +23,16 @@ const Header = ({ logout }) => {
     <div className={styles.headerWrapper}>
       <Container container className={styles.content} maxWidth="xl">
         <div className={styles.leftContent}>
-          {/* <div className={styles.menu}>
-            <MenuIcon id="basic-button" aria-controls={openSubMenu ? "basic-menu" : undefined} aria-haspopup="true" aria-expanded={openSubMenu ? "true" : undefined} onClick={handleClickSubMenu} />
-            <Menu
-              id="basic-menu"
-              anchorEl={anchorEllSubMenu}
-              open={openSubMenu}
-              onClose={handleCloseSubMenu}
-              MenuListProps={{
-                "aria-labelledby": "basic-button",
-              }}
-            >
-              <MenuItem onClick={() => (window.location.href = "/")}>Dashboard</MenuItem>
-            </Menu>
-          </div> */}
-          <div className={styles.logo} onClick={() => (window.location.pathname = "/")}>
+          <a href="/" className={styles.logo}>
             <img src="/images/logo.png" />
             <span>MEOW-CLASSROOM</span>
-          </div>
+          </a>
         </div>
 
         <div className={styles.rightContent}>
-          <Avatar
-            className={styles.avatar}
-            aria-controls={openAvatar ? "basic-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={openAvatar ? "true" : undefined}
-            onClick={handleClickAvatar}
-            alt="Remy Sharp"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQM0SyiV-GT4K7zR_tmnf2VNu5Ypqq09u-uZg&usqp=CAU"
-          />
+          <Avatar className={styles.avatar} aria-controls={openAvatar ? "basic-menu" : undefined} aria-haspopup="true" aria-expanded={openAvatar ? "true" : undefined} onClick={handleClickAvatar}>
+            {user?.name[0]}
+          </Avatar>
           <Menu
             id="basic-menu"
             anchorEl={anchorEllAvatar}
@@ -66,16 +41,52 @@ const Header = ({ logout }) => {
             MenuListProps={{
               "aria-labelledby": "basic-button",
             }}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiAvatar-root": {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&:before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            <a href="/profile">
-              <MenuItem onClick={handleCloseAvatar}>Profile</MenuItem>
-            </a>
+            <Link href="/profile">
+              <MenuItem onClick={handleCloseAvatar}>
+                <ListItemIcon>
+                  <PersonIcon fontSize="small" />
+                </ListItemIcon>
+                Profile
+              </MenuItem>
+            </Link>
             <MenuItem
               onClick={() => {
                 logout();
                 handleCloseAvatar();
               }}
             >
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
               Logout
             </MenuItem>
           </Menu>

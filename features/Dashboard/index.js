@@ -1,12 +1,16 @@
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import GroupsIcon from "@mui/icons-material/Groups";
 import { Button, Grid, TextField } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { createGroup } from "../../client/group";
+import { sleep } from "../../utils";
 import styles from "./styles.module.scss";
 
 const Dashboard = ({ user, getUser }) => {
@@ -22,6 +26,7 @@ const Dashboard = ({ user, getUser }) => {
       const res = await createGroup(data);
       if (res?.status === "OK") {
         toast.success("Create group successfully!");
+        await sleep(1500);
         await getUser();
       } else {
         toast.error(res?.message);
@@ -32,32 +37,18 @@ const Dashboard = ({ user, getUser }) => {
     setOpenCreateGroupForm(false);
   };
   const handleJoinGroup = async (data) => {
-    // const url = new URL(data.link);
     window.location.href = data.link;
-    // await getUser();
-
-    // try {
-    //   const res = await createGroup(data);
-    //   if (res?.status === "OK") {
-    //     toast.success("Create group successfully!");
-    //     user.myGroupIds.push(res.data[0]._id);
-    //   } else {
-    //     toast.error(res?.message);
-    //   }
-    // } catch (e) {
-    //   toast.error(e?.response?.data[0]?.message);
-    // }
     setOpenJoinGroupForm(false);
   };
 
   return (
     <Grid container spacing={6} className={styles.wrapper}>
       <Grid item xs={12} className={styles.actionButtonWrapper}>
-        <Button onClick={() => setOpenCreateGroupForm(true)} variant="contained">
+        <Button onClick={() => setOpenCreateGroupForm(true)} variant="contained" startIcon={<GroupAddIcon />}>
           Create new group
         </Button>
 
-        <Button onClick={() => setOpenJoinGroupForm(true)} variant="contained">
+        <Button onClick={() => setOpenJoinGroupForm(true)} variant="contained" startIcon={<GroupsIcon />}>
           Join a group
         </Button>
       </Grid>
@@ -70,9 +61,11 @@ const Dashboard = ({ user, getUser }) => {
               {user?.myGroupIds?.map((group) => (
                 <>
                   <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
-                    <div className={styles.card} onClick={() => (window.location.href = `/group/${group?._id}`)}>
-                      <span>{group?.name}</span>
-                    </div>
+                    <Link href={`/group/${group?._id}`}>
+                      <div className={styles.card}>
+                        <span>{group?.name}</span>
+                      </div>
+                    </Link>
                   </Grid>
                 </>
               ))}
@@ -95,9 +88,11 @@ const Dashboard = ({ user, getUser }) => {
           <Grid container spacing={3}>
             {user?.joinedGroupIds?.map((group) => (
               <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
-                <div className={styles.card} onClick={() => (window.location.href = `/group/${group?._id}`)}>
-                  <span>{group?.name}</span>
-                </div>
+                <Link href={`/group/${group?._id}`}>
+                  <div className={styles.card}>
+                    <span>{group?.name}</span>
+                  </div>
+                </Link>
               </Grid>
             ))}
           </Grid>

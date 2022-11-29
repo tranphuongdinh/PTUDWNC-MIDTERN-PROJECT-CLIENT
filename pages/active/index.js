@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { activeAccount } from "../../client/auth";
 import { sendVerificationEmail } from "../../client/user";
 import styles from "../../features/Login/styles.module.scss";
+import { sleep } from "../../utils";
 
 const ActivePage = () => {
   const router = useRouter();
@@ -21,6 +22,7 @@ const ActivePage = () => {
         const res = await activeAccount(data);
         if (res?.status === "OK") {
           toast.success(res?.message);
+          await sleep(1500);
           window.location.href = "/";
         }
         setIsVerifying(false);
@@ -36,6 +38,7 @@ const ActivePage = () => {
       const res = await sendVerificationEmail();
       if (res.status === "OK") {
         toast.success(res?.message);
+        await sleep(1500);
       }
     } catch (e) {
       toast.error(e?.response?.data?.message);

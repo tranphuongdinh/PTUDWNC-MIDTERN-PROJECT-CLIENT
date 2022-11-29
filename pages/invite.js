@@ -3,6 +3,7 @@ import React, { useContext, useEffect } from "react";
 import { toast } from "react-toastify";
 import { inviteToGroup } from "../client/group";
 import { AuthContext } from "../context/authContext";
+import { sleep } from "../utils";
 
 const InvitePage = () => {
   const router = useRouter();
@@ -12,8 +13,9 @@ const InvitePage = () => {
     try {
       const res = await inviteToGroup({ groupId, code, userId: user._id });
       if (res?.status === "OK") {
-        window.location.href = (`/group/${groupId}`);
+        window.location.href = `/group/${groupId}`;
         toast.success("Join group successfully");
+        await sleep(1500);
         await getUser();
       }
     } catch (err) {

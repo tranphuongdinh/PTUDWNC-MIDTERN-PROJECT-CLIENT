@@ -10,7 +10,7 @@ const Home = () => {
     window.location.href = "/login";
   }
 
-  return isLoadingAuth ? <LoadingScreen /> : <Dashboard user={user} getUser={getUser} />;
+  return isLoadingAuth || !user ? <LoadingScreen /> : <Dashboard user={user} getUser={getUser} />;
 };
 
 export default Home;

@@ -1,0 +1,21 @@
+.tableHead {
+  background-color: #1976d2;
+}
+
+.tableHead * {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #fff !important;
+}
+
+.ownerRow {
+  background-color: khaki;
+}
+
+.coOwnerRow {
+  background-color: #cce2f8;
+}
+
+.memberRow {
+  background-color: #fff;
+}

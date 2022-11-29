@@ -9,6 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import { updateUserInfo } from "../../client/user";
+import { sleep } from "../../utils";
 import styles from "./styles.module.scss";
 
 const UserProfile = ({ user }) => {
@@ -57,6 +58,7 @@ const UserProfile = ({ user }) => {
         const res = await updateUserInfo(formData);
         if (res.status === "OK") {
           toast.success("Update information successfully!");
+          await sleep(1500);
         } else {
           toast.error(res.message);
         }
