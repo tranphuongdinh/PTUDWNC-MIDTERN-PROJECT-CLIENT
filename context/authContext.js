@@ -105,9 +105,10 @@ const AuthContextProvider = ({ children }) => {
     try {
       setIsLoadingAuth(true);
       const res = await registerFunc(data);
+      localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
       setIsLoadingAuth(false);
       toast.success("Register successful!");
-      router.push("/login");
+      router.push("/active");
     } catch (e) {
       toast.error(e?.response?.data?.message || "Register failed!");
       setIsLoadingAuth(false);

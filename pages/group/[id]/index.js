@@ -23,14 +23,15 @@ export default function GroupDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const getInviteLink = async (id) => {
-    const inviteLinkRes = await createInviteLinkGroup({ groupId: id });
-    if (inviteLinkRes?.status === "OK") {
-      const { code = "", groupId = "" } = inviteLinkRes?.data[0];
-      const inviteLink = window.location.origin + "/invite?" + "groupId=" + groupId + "&code=" + code;
-      setInviteLink(inviteLink);
-      toast.success("Invite link copied!");
-    } else {
-      toast.error("Unexpected error");
+    try {
+      const inviteLinkRes = await createInviteLinkGroup({ groupId: id });
+      if (inviteLinkRes?.status === "OK") {
+        const { code = "", groupId = "" } = inviteLinkRes?.data[0];
+        const inviteLink = window.location.origin + "/invite?" + "groupId=" + groupId + "&code=" + code;
+        setInviteLink(inviteLink);
+      }
+    } catch (e) {
+      // toast.error(e?.response?.data?.message);
     }
   };
 
@@ -39,6 +40,8 @@ export default function GroupDetailPage() {
       const res = await getGroupDetail(router.query.id);
       if (res.status === "OK") {
         const groupInfo = res.data[0];
+
+        await getInviteLink(groupInfo?._id);
 
         const userListRes = await getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]);
         const userListMap = {};
@@ -91,7 +94,16 @@ export default function GroupDetailPage() {
   ) : (
     <Paper>
       <CopyToClipboard text={inviteLink}>
-        <Button variant="contained" onClick={() => getInviteLink(group?._id)}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            toast.promise(getInviteLink(group?._id), {
+              pending: "Getting invite link...",
+              success: "Invite link copied!",
+              error: "Unexpected error",
+            });
+          }}
+        >
           Copy invite link
         </Button>
       </CopyToClipboard>
@@ -120,7 +132,7 @@ export default function GroupDetailPage() {
                 <TableCell align="center">CO OWNER</TableCell>
                 {user?._id === group?.ownerId && (
                   <TableCell align="center">
-                    <Button variant="outlined" onClick={() => handleUpgradeRole(coOwner, false)} style={{marginRight: "10px"}}>
+                    <Button variant="outlined" onClick={() => handleUpgradeRole(coOwner, false)} style={{ marginRight: "10px" }}>
                       Become member
                     </Button>
 
@@ -139,7 +151,7 @@ export default function GroupDetailPage() {
                 <TableCell align="center">MEMBER</TableCell>
                 {user?._id === group?.ownerId && (
                   <TableCell align="center">
-                    <Button variant="outlined" onClick={() => handleUpgradeRole(member, true)} style={{marginRight: "10px"}}>
+                    <Button variant="outlined" onClick={() => handleUpgradeRole(member, true)} style={{ marginRight: "10px" }}>
                       Become Co-owner
                     </Button>
 
