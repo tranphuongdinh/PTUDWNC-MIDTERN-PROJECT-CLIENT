@@ -1,11 +1,14 @@
+import { Button } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { activeAccount } from "../../client/auth";
+import { sendVerificationEmail } from "../../client/user";
 import styles from "../../features/Login/styles.module.scss";
 
 const ActivePage = () => {
   const router = useRouter();
+
   const { userId = "", activeCode = "" } = router.query;
 
   const [isVerifying, setIsVerifying] = useState(false);
@@ -28,6 +31,18 @@ const ActivePage = () => {
     }
   };
 
+  const handleResendVerificationEmail = async () => {
+    try {
+      const res = await sendVerificationEmail();
+      if (res.status === "OK") {
+        toast.success(res?.message);
+      }
+    } catch (e) {
+      toast.error(e?.response?.data?.message);
+      setIsVerifying(false);
+    }
+  };
+
   useEffect(() => {
     handleActiveAccount();
   }, []);
@@ -35,9 +50,11 @@ const ActivePage = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.loginwrapper}>
-        {isVerifying
-          ? "Please wait while we verify your account..."
-          : "We sent a verification link to your email to verify your email address and activate your account."}
+        {isVerifying ? "Please wait while we verify your account..." : "We sent a verification link to your email to verify your email address and activate your account."}
+
+        <Button onClick={handleResendVerificationEmail} variant="contained">
+          RE-SEND VERIFICATION EMAIL
+        </Button>
       </div>
     </div>
   );
