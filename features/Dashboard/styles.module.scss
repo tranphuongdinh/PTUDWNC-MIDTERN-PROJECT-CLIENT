@@ -22,16 +22,21 @@
     }
     .card {
       height: 100px;
-      background-color: #1976d211;
-      border: 1px dashed #1976d22b;
-      box-shadow: 1px 1px 1px 2px #1976d20c;
+      border: 1px dashed #50baf0;
+      background: #f0faff;
+      box-shadow: 20px 20px 60px #ccd5d9, -20px -20px 60px #ffffff;
       border-radius: 10px;
       padding: 20px;
       cursor: pointer;
+      transition: 0.2s ease-in-out;
       span {
         text-decoration: none;
         font-size: 18px;
         font-weight: 400;
+      }
+      &:hover {
+        background: #cce2f8;
+        box-shadow: 20px 20px 60px #ccd5d9, -20px -20px 60px #ffffff;
       }
     }
 

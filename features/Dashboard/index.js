@@ -119,7 +119,7 @@ const Dashboard = ({ user, getUser }) => {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenCreateGroupForm(false)}>Cancel</Button>
-            <Button type="submit">Submit</Button>
+            <Button type="submit">Create</Button>
           </DialogActions>
         </form>
       </Dialog>
@@ -132,7 +132,7 @@ const Dashboard = ({ user, getUser }) => {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenJoinGroupForm(false)}>Cancel</Button>
-            <Button type="submit">Submit</Button>
+            <Button type="submit">Join</Button>
           </DialogActions>
         </form>
       </Dialog>

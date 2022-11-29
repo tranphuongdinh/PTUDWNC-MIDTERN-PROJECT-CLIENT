@@ -1,16 +1,15 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import SaveIcon from "@mui/icons-material/Save";
 import { Avatar, Button, TextField } from "@mui/material";
 import Box from "@mui/material/Box";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import AuthContext from "../../context/authContext";
 import * as yup from "yup";
+import { updateUserInfo } from "../../client/user";
 import styles from "./styles.module.scss";
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import SaveIcon from '@mui/icons-material/Save';
-import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
-import {getUserInfo, updateUserInfo} from "../../client/user";
 
 const UserProfile = ({ user }) => {
   const [updateMode, setUpdateMode] = useState(false);
@@ -36,9 +35,7 @@ const UserProfile = ({ user }) => {
     .object({
       password: yup.string().required("Mật khẩu không được để trống"),
       newPassword: yup.string().required("Mật khẩu không được để trống"),
-      confirmedNewPassword: yup
-        .string()
-        .oneOf([yup.ref("newPassword"), null], "Xác nhận mật khẩu không đúng"),
+      confirmedNewPassword: yup.string().oneOf([yup.ref("newPassword"), null], "Xác nhận mật khẩu không đúng"),
     })
     .required();
   const {
@@ -49,30 +46,25 @@ const UserProfile = ({ user }) => {
 
   const handleUpdateUserInfo = async (data) => {
     if (!updateMode) {
-        setUpdateMode(true);
+      setUpdateMode(true);
     } else {
-        const formData = {
-            name: data.name,
-            password: data.password,
-            newPassword: data.newPassword,
-        };
-        try {
-          const res = await updateUserInfo(formData);
-          if (res.status === 'OK') {
-            toast.success("Update information successfully!");
-          }
-          else {
-            toast.error(res.message);
-          }
-          setUpdateMode(false);
-
+      const formData = {
+        name: data.name,
+        password: data.password,
+        newPassword: data.newPassword,
+      };
+      try {
+        const res = await updateUserInfo(formData);
+        if (res.status === "OK") {
+          toast.success("Update information successfully!");
+        } else {
+          toast.error(res.message);
         }
-        catch(error) {
-          toast.error(error.response.data.message);
-          setUpdateMode(false);
-
-        }
-        
+        setUpdateMode(false);
+      } catch (error) {
+        toast.error(error.response.data.message);
+        setUpdateMode(false);
+      }
     }
   };
 
@@ -83,45 +75,16 @@ const UserProfile = ({ user }) => {
   return (
     <div className={styles.wapper}>
       <div className={styles.profile}>
-        <Avatar
-          className={styles.avatar}
-          src="https://th.bing.com/th/id/OIP.JxYNIqDBP3gtzKsxaSHTsgHaHa?pid=ImgDet&rs=1"
-          alt=""
-        />
-        <Box
-          className={styles.info}
-          component="form"
-          noValidate
-          autoComplete="off"
-          onSubmit={handleSubmit((data) =>
-              handleUpdateUserInfo(data)
-          )}
-        >
+        <Avatar className={styles.avatar} src="/images/avatar.png" alt="" />
+        <Box className={styles.info} component="form" noValidate autoComplete="off" onSubmit={handleSubmit((data) => handleUpdateUserInfo(data))}>
           <Box>
-          <Controller
+            <Controller
               name="name"
               defaultValue={name}
               control={control}
-              render={({ field }) => (
-                <TextField
-                  className={styles.infoField}
-                  label="Name"
-                  variant="outlined"
-                  type="name"
-                  disabled={!updateMode}
-                  style={{display: "inline-flex" }}
-                  {...field}
-                />
-              )}
+              render={({ field }) => <TextField className={styles.infoField} label="Name" variant="outlined" type="name" disabled={!updateMode} style={{ display: "inline-flex" }} {...field} />}
             />
-              <TextField
-              className={styles.infoField}
-              id="email"
-              label="Email"
-              variant="outlined"
-              value={user?.email}
-              disabled
-            />
+            <TextField className={styles.infoField} id="email" label="Email" variant="outlined" value={user?.email} disabled />
             <Controller
               name="password"
               defaultValue=""
@@ -213,17 +176,14 @@ const UserProfile = ({ user }) => {
                   handleChangeMode(true);
                 }}
               >
-                <ModeEditIcon />&nbsp;Edit 
+                <ModeEditIcon />
+                &nbsp;Edit
               </Button>
             )}
             {updateMode && (
-              <Button
-                variant="contained"
-                className="btnPrimary"
-                type="submit"
-                sx={{ marginRight: "20px" }}
-              >
-                <SaveIcon />&nbsp;Save
+              <Button variant="contained" className="btnPrimary" type="submit" sx={{ marginRight: "20px" }}>
+                <SaveIcon />
+                &nbsp;Save
               </Button>
             )}
             {updateMode && (
@@ -235,7 +195,8 @@ const UserProfile = ({ user }) => {
                   handleChangeMode(false);
                 }}
               >
-               <DisabledByDefaultIcon />&nbsp;Hủy
+                <DisabledByDefaultIcon />
+                &nbsp;Hủy
               </Button>
             )}
           </Box>

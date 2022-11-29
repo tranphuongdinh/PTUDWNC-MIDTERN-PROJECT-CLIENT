@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }) {
       <AuthContextProvider>
         <NextNProgress color="#1976d2" />
         <Head>
-          <title>App</title>
+          <title>Meow Classrrom</title>
         </Head>
         <div className="wrapper">
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="colored" />
