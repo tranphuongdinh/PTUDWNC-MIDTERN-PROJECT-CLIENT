@@ -120,11 +120,11 @@ export default function GroupDetailPage() {
                 <TableCell align="center">CO OWNER</TableCell>
                 {user?._id === group?.ownerId && (
                   <TableCell align="center">
-                    <Button variant="contained" onClick={() => handleUpgradeRole(coOwner, false)}>
+                    <Button variant="outlined" onClick={() => handleUpgradeRole(coOwner, false)} style={{marginRight: "10px"}}>
                       Become member
                     </Button>
 
-                    <Button variant="contained" onClick={() => handleRemove(coOwner)}>
+                    <Button variant="outlined" color="error" onClick={() => handleRemove(coOwner)}>
                       Remove from group
                     </Button>
                   </TableCell>
@@ -139,11 +139,11 @@ export default function GroupDetailPage() {
                 <TableCell align="center">MEMBER</TableCell>
                 {user?._id === group?.ownerId && (
                   <TableCell align="center">
-                    <Button variant="contained" onClick={() => handleUpgradeRole(member, true)}>
+                    <Button variant="outlined" onClick={() => handleUpgradeRole(member, true)} style={{marginRight: "10px"}}>
                       Become Co-owner
                     </Button>
 
-                    <Button variant="contained" onClick={() => handleRemove(member)}>
+                    <Button variant="outlined" color="error" onClick={() => handleRemove(member)}>
                       Remove from group
                     </Button>
                   </TableCell>
