@@ -21,11 +21,11 @@ const Header = ({ logout, user }) => {
   };
   return (
     <div className={styles.headerWrapper}>
-      <Container container className={styles.content} maxWidth="xl">
+      <Container container className={styles.content} maxWidth="xl" sx={{ display: "flex" }}>
         <div className={styles.leftContent}>
           <a href="/" className={styles.logo}>
             <img src="/images/logo.png" />
-            <span>MEOW-CLASSROOM</span>
+            <span>MEOW CLASSROOM</span>
           </a>
         </div>
 

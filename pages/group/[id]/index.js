@@ -22,7 +22,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { createInviteLinkGroup, getGroupDetail, removeFromGroup, updateRoleInGroup } from "../../../client/group";
+import { createInviteLinkGroup, getGroupDetail, removeFromGroup, sendInviteEmail, updateRoleInGroup } from "../../../client/group";
 import { getUserByIds } from "../../../client/user";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { AuthContext } from "../../../context/authContext";
@@ -33,7 +33,7 @@ export default function GroupDetailPage() {
   const [group, setGroup] = useState(null);
   const [inviteLink, setInviteLink] = useState("");
   const router = useRouter();
-  const { user } = useContext(AuthContext);
+  const { user, isLoadingAuth } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
 
   const [anchorElButton, setAnchorElButton] = React.useState(null);
@@ -48,7 +48,25 @@ export default function GroupDetailPage() {
   const [openInviteMemberForm, setOpenInviteMemberForm] = useState(false);
 
   const handleInviteMember = async (data) => {
-    console.log(data);
+    try {
+      const inviteLink = await getInviteLink(group?._id);
+      const submitData = {
+        email: data.memberEmail,
+        ownerName: group?.owner?.name,
+        link: inviteLink,
+      };
+
+      const res = await sendInviteEmail(submitData);
+
+      if (res?.status === "OK") {
+        toast.success("Invite link has been sent!");
+      }
+
+      setOpenInviteMemberForm(false);
+    } catch (e) {
+      toast.error(e?.response?.data?.message);
+      setOpenInviteMemberForm(false);
+    }
   };
 
   const getInviteLink = async (id) => {
@@ -57,10 +75,10 @@ export default function GroupDetailPage() {
       if (inviteLinkRes?.status === "OK") {
         const { code = "", groupId = "" } = inviteLinkRes?.data[0];
         const inviteLink = window.location.origin + "/invite?" + "groupId=" + groupId + "&code=" + code;
-        setInviteLink(inviteLink);
+        return inviteLink;
       }
     } catch (e) {
-      // toast.error(e?.response?.data?.message);
+      return "";
     }
   };
 
@@ -70,7 +88,8 @@ export default function GroupDetailPage() {
       if (res.status === "OK") {
         const groupInfo = res.data[0];
 
-        await getInviteLink(groupInfo?._id);
+        const inviteLink = await getInviteLink(groupInfo?._id);
+        if (inviteLink) setInviteLink(inviteLink);
 
         const userListRes = await getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]);
         const userListMap = {};
@@ -120,7 +139,7 @@ export default function GroupDetailPage() {
     }
   };
 
-  return isLoading ? (
+  return isLoading || isLoadingAuth || !user ? (
     <LoadingScreen />
   ) : (
     <Grid container spacing={6}>
@@ -151,11 +170,17 @@ export default function GroupDetailPage() {
           <CopyToClipboard text={inviteLink}>
             <MenuItem
               onClick={() => {
-                toast.promise(getInviteLink(group?._id), {
-                  pending: "Getting invite link...",
-                  success: "Invite link copied!",
-                  error: "Unexpected error",
-                });
+                toast.promise(
+                  async () => {
+                    const newInviteLink = await getInviteLink(group?._id);
+                    setInviteLink(newInviteLink);
+                  },
+                  {
+                    pending: "Getting invite link...",
+                    success: "Invite link copied!",
+                    error: "Unexpected error",
+                  }
+                );
                 setAnchorElButton(null);
               }}
             >
@@ -194,8 +219,8 @@ export default function GroupDetailPage() {
             </TableHead>
             <TableBody>
               <TableRow key={group?.ownerId} className={styles.ownerRow}>
-                <TableCell align="center">{group?.owner.name}</TableCell>
-                <TableCell align="center">{group?.owner.email}</TableCell>
+                <TableCell align="center">{group?.owner?.name}</TableCell>
+                <TableCell align="center">{group?.owner?.email}</TableCell>
                 <TableCell align="center">OWNER</TableCell>
                 <TableCell align="center">
                   <Tooltip title="Add new member">
@@ -208,8 +233,8 @@ export default function GroupDetailPage() {
 
               {group?.coOwners?.map((coOwner) => (
                 <TableRow key={coOwner._id} className={styles.coOwnerRow}>
-                  <TableCell align="center">{coOwner.name}</TableCell>
-                  <TableCell align="center">{coOwner.email}</TableCell>
+                  <TableCell align="center">{coOwner?.name}</TableCell>
+                  <TableCell align="center">{coOwner?.email}</TableCell>
                   <TableCell align="center">CO OWNER</TableCell>
                   {user?._id === group?.ownerId && (
                     <TableCell align="center">
@@ -231,8 +256,8 @@ export default function GroupDetailPage() {
 
               {group?.members?.map((member) => (
                 <TableRow key={member._id} className={styles.memberRow}>
-                  <TableCell align="center">{member.name}</TableCell>
-                  <TableCell align="center">{member.email}</TableCell>
+                  <TableCell align="center">{member?.name}</TableCell>
+                  <TableCell align="center">{member?.email}</TableCell>
                   <TableCell align="center">MEMBER</TableCell>
                   {user?._id === group?.ownerId && (
                     <TableCell align="center">

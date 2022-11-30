@@ -77,6 +77,7 @@ const AuthContextProvider = ({ children }) => {
         }
       } else {
         toast.error(res?.message);
+        setIsLoadingAuth(false);
       }
     } catch (e) {
       toast.error(e?.response?.data?.message || "Login failed!");
@@ -88,16 +89,16 @@ const AuthContextProvider = ({ children }) => {
     try {
       setIsLoadingAuth(true);
       const res = await loginGoogleFunc(data);
-      setIsLoadingAuth(false);
       if (res?.status === "OK") {
         setUser(res?.data?.[0]);
         setIsAuthenticated(true);
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
         toast.success("Login successful!");
         await sleep(1500);
-        router.push("/");
+        window.location.href = "/";
       } else {
         toast.error(res.message);
+        setIsLoadingAuth(false);
       }
     } catch (e) {
       toast.error(e?.response?.data?.message || "Login failed!");

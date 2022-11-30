@@ -13,3 +13,5 @@ export const removeFromGroup = async (data) => request("POST", "/group/remove", 
 export const getGroupDetail = async (groupId) => request("GET", `/group/detail/${groupId}`);
 
 export const getGroupByIds = async (ids) => request("POST", "/group/list", { ids });
+
+export const sendInviteEmail = async (data) => request("POST", "/group/send-invite-email", data);

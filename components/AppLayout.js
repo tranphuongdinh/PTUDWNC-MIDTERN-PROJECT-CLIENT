@@ -8,7 +8,7 @@ const AppLayout = ({ children }) => {
   const { isAuthenticated, logout, user } = useContext(AuthContext);
 
   const checkNotLoggedIn = window.location.href === "/active";
-  if (!isAuthenticated || checkNotLoggedIn) {
+  if (!isAuthenticated || checkNotLoggedIn || !user) {
     return <>{children}</>;
   }
 
