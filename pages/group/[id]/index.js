@@ -94,7 +94,7 @@ export default function GroupDetailPage() {
         const userListRes = await getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]);
         const userListMap = {};
 
-        userListRes?.data?.forEach((user) => (userListMap[user._id] = user));
+        userListRes?.data?.forEach((user) => (userListMap[user?._id] = user));
 
         groupInfo.owner = userListMap[groupInfo.ownerId];
         groupInfo.members = groupInfo.memberIds.map((id) => userListMap[id]);
@@ -117,7 +117,7 @@ export default function GroupDetailPage() {
 
   const handleUpgradeRole = async (member, isUpgrade) => {
     try {
-      const data = { memberId: member._id, groupId: group?._id, isUpgrade };
+      const data = { memberId: member?._id, groupId: group?._id, isUpgrade };
       await updateRoleInGroup(data);
       toast.success("Update role successfully!");
       await sleep(1500);
@@ -129,7 +129,7 @@ export default function GroupDetailPage() {
 
   const handleRemove = async (member) => {
     try {
-      const data = { userId: member._id, groupId: group?._id };
+      const data = { userId: member?._id, groupId: group?._id };
       await removeFromGroup(data);
       toast.success(`Remove member ${member.name} successfully!`);
       await sleep(1500);
@@ -232,7 +232,7 @@ export default function GroupDetailPage() {
               </TableRow>
 
               {group?.coOwners?.map((coOwner) => (
-                <TableRow key={coOwner._id} className={styles.coOwnerRow}>
+                <TableRow key={coOwner?._id} className={styles.coOwnerRow}>
                   <TableCell align="center">{coOwner?.name}</TableCell>
                   <TableCell align="center">{coOwner?.email}</TableCell>
                   <TableCell align="center">CO OWNER</TableCell>
@@ -255,7 +255,7 @@ export default function GroupDetailPage() {
               ))}
 
               {group?.members?.map((member) => (
-                <TableRow key={member._id} className={styles.memberRow}>
+                <TableRow key={member?._id} className={styles.memberRow}>
                   <TableCell align="center">{member?.name}</TableCell>
                   <TableCell align="center">{member?.email}</TableCell>
                   <TableCell align="center">MEMBER</TableCell>
