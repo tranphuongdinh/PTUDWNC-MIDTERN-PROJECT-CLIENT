@@ -114,7 +114,7 @@ const AuthContextProvider = ({ children }) => {
       setIsLoadingAuth(false);
       toast.success("Register successful!");
       await sleep(1500);
-      router.push("/active");
+      window.location.href = "/active";
     } catch (e) {
       toast.error(e?.response?.data?.message || "Register failed!");
       setIsLoadingAuth(false);
