@@ -222,13 +222,15 @@ export default function GroupDetailPage() {
                 <TableCell align="center">{group?.owner?.name}</TableCell>
                 <TableCell align="center">{group?.owner?.email}</TableCell>
                 <TableCell align="center">OWNER</TableCell>
-                <TableCell align="center">
-                  <Tooltip title="Add new member">
-                    <IconButton onClick={() => setOpenInviteMemberForm(true)}>
-                      <PersonAddIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+                {user?._id === group?.ownerId && (
+                  <TableCell align="center">
+                    <Tooltip title="Add new member">
+                      <IconButton onClick={() => setOpenInviteMemberForm(true)}>
+                        <PersonAddIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                )}
               </TableRow>
 
               {group?.coOwners?.map((coOwner) => (
