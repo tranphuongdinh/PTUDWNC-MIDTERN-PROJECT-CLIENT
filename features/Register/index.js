@@ -15,12 +15,8 @@ function Register() {
   const schema = yup.object().shape({
     name: yup.string().required("Name is required"),
     email: yup.string().email("Email is invalid").required("Email is required"),
-    password: yup
-      .string()
-      .min(3, "Password must be at least 3 characters long"),
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref("password"), null], "Confirm password does not match"),
+    password: yup.string().min(3, "Password must be at least 3 characters long"),
+    confirmPassword: yup.string().oneOf([yup.ref("password"), null], "Password and confirm password does not match"),
   });
 
   const {
@@ -29,8 +25,7 @@ function Register() {
     handleSubmit,
   } = useForm({ resolver: yupResolver(schema), mode: "onChange" });
 
-  const { signup, isLoadingAuth } =
-    useContext(AuthContext);
+  const { signup, isLoadingAuth } = useContext(AuthContext);
 
   return (
     <div className={styles.wrapper}>
@@ -38,24 +33,8 @@ function Register() {
         <h2 className={styles.loginTitle}>Welcome to MeowClassroom</h2>
         <div className={styles.formWrapper}>
           <form onSubmit={handleSubmit(signup)} className={styles.form}>
-            <TextField
-              style={{ marginBottom: 20 }}
-              {...register("name")}
-              placeholder="Name"
-              label="Name"
-              size="small"
-              error={!!errors.name}
-              helperText={errors.name?.message}
-            />
-            <TextField
-              style={{ marginBottom: 20 }}
-              {...register("email")}
-              placeholder="Email"
-              label="Email"
-              size="small"
-              error={!!errors.email}
-              helperText={errors.email?.message}
-            />
+            <TextField style={{ marginBottom: 20 }} {...register("name")} placeholder="Name" label="Name" size="small" error={!!errors.name} helperText={errors.name?.message} />
+            <TextField style={{ marginBottom: 20 }} {...register("email")} placeholder="Email" label="Email" size="small" error={!!errors.email} helperText={errors.email?.message} />
             <TextField
               style={{ marginBottom: 20 }}
               {...register("password")}
@@ -76,11 +55,7 @@ function Register() {
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword?.message}
             />
-            <LoadingButton
-              loading={isLoadingAuth}
-              variant="contained"
-              type="submit"
-            >
+            <LoadingButton loading={isLoadingAuth} variant="contained" type="submit">
               REGISTER
             </LoadingButton>
           </form>

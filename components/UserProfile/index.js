@@ -15,28 +15,12 @@ import styles from "./styles.module.scss";
 const UserProfile = ({ user }) => {
   const [updateMode, setUpdateMode] = useState(false);
   const [name, setName] = useState(user?.name || "default-name");
-  // useEffect(() => {
-  //     const getUser = async () => {
-  //         try {
-  //             const res = await getUserClient().getUserInfo();
-  //             const tmp = await getCharactersClient().getMyChars();
-
-  //             if (tmp?.success) {
-  //                 const newRw = mapListToRows(tmp.characters);
-  //                 setRows(newRw);
-  //             }
-
-  //             setname(res.data.name);
-  //         } catch (error) {}
-  //     };
-  //     getUser();
-  // }, []);
 
   const schema = yup
     .object({
-      password: yup.string().required("Mật khẩu không được để trống"),
-      newPassword: yup.string().required("Mật khẩu không được để trống"),
-      confirmedNewPassword: yup.string().oneOf([yup.ref("newPassword"), null], "Xác nhận mật khẩu không đúng"),
+      password: yup.string().required("Password is required"),
+      newPassword: yup.string().required("New password is required"),
+      confirmedNewPassword: yup.string().oneOf([yup.ref("newPassword"), null], "Password and confirm password does not match"),
     })
     .required();
   const {
@@ -77,7 +61,7 @@ const UserProfile = ({ user }) => {
   return (
     <div className={styles.wapper}>
       <div className={styles.profile}>
-        <Avatar className={styles.avatar} src="/images/avatar.png" alt="" />
+        <Avatar className={styles.avatar}>{user?.name[0]}</Avatar>
         <Box className={styles.info} component="form" noValidate autoComplete="off" onSubmit={handleSubmit((data) => handleUpdateUserInfo(data))}>
           <Box>
             <Controller
@@ -198,7 +182,7 @@ const UserProfile = ({ user }) => {
                 }}
               >
                 <DisabledByDefaultIcon />
-                &nbsp;Hủy
+                &nbsp;Cancel
               </Button>
             )}
           </Box>
