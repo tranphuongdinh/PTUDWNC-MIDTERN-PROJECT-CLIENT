@@ -1,5 +1,6 @@
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import GroupsIcon from "@mui/icons-material/Groups";
+import SlideshowIcon from "@mui/icons-material/Slideshow";
 import { Button, Grid, TextField } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -44,13 +45,19 @@ const Dashboard = ({ user, getUser }) => {
   return (
     <Grid container spacing={6} className={styles.wrapper}>
       <Grid item xs={12} className={styles.actionButtonWrapper}>
-        <Button onClick={() => setOpenCreateGroupForm(true)} variant="contained" startIcon={<GroupAddIcon />}>
+        <Button onClick={() => setOpenCreateGroupForm(true)} variant="contained" startIcon={<GroupAddIcon />} sx={{ margin: "0 0 20px 20px" }}>
           Create new group
         </Button>
 
-        <Button onClick={() => setOpenJoinGroupForm(true)} variant="contained" startIcon={<GroupsIcon />}>
+        <Button onClick={() => setOpenJoinGroupForm(true)} variant="contained" startIcon={<GroupsIcon />} sx={{ margin: "0 0 20px 20px" }}>
           Join a group
         </Button>
+
+        <Link href="/presentation">
+          <Button variant="contained" startIcon={<SlideshowIcon />} sx={{ margin: "0 0 20px 20px" }}>
+            Presentation
+          </Button>
+        </Link>
       </Grid>
 
       <Grid item xs={12} className={styles.groupWrapper}>
@@ -110,7 +117,7 @@ const Dashboard = ({ user, getUser }) => {
         <form onSubmit={handleSubmit(handleCreateGroup)}>
           <DialogTitle id="alert-dialog-title">Create new group</DialogTitle>
           <DialogContent className={styles.groupContent}>
-            <TextField label="Group's name" placeholder="Enter group's name" {...register("name")} />
+            <TextField label="Group's name" placeholder="Enter group's name" {...register("name")} fullWidth />
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenCreateGroupForm(false)}>Cancel</Button>
@@ -123,7 +130,7 @@ const Dashboard = ({ user, getUser }) => {
         <form onSubmit={handleSubmit(handleJoinGroup)}>
           <DialogTitle id="alert-dialog-title">Enter invite link to join group</DialogTitle>
           <DialogContent className={styles.groupContent}>
-            <TextField label="Invite link" placeholder="Enter invite link" {...register("link")} />
+            <TextField label="Invite link" placeholder="Enter invite link" {...register("link")} fullWidth />
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenJoinGroupForm(false)}>Cancel</Button>
