@@ -24,7 +24,16 @@ const PresentationDetailPage = () => {
       type: "Multiple Choice",
       content: {
         question: "",
-        options: ["option1", "option2"],
+        options: [
+          {
+            label: "Option1",
+            data: 0,
+          },
+          {
+            label: "Option1",
+            data: 0,
+          },
+        ],
       },
     },
   ]);
@@ -64,8 +73,14 @@ const PresentationDetailPage = () => {
                   content: {
                     question: "",
                     options: [
-                      { title: "option1", value: 2 },
-                      { title: "option2", value: 5 },
+                      {
+                        label: "Option1",
+                        data: 0,
+                      },
+                      {
+                        label: "Option1",
+                        data: 0,
+                      },
                     ],
                   },
                 },
@@ -147,12 +162,12 @@ const PresentationDetailPage = () => {
                     label="Option 1"
                     placeholder="Type option 1"
                     fullWidth
-                    value={selectedSlide.content.options[index].title}
+                    value={selectedSlide.content.options[index].label}
                     onChange={(e) => {
                       const tmp = [...selectedSlide.content.options];
                       tmp.splice(index, 1, {
-                        title: e.target.value,
-                        value: 0,
+                        label: e.target.value,
+                        data: 0,
                       });
                       setSelectedSlide({
                         ...selectedSlide,
@@ -188,10 +203,10 @@ const PresentationDetailPage = () => {
                   const tmp = [
                     ...selectedSlide.content.options,
                     {
-                      value: 0,
-                      title: `Option ${
+                      label: `Option ${
                         selectedSlide.content.options.length + 1
                       }`,
+                      data: 0,
                     },
                   ];
                   setSelectedSlide({
