@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import styles from "./styles.module.scss";
 import clsx from "clsx";
+import { Chart } from "react-google-charts";
 
 // Slide ={
 // 	id,
@@ -16,6 +17,21 @@ import clsx from "clsx";
 // 	}
 // }
 
+const data = [
+  ["Year", "Sales"],
+  ["2014", 1000],
+  ["2015", 1170],
+  ["2016", 660],
+  ["2017", 1030],
+];
+
+const options = {
+  chart: {
+    title: "Company Performance",
+    subtitle: "Sales, Expenses, and Profit: 2014-2017",
+  },
+};
+
 const PresentationDetailPage = () => {
   const router = useRouter();
   const [slides, setSlides] = useState([
@@ -23,32 +39,38 @@ const PresentationDetailPage = () => {
       // id: 0,
       type: "Multiple Choice",
       content: {
-        question: "",
+        question: "Question",
         options: [
           {
             label: "Option1",
-            data: 0,
+            data: 3,
           },
           {
-            label: "Option1",
-            data: 0,
+            label: "Option2",
+            data: 5,
           },
         ],
       },
     },
   ]);
 
-  const [selectedSlide, setSelectedSlide] = useState({
-    ...slides[0],
-    id: 0,
-  });
+  const [selectedSlide, setSelectedSlide] = useState(0);
   const { id } = router.query;
   //  console.log(id);
+
+  const renderData = () => {
+    let res = [["Option", "Count"]];
+    slides[selectedSlide].content.options.map((option) => {
+      res.push([option.label, option.data]);
+    });
+    return res;
+  };
   return (
     <Grid container spacing={3}>
       <Grid container item xs={12}>
         <Grid item xs={10}>
-          {JSON.stringify(selectedSlide)}
+          <h1>SELECTED SLIDE: {JSON.stringify(selectedSlide)}</h1>
+          {JSON.stringify(slides[selectedSlide])}
         </Grid>
         <Grid item xs={2}>
           <Button sx={{ margin: "0 0 20px 20px" }} variant="contained">
@@ -71,7 +93,7 @@ const PresentationDetailPage = () => {
                   // id: idx,
                   type: "Multiple Choice",
                   content: {
-                    question: "",
+                    question: "Question",
                     options: [
                       {
                         label: "Option1",
@@ -101,30 +123,21 @@ const PresentationDetailPage = () => {
               <Card
                 className={clsx(
                   styles.slide,
-                  index === selectedSlide.id && styles.selected
+                  index === selectedSlide && styles.selected
                 )}
-                onClick={() =>
-                  setSelectedSlide({
-                    ...selectedSlide,
-                    id: index,
-                  })
-                }
+                onClick={() => setSelectedSlide(index)}
               >
                 {index}
               </Card>
               <Button
                 onClick={() => {
-                  console.log("before", [...slides]);
-                  if (index === selectedSlide.id) {
+                  if (index === selectedSlide) {
                     const idx = index > 0 ? index - 1 : 0;
-                    setSelectedSlide({ ...selectedSlide, id: idx });
+                    setSelectedSlide(idx);
                   }
-                  const tmp = slides;
+                  const tmp = [...slides];
                   tmp.splice(index, 1);
-                  console.log("after", tmp);
                   setSlides([...tmp]);
-
-                  // setSlides(filterdSlides);
                 }}
               >
                 Delete slide {index}
@@ -134,95 +147,140 @@ const PresentationDetailPage = () => {
         </Grid>
 
         <Grid item md={6}>
-          Preview slide
+          <div className={styles.previewSlide}>
+            {slides.length ? (
+              <>
+                {" "}
+                <h2>{slides[selectedSlide]?.content?.question}</h2>
+                <Chart
+                  chartType="Bar"
+                  width="400px"
+                  height="300px"
+                  data={renderData()}
+                  options={options}
+                />
+              </>
+            ) : (
+              <h2>Empty slide</h2>
+            )}
+          </div>
         </Grid>
-        <Grid item md={4} container>
-          <Grid item container xs={12}>
-            <Grid item xs={12}>
-              <FormLabel className={styles.formLabel}>Your Question</FormLabel>
+        {slides.length ? (
+          <Grid item md={4} container>
+            <Grid item container xs={12}>
+              <Grid item xs={12}>
+                <FormLabel className={styles.formLabel}>
+                  Your Question
+                </FormLabel>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  label="Your question"
+                  placeholder="Type your question"
+                  fullWidth
+                  value={slides[selectedSlide].content.question}
+                  onChange={(e) => {
+                    const replaceSlide = {
+                      ...slides[selectedSlide],
+                      content: {
+                        ...slides[selectedSlide].content,
+                        question: e.target.value,
+                      },
+                    };
+                    const tmp = [...slides];
+                    tmp.splice(selectedSlide, 1, replaceSlide);
+                    setSlides([...tmp]);
+                  }}
+                />
+              </Grid>
             </Grid>
 
-            <Grid item xs={12}>
-              <TextField
-                label="Your question"
-                placeholder="Type your question"
-                fullWidth
-              />
-            </Grid>
-          </Grid>
+            <Grid item container xs={12} spacing={2}>
+              <Grid item xs={12}>
+                <FormLabel className={styles.formLabel}>Options</FormLabel>
+              </Grid>
+              {slides[selectedSlide].content.options.length > 0 &&
+                slides[selectedSlide].content.options.map((option, index) => (
+                  <Grid item xs={12} key={index}>
+                    <TextField
+                      label="Option 1"
+                      placeholder="Type option 1"
+                      fullWidth
+                      value={slides[selectedSlide].content.options[index].label}
+                      onChange={(e) => {
+                        // full code to control option in slides state
+                        const newOptions = [
+                          ...slides[selectedSlide].content.options,
+                        ];
+                        newOptions.splice(index, 1, {
+                          ...newOptions[index],
+                          label: e.target.value,
+                        });
+                        const replaceSlide = {
+                          ...slides[selectedSlide],
+                          content: {
+                            ...slides[selectedSlide].content,
+                            options: [...newOptions],
+                          },
+                        };
+                        const tmp = [...slides];
+                        tmp.splice(selectedSlide, 1, replaceSlide);
+                        setSlides([...tmp]);
+                      }}
+                    />
+                    <Button
+                      onClick={() => {
+                        const newOptions = [
+                          ...slides[selectedSlide].content.options,
+                        ];
+                        newOptions.splice(index, 1);
+                        const replaceSlide = {
+                          ...slides[selectedSlide],
+                          content: {
+                            ...slides[selectedSlide].content,
+                            options: [...newOptions],
+                          },
+                        };
+                        const tmp = [...slides];
+                        tmp.splice(selectedSlide, 1, replaceSlide);
+                        setSlides([...tmp]);
+                      }}
+                    >
+                      Delete option {index + 1}
+                    </Button>
+                  </Grid>
+                ))}
 
-          <Grid item container xs={12} spacing={2}>
-            <Grid item xs={12}>
-              <FormLabel className={styles.formLabel}>Options</FormLabel>
-            </Grid>
-            {selectedSlide?.content?.options?.length > 0 &&
-              selectedSlide?.content?.options.map((option, index) => (
-                <Grid item xs={12} key={index}>
-                  <TextField
-                    label="Option 1"
-                    placeholder="Type option 1"
-                    fullWidth
-                    value={selectedSlide.content.options[index].label}
-                    onChange={(e) => {
-                      const tmp = [...selectedSlide.content.options];
-                      tmp.splice(index, 1, {
-                        label: e.target.value,
-                        data: 0,
-                      });
-                      setSelectedSlide({
-                        ...selectedSlide,
-                        content: {
-                          ...selectedSlide.content,
-                          options: [...tmp],
-                        },
-                      });
-                    }}
-                  />
-                  <Button
-                    onClick={() => {
-                      const tmp = [...selectedSlide.content.options];
-                      tmp.splice(index, 1);
-                      setSelectedSlide({
-                        ...selectedSlide,
-                        content: {
-                          ...selectedSlide.content,
-                          options: [...tmp],
-                        },
-                      });
-                    }}
-                  >
-                    Delete option {index + 1}
-                  </Button>
-                </Grid>
-              ))}
-
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  const tmp = [
-                    ...selectedSlide.content.options,
-                    {
-                      label: `Option ${
-                        selectedSlide.content.options.length + 1
-                      }`,
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    const newOptions = [
+                      ...slides[selectedSlide].content.options,
+                    ];
+                    newOptions.push({
+                      label: `Option ${newOptions.length + 1}`,
                       data: 0,
-                    },
-                  ];
-                  setSelectedSlide({
-                    ...selectedSlide,
-                    content: {
-                      ...selectedSlide.content,
-                      options: [...tmp],
-                    },
-                  });
-                }}
-              >
-                Add option
-              </Button>
+                    });
+                    const replaceSlide = {
+                      ...slides[selectedSlide],
+                      content: {
+                        ...slides[selectedSlide].content,
+                        options: [...newOptions],
+                      },
+                    };
+                    const tmp = [...slides];
+                    tmp.splice(selectedSlide, 1, replaceSlide);
+                    setSlides([...tmp]);
+                  }}
+                >
+                  Add option
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
+        ) : null}
       </Grid>
     </Grid>
   );
