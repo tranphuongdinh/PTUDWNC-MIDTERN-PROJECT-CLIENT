@@ -1,12 +1,44 @@
 import { Button, Card, FormLabel, Grid, TextField } from "@mui/material";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import styles from "./styles.module.scss";
+import clsx from "clsx";
+
+// Slide ={
+// 	id,
+// 	type,
+// 	content: {
+// 		question:
+// 		options:[
+// 			option1,
+// 			option2,
+// 		]
+// 	}
+// }
 
 const PresentationDetailPage = () => {
   const router = useRouter();
+  const [slides, setSlides] = useState([
+    {
+      // id: 0,
+      type: "Multiple Choice",
+      content: {
+        question: "",
+        options: ["option1", "option2"],
+      },
+    },
+  ]);
+
+  const [selectedSlide, setSelectedSlide] = useState({
+    id: 0,
+    type: "Multiple Choice",
+    content: {
+      question: "",
+      options: ["option1", "option2"],
+    },
+  });
   const { id } = router.query;
-  console.log(id);
+  //  console.log(id);
   return (
     <Grid container spacing={3}>
       <Grid container item xs={12}>
@@ -25,24 +57,64 @@ const PresentationDetailPage = () => {
 
       <Grid container item xs={12}>
         <Grid item xs={12}>
-          <Button variant="contained">New Slide</Button>
+          <Button
+            onClick={() => {
+              // const idx = slides[slides.length - 1].id + 1;
+              const newSlides = [
+                ...slides,
+                {
+                  // id: idx,
+                  type: "Multiple Choice",
+                  content: {
+                    question: "",
+                    options: ["option1", "option2"],
+                  },
+                },
+              ];
+              setSlides(newSlides);
+            }}
+            variant="contained"
+          >
+            New Slide
+          </Button>
         </Grid>
       </Grid>
 
       <Grid container item xs={12} spacing={3}>
         <Grid item md={2} container spacing={2}>
-          <Grid item xs={12}>
-            <Card className={styles.slide}>Slide 1</Card>
-          </Grid>
+          {slides.map((slide, index) => (
+            <Grid item xs={12} key={index}>
+              <Card
+                className={clsx(
+                  styles.slide,
+                  index === selectedSlide.id && styles.selected
+                )}
+                onClick={() =>
+                  setSelectedSlide({
+                    ...selectedSlide,
+                    id: index,
+                  })
+                }
+              >
+                {index}
+              </Card>
+              <Button
+                onClick={() => {
+                  console.log("before", [...slides]);
+                  const tmp = slides;
+                  tmp.splice(index, 1);
+                  console.log("after", tmp);
+                  setSlides([...tmp]);
 
-          <Grid item xs={12}>
-            <Card className={styles.slide}>Slide 2</Card>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Card className={styles.slide}>Slide 3</Card>
-          </Grid>
+                  // setSlides(filterdSlides);
+                }}
+              >
+                Delete slide {index}
+              </Button>
+            </Grid>
+          ))}
         </Grid>
+
         <Grid item md={6}>
           Preview slide
         </Grid>
@@ -53,7 +125,11 @@ const PresentationDetailPage = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <TextField label="Your question" placeholder="Type your question" fullWidth />
+              <TextField
+                label="Your question"
+                placeholder="Type your question"
+                fullWidth
+              />
             </Grid>
           </Grid>
 
@@ -63,14 +139,26 @@ const PresentationDetailPage = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <TextField label="Option 1" placeholder="Type option 1" fullWidth />
+              <TextField
+                label="Option 1"
+                placeholder="Type option 1"
+                fullWidth
+              />
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Option 2" placeholder="Type option 2" fullWidth />
+              <TextField
+                label="Option 2"
+                placeholder="Type option 2"
+                fullWidth
+              />
             </Grid>
 
             <Grid item xs={12}>
-              <TextField label="Option 3" placeholder="Type option 3" fullWidth />
+              <TextField
+                label="Option 3"
+                placeholder="Type option 3"
+                fullWidth
+              />
             </Grid>
 
             <Grid item xs={12}>
