@@ -30,12 +30,8 @@ const PresentationDetailPage = () => {
   ]);
 
   const [selectedSlide, setSelectedSlide] = useState({
+    ...slides[0],
     id: 0,
-    type: "Multiple Choice",
-    content: {
-      question: "",
-      options: ["option1", "option2"],
-    },
   });
   const { id } = router.query;
   //  console.log(id);
@@ -43,7 +39,7 @@ const PresentationDetailPage = () => {
     <Grid container spacing={3}>
       <Grid container item xs={12}>
         <Grid item xs={10}>
-          Presentation name
+          {JSON.stringify(selectedSlide)}
         </Grid>
         <Grid item xs={2}>
           <Button sx={{ margin: "0 0 20px 20px" }} variant="contained">
@@ -101,6 +97,10 @@ const PresentationDetailPage = () => {
               <Button
                 onClick={() => {
                   console.log("before", [...slides]);
+                  if (index === selectedSlide.id) {
+                    const idx = index > 0 ? index - 1 : 0;
+                    setSelectedSlide({ ...selectedSlide, id: idx });
+                  }
                   const tmp = slides;
                   tmp.splice(index, 1);
                   console.log("after", tmp);
@@ -137,32 +137,63 @@ const PresentationDetailPage = () => {
             <Grid item xs={12}>
               <FormLabel className={styles.formLabel}>Options</FormLabel>
             </Grid>
+            {selectedSlide?.content?.options?.length > 0 &&
+              selectedSlide?.content?.options.map((option, index) => (
+                <Grid item xs={12} key={index}>
+                  <TextField
+                    label="Option 1"
+                    placeholder="Type option 1"
+                    fullWidth
+                    value={selectedSlide.content.options[index]}
+                    onChange={(e) => {
+                      const tmp = [...selectedSlide.content.options];
+                      tmp.splice(index, 1, e.target.value);
+                      setSelectedSlide({
+                        ...selectedSlide,
+                        content: {
+                          ...selectedSlide.content,
+                          options: [...tmp],
+                        },
+                      });
+                    }}
+                  />
+                  <Button
+                    onClick={() => {
+                      const tmp = [...selectedSlide.content.options];
+                      tmp.splice(index, 1);
+                      setSelectedSlide({
+                        ...selectedSlide,
+                        content: {
+                          ...selectedSlide.content,
+                          options: [...tmp],
+                        },
+                      });
+                    }}
+                  >
+                    Delete option {index + 1}
+                  </Button>
+                </Grid>
+              ))}
 
             <Grid item xs={12}>
-              <TextField
-                label="Option 1"
-                placeholder="Type option 1"
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Option 2"
-                placeholder="Type option 2"
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                label="Option 3"
-                placeholder="Type option 3"
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button variant="contained">Add option</Button>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  const tmp = [
+                    ...selectedSlide.content.options,
+                    `Option ${selectedSlide.content.options.length + 1}`,
+                  ];
+                  setSelectedSlide({
+                    ...selectedSlide,
+                    content: {
+                      ...selectedSlide.content,
+                      options: [...tmp],
+                    },
+                  });
+                }}
+              >
+                Add option
+              </Button>
             </Grid>
           </Grid>
         </Grid>
