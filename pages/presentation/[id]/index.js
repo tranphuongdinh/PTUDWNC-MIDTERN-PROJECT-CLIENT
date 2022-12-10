@@ -63,7 +63,10 @@ const PresentationDetailPage = () => {
                   type: "Multiple Choice",
                   content: {
                     question: "",
-                    options: ["option1", "option2"],
+                    options: [
+                      { title: "option1", value: 2 },
+                      { title: "option2", value: 5 },
+                    ],
                   },
                 },
               ];
@@ -144,10 +147,13 @@ const PresentationDetailPage = () => {
                     label="Option 1"
                     placeholder="Type option 1"
                     fullWidth
-                    value={selectedSlide.content.options[index]}
+                    value={selectedSlide.content.options[index].title}
                     onChange={(e) => {
                       const tmp = [...selectedSlide.content.options];
-                      tmp.splice(index, 1, e.target.value);
+                      tmp.splice(index, 1, {
+                        title: e.target.value,
+                        value: 0,
+                      });
                       setSelectedSlide({
                         ...selectedSlide,
                         content: {
@@ -181,7 +187,12 @@ const PresentationDetailPage = () => {
                 onClick={() => {
                   const tmp = [
                     ...selectedSlide.content.options,
-                    `Option ${selectedSlide.content.options.length + 1}`,
+                    {
+                      value: 0,
+                      title: `Option ${
+                        selectedSlide.content.options.length + 1
+                      }`,
+                    },
                   ];
                   setSelectedSlide({
                     ...selectedSlide,
