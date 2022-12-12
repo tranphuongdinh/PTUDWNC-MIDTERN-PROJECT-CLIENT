@@ -140,7 +140,6 @@ const PresentationDetailPage = () => {
         <Grid container item xs={12} spacing={3}>
           <Grid item md={2} container spacing={2}>
             <div className={styles.slidesList}>
-              {" "}
               {slides.map((slide, index) => (
                 <Grid
                   item
