@@ -9,6 +9,7 @@ const SlideShow = () => {
   // lay slides tu database (xai tam thoi storage)
   const slides = JSON.parse(localStorage.getItem("slides"));
   const [index, setIndex] = useState(0);
+  const [isAnswered, setIsAnswered] = useState(false);
   const renderData = () => {
     let res = [["Option", "Count"]];
     slides[index].content.options.map((option) => {
@@ -17,7 +18,7 @@ const SlideShow = () => {
     return res;
   };
   const { id } = router.query;
-  const isOwner = true;
+  const isOwner = false;
 
   if (!slides.length) {
     return <div>EMPTY SLIDE, CANNOT PRESENT</div>;
@@ -89,33 +90,34 @@ const SlideShow = () => {
             height: "100vh",
           }}
         >
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            {index > 0 && (
-              <Button onClick={() => setIndex(index - 1)}>Previous</Button>
-            )}
-            {index < slides.length - 1 && (
-              <Button onClick={() => setIndex(index + 1)}>Next</Button>
-            )}
-            <Button
-              onClick={() => (window.location.href = `/presentation/${id}`)}
+          {isAnswered ? (
+            <div>Thank you for you answer</div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "30px",
+              }}
             >
-              Exit
-            </Button>
-          </div>
-
-          <h1>{slides[index]?.content?.question}</h1>
-          <Chart
-            chartType="Bar"
-            width="60vh"
-            height="60vh"
-            data={renderData()}
-          />
+              <h1>{slides[index]?.content?.question}</h1>
+              {slides[index]?.content.options.map((option, index) => (
+                <Button
+                  key={index}
+                  onClick={() => {
+                    setIsAnswered(true);
+                  }}
+                  variant="contained"
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
       );
     }
-    // cho nguoi xem bth
   }
-  return <div>{slides}</div>;
 };
 
 export default SlideShow;
