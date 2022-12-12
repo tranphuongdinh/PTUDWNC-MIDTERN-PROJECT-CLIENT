@@ -1,10 +1,13 @@
 import { Button, Card, FormLabel, Grid, TextField } from "@mui/material";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import clsx from "clsx";
 import { Chart } from "react-google-charts";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import SlideshowIcon from "@mui/icons-material/Slideshow";
+import ShareIcon from "@mui/icons-material/Share";
 
 // Slide ={
 // 	id,
@@ -26,34 +29,40 @@ const data = [
   ["2017", 1030],
 ];
 
-const options = {
-  chart: {
-    title: "Company Performance",
-    subtitle: "Sales, Expenses, and Profit: 2014-2017",
-  },
-};
-
 const PresentationDetailPage = () => {
   const router = useRouter();
-  const [slides, setSlides] = useState([
-    {
-      // id: 0,
-      type: "Multiple Choice",
-      content: {
-        question: "Question",
-        options: [
+
+  //get slide from store (tam thoi)
+  const temp = localStorage.getItem("slides");
+
+  const [slides, setSlides] = useState(
+    temp
+      ? JSON.parse(temp)
+      : [
           {
-            label: "Option1",
-            data: 3,
+            // id: 0,
+            type: "Multiple Choice",
+            content: {
+              question: "Question",
+              options: [
+                {
+                  label: "Option1",
+                  data: 3,
+                },
+                {
+                  label: "Option2",
+                  data: 5,
+                },
+              ],
+            },
           },
-          {
-            label: "Option2",
-            data: 5,
-          },
-        ],
-      },
-    },
-  ]);
+        ]
+  );
+
+  // tam thoi luu slides vao storage (that ra la luu vao database)
+  useEffect(() => {
+    localStorage.setItem("slides", JSON.stringify(slides));
+  }, [slides]);
 
   const [selectedSlide, setSelectedSlide] = useState(0);
   const { id } = router.query;
@@ -70,16 +79,24 @@ const PresentationDetailPage = () => {
     <div className={styles.wrapper}>
       <Grid container spacing={3}>
         <Grid container item xs={12}>
-          <Grid item xs={10}>
+          <Grid item xs={9}>
             <h1>SELECTED SLIDE: {JSON.stringify(selectedSlide)}</h1>
             {JSON.stringify(slides[selectedSlide])}
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={3}>
             <Button sx={{ margin: "0 0 20px 20px" }} variant="contained">
-              Share
+              <ShareIcon />
+              &nbsp;Share
             </Button>
-            <Button sx={{ margin: "0 0 20px 20px" }} variant="contained">
-              Present
+            <Button
+              sx={{ margin: "0 0 20px 20px" }}
+              variant="contained"
+              onClick={() =>
+                (window.location.href = `/presentation/${id}/slideshow`)
+              }
+            >
+              <SlideshowIcon />
+              &nbsp;Present
             </Button>
           </Grid>
         </Grid>
@@ -87,6 +104,7 @@ const PresentationDetailPage = () => {
         <Grid container item xs={12}>
           <Grid item xs={12}>
             <Button
+              style={{ marginLeft: "20px" }}
               onClick={() => {
                 // const idx = slides[slides.length - 1].id + 1;
                 const newSlides = [
@@ -113,7 +131,8 @@ const PresentationDetailPage = () => {
               }}
               variant="contained"
             >
-              New Slide
+              <AddIcon />
+              &nbsp;New Slide
             </Button>
           </Grid>
         </Grid>
@@ -167,7 +186,6 @@ const PresentationDetailPage = () => {
                     width="400px"
                     height="300px"
                     data={renderData()}
-                    options={options}
                   />
                 </>
               ) : (
@@ -242,6 +260,7 @@ const PresentationDetailPage = () => {
                         }}
                       />
                       <Button
+                        size="small"
                         onClick={() => {
                           const newOptions = [
                             ...slides[selectedSlide].content.options,
@@ -259,7 +278,8 @@ const PresentationDetailPage = () => {
                           setSlides([...tmp]);
                         }}
                       >
-                        Delete option {index + 1}
+                        <DeleteIcon style={{ fontSize: "18px" }} />
+                        &nbsp;Delete option {index + 1}
                       </Button>
                     </Grid>
                   ))}
