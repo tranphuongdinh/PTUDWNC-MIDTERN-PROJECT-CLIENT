@@ -1,4 +1,4 @@
-import { Button, IconButton, Tooltip } from "@mui/material";
+import { Button, Grid, IconButton, Tooltip } from "@mui/material";
 import React, { useRef, useState } from "react";
 import { Chart } from "react-google-charts";
 import { useRouter } from "next/router";
@@ -9,11 +9,13 @@ import { useContext } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { useEffect } from "react";
 import { getPresentationDetail, updatePresentation } from "../../../client/presentation";
+import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
+import SkipNextIcon from "@mui/icons-material/SkipNext";
+import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 
 const SlideShow = () => {
   const handle = useFullScreenHandle();
   const router = useRouter();
-  const { id } = router.query;
   const { user } = useContext(AuthContext);
 
   const [presentation, setPresentation] = useState({});
@@ -21,6 +23,7 @@ const SlideShow = () => {
 
   const getPresentation = async () => {
     try {
+      const { id } = router.query;
       const res = await getPresentationDetail(id);
       const presentation = res?.data?.[0];
       setPresentation(presentation);
@@ -44,9 +47,10 @@ const SlideShow = () => {
 
   const [index, setIndex] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
-  const renderData = () => {
-    let res = [["Option", "Count"]];
-    slides[index].content.options.map((option) => {
+
+  const renderData = (isNext = false) => {
+    let res = [["Options", "Count"]];
+    slides[isNext ? index + 1 : index]?.content?.options.map((option) => {
       res.push([option.label, option.data]);
     });
     return res;
@@ -62,10 +66,12 @@ const SlideShow = () => {
 
   return (
     <>
-      {presentation?.ownerId === user?._id ? (
+      {user?._id && presentation?.ownerId === user?._id ? (
         <FullScreen handle={handle}>
           <PresentButton />
-          <div
+          <Grid
+            container
+            spacing={6}
             style={{
               display: "flex",
               flexDirection: "row",
@@ -74,35 +80,45 @@ const SlideShow = () => {
               height: "100vh",
             }}
           >
-            <div style={{ width: "70vw", height: "70vh" }}>
-              current slide show
-              <div style={{ display: "flex", flexDirection: "row" }}>
-                {index > 0 && <Button onClick={() => setIndex(index - 1)}>Previous</Button>}
-                {index < slides.length - 1 && <Button onClick={() => setIndex(index + 1)}>Next</Button>}
+            <Grid item xl={8} md={7} xs={12} className={styles.presentationSlideCol}>
+              <div className={styles.buttonWrapper}>
+                {index > 0 && (
+                  <Button startIcon={<SkipPreviousIcon />} variant="contained" onClick={() => setIndex(index - 1)}>
+                    Previous Slide
+                  </Button>
+                )}
+                {index < slides.length - 1 && (
+                  <Button startIcon={<SkipNextIcon />} variant="contained" onClick={() => setIndex(index + 1)}>
+                    Next Slide
+                  </Button>
+                )}
                 <Button
+                  startIcon={<CancelPresentationIcon />}
+                  variant="contained"
                   onClick={async () => {
                     await updatePresentationDetail({ isPresent: false });
                     router.back();
                   }}
+                  color="error"
                 >
-                  Exit
+                  Stop Present
                 </Button>
               </div>
               <h1>{slides[index]?.content?.question}</h1>
-              <Chart chartType="Bar" width="60vh" height="60vh" data={renderData()} />
-            </div>
-            <div style={{ width: "30vw", height: "30vh" }}>
-              preview next slide
+              <Chart chartType="Bar" width="90%" height="60vh" data={renderData()} />
+            </Grid>
+            <Grid item xs={12} md={5} xl={4} className={styles.previewPresentationSlideCol}>
+              {index + 1 < slides.length && <h2 className={styles.previewTitle}>Preview next slide:</h2>}
               {index + 1 < slides.length ? (
                 <>
                   <h1>{slides[index + 1]?.content?.question}</h1>
-                  <Chart chartType="Bar" width="60vh" height="60vh" data={renderData()} />
+                  <Chart chartType="Bar" width="100%" height="60vh" data={renderData(true)} />
                 </>
               ) : (
-                <p>da toi cuoi slide</p>
+                <p style={{ textAlign: "center" }}><i>End of slideshow</i></p>
               )}
-            </div>
-          </div>
+            </Grid>
+          </Grid>
         </FullScreen>
       ) : (
         <FullScreen handle={handle}>
