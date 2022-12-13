@@ -142,7 +142,7 @@ export default function GroupDetailPage() {
   return isLoading || isLoadingAuth || !user ? (
     <LoadingScreen />
   ) : (
-    <Grid container spacing={6}>
+    <Grid container spacing={6} className={styles.wrapper}>
       <Grid item xs={12} style={{ display: "flex", justifyContent: "flex-end" }}>
         <Button variant="contained" ref={anchorElButton} onClick={handleClickButton} startIcon={<PersonAddIcon />}>
           Invite

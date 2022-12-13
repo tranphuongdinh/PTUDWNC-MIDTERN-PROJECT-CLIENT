@@ -1,4 +1,10 @@
 .wrapper {
+  padding: 0 50px;
+
+  @media (max-width: 576px) {
+    padding: 0 20px;
+  }
+
   .actionButtonWrapper {
     justify-content: flex-end !important;
     display: flex;

@@ -50,9 +50,6 @@
 
 .appLayout {
   min-height: 100vh;
-  padding: 50px;
   position: relative;
-  @media screen and (max-width: 768px) {
-    padding: 30px;
-  }
+  padding: 50px 0;
 }

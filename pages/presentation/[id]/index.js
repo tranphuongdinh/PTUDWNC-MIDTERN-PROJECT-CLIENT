@@ -1,4 +1,4 @@
-import { Button, Card, FormLabel, Grid, TextField } from "@mui/material";
+import { Button, Card, Container, FormLabel, Grid, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
@@ -56,19 +56,19 @@ const PresentationDetailPage = () => {
   };
 
   return (
-    <div className={styles.wrapper}>
+    <Container className={styles.wrapper}>
       <Grid container spacing={3}>
         <Grid container item xs={12}>
-          <Grid item xs={9}>
+          <Grid item xs={12} md={6}>
             <h1>{presentation?.name}</h1>
           </Grid>
-          <Grid item xs={3} className={styles.buttonGroup}>
-            <Button sx={{ margin: "0 0 20px 20px" }} variant="contained">
+          <Grid item xs={12} md={6} className={styles.buttonGroup}>
+            <Button sx={{ margin: "10px 0 10px 20px" }} variant="contained">
               <ShareIcon />
               &nbsp;Share
             </Button>
             <Button
-              sx={{ margin: "0 0 20px 20px" }}
+              sx={{ margin: "10px 0 10px 20px" }}
               variant="contained"
               onClick={async () => {
                 await updatePresentationDetail({ isPresent: true });
@@ -82,37 +82,35 @@ const PresentationDetailPage = () => {
         </Grid>
 
         <Grid container item xs={12}>
-          <Grid item xs={12}>
-            <Button
-              style={{ marginLeft: "20px" }}
-              onClick={() => {
-                const newSlides = [
-                  ...slides,
-                  {
-                    type: "Multiple Choice",
-                    content: {
-                      question: "Your question",
-                      options: [
-                        {
-                          label: "Option 1",
-                          data: 0,
-                        },
-                        {
-                          label: "Option 2",
-                          data: 0,
-                        },
-                      ],
-                    },
+          <Button
+            style={{ marginLeft: "20px" }}
+            onClick={() => {
+              const newSlides = [
+                ...slides,
+                {
+                  type: "Multiple Choice",
+                  content: {
+                    question: "Your question",
+                    options: [
+                      {
+                        label: "Option 1",
+                        data: 0,
+                      },
+                      {
+                        label: "Option 2",
+                        data: 0,
+                      },
+                    ],
                   },
-                ];
-                setSlides(newSlides);
-              }}
-              variant="contained"
-            >
-              <AddIcon />
-              &nbsp;New Slide
-            </Button>
-          </Grid>
+                },
+              ];
+              setSlides(newSlides);
+            }}
+            variant="contained"
+          >
+            <AddIcon />
+            &nbsp;New Slide
+          </Button>
         </Grid>
 
         <Grid container item xs={12} spacing={3}>
@@ -142,12 +140,12 @@ const PresentationDetailPage = () => {
             </div>
           </Grid>
 
-          <Grid item md={6}>
+          <Grid item md={6} sm={12} xs={12}>
             <div className={styles.previewSlide}>
               {slides.length ? (
                 <>
                   <h2>{slides[selectedSlide]?.content?.question}</h2>
-                  <Chart chartType="Bar" width="400px" height="300px" data={renderData()} />
+                  <Chart chartType="Bar" width="90%" height="90%" data={renderData()} />
                 </>
               ) : (
                 <h2>Empty slide</h2>
@@ -155,7 +153,7 @@ const PresentationDetailPage = () => {
             </div>
           </Grid>
           {slides.length ? (
-            <Grid item md={4} container>
+            <Grid item md={4} sm={12} container className={styles.content}>
               <Grid item container xs={12}>
                 <Grid item xs={12}>
                   <FormLabel className={styles.formLabel}>Your Question</FormLabel>
@@ -266,7 +264,7 @@ const PresentationDetailPage = () => {
           ) : null}
         </Grid>
       </Grid>
-    </div>
+    </Container>
   );
 };
 
