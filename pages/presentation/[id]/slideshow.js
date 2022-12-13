@@ -12,8 +12,11 @@ import { getPresentationDetail, updatePresentation } from "../../../client/prese
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
+import { SocketContext } from "../../../context/socketContext";
 
 const SlideShow = () => {
+  const { socket } = useContext(SocketContext);
+
   const handle = useFullScreenHandle();
   const router = useRouter();
   const { user } = useContext(AuthContext);
@@ -41,11 +44,10 @@ const SlideShow = () => {
     } catch (e) {}
   };
 
-  useEffect(() => {
-    getPresentation();
-  }, []);
-
   const [index, setIndex] = useState(0);
+
+  const [viewIndex, setViewIndex] = useState(0);
+
   const [isAnswered, setIsAnswered] = useState(false);
 
   const renderData = (isNext = false) => {
@@ -63,6 +65,25 @@ const SlideShow = () => {
       </IconButton>
     </Tooltip>
   );
+
+  useEffect(() => {
+    if (router.isReady) getPresentation();
+  }, [router.isReady]);
+
+  useEffect(() => {
+    socket.on("voted", (data) => {
+      if (data?._id === presentation?._id) {
+        setSlides(JSON.parse(data.slides) || []);
+      }
+    });
+
+    socket.on("changeSlideIndex", (data) => {
+      if (data?.presentationId === presentation?._id) {
+        setViewIndex(data.viewIndex);
+        setIsAnswered(false);
+      }
+    });
+  }, [presentation]);
 
   return (
     <>
@@ -83,12 +104,26 @@ const SlideShow = () => {
             <Grid item xl={8} md={7} xs={12} className={styles.presentationSlideCol}>
               <div className={styles.buttonWrapper}>
                 {index > 0 && (
-                  <Button startIcon={<SkipPreviousIcon />} variant="contained" onClick={() => setIndex(index - 1)}>
+                  <Button
+                    startIcon={<SkipPreviousIcon />}
+                    variant="contained"
+                    onClick={() => {
+                      setIndex(index - 1);
+                      socket.emit("clientChangeSlideIndex", { presentationId: presentation?._id, viewIndex: index - 1 });
+                    }}
+                  >
                     Previous Slide
                   </Button>
                 )}
                 {index < slides.length - 1 && (
-                  <Button startIcon={<SkipNextIcon />} variant="contained" onClick={() => setIndex(index + 1)}>
+                  <Button
+                    startIcon={<SkipNextIcon />}
+                    variant="contained"
+                    onClick={() => {
+                      setIndex(index + 1);
+                      socket.emit("clientChangeSlideIndex", { presentationId: presentation?._id, viewIndex: index + 1 });
+                    }}
+                  >
                     Next Slide
                   </Button>
                 )}
@@ -115,7 +150,9 @@ const SlideShow = () => {
                   <Chart chartType="Bar" width="100%" height="60vh" data={renderData(true)} />
                 </>
               ) : (
-                <p style={{ textAlign: "center" }}><i>End of slideshow</i></p>
+                <p style={{ textAlign: "center" }}>
+                  <i>End of slideshow</i>
+                </p>
               )}
             </Grid>
           </Grid>
@@ -144,11 +181,14 @@ const SlideShow = () => {
                   gap: "30px",
                 }}
               >
-                <h1>{slides[index]?.content?.question}</h1>
-                {slides[index]?.content.options.map((option, index) => (
+                <h1>{slides[viewIndex]?.content?.question}</h1>
+                {slides[viewIndex]?.content.options.map((option, index) => (
                   <Button
                     key={index}
                     onClick={() => {
+                      option.data += 1;
+                      const updatedPresentation = { ...presentation, slides: JSON.stringify(slides) };
+                      socket.emit("vote", updatedPresentation);
                       setIsAnswered(true);
                     }}
                     variant="contained"
