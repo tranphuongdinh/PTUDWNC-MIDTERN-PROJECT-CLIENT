@@ -5,13 +5,43 @@ import { useRouter } from "next/router";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import { ZoomInMapRounded, ZoomOutMapRounded } from "@mui/icons-material";
 import styles from "./styles.module.scss";
+import { useContext } from "react";
+import { AuthContext } from "../../../context/authContext";
+import { useEffect } from "react";
+import { getPresentationDetail, updatePresentation } from "../../../client/presentation";
 
 const SlideShow = () => {
   const handle = useFullScreenHandle();
   const router = useRouter();
+  const { id } = router.query;
+  const { user } = useContext(AuthContext);
 
-  // lay slides tu database (xai tam thoi storage)
-  const slides = JSON.parse(localStorage.getItem("slides"));
+  const [presentation, setPresentation] = useState({});
+  const [slides, setSlides] = useState([]);
+
+  const getPresentation = async () => {
+    try {
+      const res = await getPresentationDetail(id);
+      const presentation = res?.data?.[0];
+      setPresentation(presentation);
+      setSlides(JSON.parse(presentation?.slides) || []);
+    } catch (e) {}
+  };
+
+  const updatePresentationDetail = async (config = {}) => {
+    try {
+      const newPresentation = {
+        ...presentation,
+        ...config,
+      };
+      const res = await updatePresentation(newPresentation);
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    getPresentation();
+  }, []);
+
   const [index, setIndex] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
   const renderData = () => {
@@ -21,14 +51,6 @@ const SlideShow = () => {
     });
     return res;
   };
-  const { id } = router.query;
-  const isOwner = false;
-
-  if (!slides.length) {
-    return <div>EMPTY SLIDE, CANNOT PRESENT</div>;
-  }
-
-  // if (ownerToken === accessToken) { // cho host va co-host
 
   const PresentButton = () => (
     <Tooltip title={handle.active ? "Exit full screen" : "Go to full screen"}>
@@ -40,7 +62,7 @@ const SlideShow = () => {
 
   return (
     <>
-      {isOwner ? (
+      {presentation?.ownerId === user?._id ? (
         <FullScreen handle={handle}>
           <PresentButton />
           <div
@@ -57,7 +79,14 @@ const SlideShow = () => {
               <div style={{ display: "flex", flexDirection: "row" }}>
                 {index > 0 && <Button onClick={() => setIndex(index - 1)}>Previous</Button>}
                 {index < slides.length - 1 && <Button onClick={() => setIndex(index + 1)}>Next</Button>}
-                <Button onClick={() => (window.location.href = `/presentation/${id}`)}>Exit</Button>
+                <Button
+                  onClick={async () => {
+                    await updatePresentationDetail({ isPresent: false });
+                    router.back();
+                  }}
+                >
+                  Exit
+                </Button>
               </div>
               <h1>{slides[index]?.content?.question}</h1>
               <Chart chartType="Bar" width="60vh" height="60vh" data={renderData()} />

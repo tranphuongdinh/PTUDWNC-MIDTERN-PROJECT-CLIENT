@@ -8,6 +8,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { createPresentation } from "../../client/presentation";
 import styles from "./styles.module.scss";
 
 const Presentation = ({ user, getUser }) => {
@@ -20,7 +22,19 @@ const Presentation = ({ user, getUser }) => {
   const [openJoinGroupForm, setOpenJoinGroupForm] = useState(false);
 
   const handleCreatePresentation = async (data) => {
-    // handle api
+    const {name = '', groupId = ''} = data;
+    try {
+      const res = await createPresentation({name, groupId});
+      if (res?.status === "OK") {
+        toast.success("Create presentation successfully!");
+        await sleep(1500);
+        await getUser();
+      } else {
+        toast.error(res?.message);
+      }
+    } catch (e) {
+      toast.error(e?.response?.data?.message);
+    }
     setOpenCreatePresentation(false);
   };
   const handleJoinGroup = async (data) => {
@@ -45,12 +59,12 @@ const Presentation = ({ user, getUser }) => {
         <div>
           {user?.myGroupIds.length > 0 ? (
             <Grid container spacing={3}>
-              {user?.myGroupIds?.map((group) => (
+              {user?.presentationIds?.map((presentation) => (
                 <>
-                  <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
-                    <Link href={`/group/${group?._id}`}>
+                  <Grid item xs={12} md={6} lg={4} xl={3} key={presentation?._id}>
+                    <Link href={`/presentation/${presentation?._id}`}>
                       <div className={styles.card}>
-                        <span>{group?.name}</span>
+                        <span>{presentation?.name}</span>
                       </div>
                     </Link>
                   </Grid>

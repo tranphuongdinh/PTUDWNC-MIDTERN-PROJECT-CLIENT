@@ -3,6 +3,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { loginFunc, loginGoogleFunc, registerFunc } from "../client/auth";
 import { getGroupByIds } from "../client/group";
+import { getPresentationByIds } from "../client/presentation";
 import { getUserInfo } from "../client/user";
 import LoadingScreen from "../components/LoadingScreen";
 import { sleep } from "../utils";
@@ -27,13 +28,21 @@ const AuthContextProvider = ({ children }) => {
 
           const groupListRes = await getGroupByIds([...userInfo.myGroupIds, ...userInfo.joinedGroupIds]);
 
+          const presentationListRes = await getPresentationByIds(userInfo.presentationIds);
+
           const groupListMap = {};
 
+          const presentationListMap = {};
+
           groupListRes.data.forEach((group) => (groupListMap[group?._id] = group));
+
+          presentationListRes.data.forEach((presentation) => (presentationListMap[presentation?._id] = presentation));
 
           userInfo.myGroupIds = userInfo.myGroupIds.map((code) => groupListMap[code]);
 
           userInfo.joinedGroupIds = userInfo.joinedGroupIds.map((code) => groupListMap[code]);
+
+          userInfo.presentationIds = userInfo.presentationIds.map((code) => presentationListMap[code]);
 
           setUser({ ...user, ...userInfo });
           setIsAuthenticated(true);

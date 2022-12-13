@@ -8,65 +8,44 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
 import ShareIcon from "@mui/icons-material/Share";
-
-// Slide ={
-// 	id,
-// 	type,
-// 	content: {
-// 		question:
-// 		options:[
-// 			option1,
-// 			option2,
-// 		]
-// 	}
-// }
-
-const data = [
-  ["Year", "Sales"],
-  ["2014", 1000],
-  ["2015", 1170],
-  ["2016", 660],
-  ["2017", 1030],
-];
+import { getPresentationDetail, updatePresentation } from "../../../client/presentation";
 
 const PresentationDetailPage = () => {
   const router = useRouter();
+  const { id } = router.query;
 
-  //get slide from store (tam thoi)
-  const temp = localStorage.getItem("slides");
+  const [presentation, setPresentation] = useState({});
+  const [slides, setSlides] = useState([]);
 
-  const [slides, setSlides] = useState(
-    temp
-      ? JSON.parse(temp)
-      : [
-          {
-            // id: 0,
-            type: "Multiple Choice",
-            content: {
-              question: "Question",
-              options: [
-                {
-                  label: "Option1",
-                  data: 3,
-                },
-                {
-                  label: "Option2",
-                  data: 5,
-                },
-              ],
-            },
-          },
-        ]
-  );
+  const getPresentation = async () => {
+    try {
+      const res = await getPresentationDetail(id);
+      const presentation = res?.data?.[0];
+      setPresentation(presentation);
+      setSlides(JSON.parse(presentation?.slides) || []);
+    } catch (e) {}
+  };
 
-  // tam thoi luu slides vao storage (that ra la luu vao database)
+  const updatePresentationDetail = async (config = {}) => {
+    try {
+      const newPresentation = {
+        ...presentation,
+        slides: JSON.stringify(slides),
+        ...config,
+      };
+      const res = await updatePresentation(newPresentation);
+    } catch (e) {}
+  };
+
   useEffect(() => {
-    localStorage.setItem("slides", JSON.stringify(slides));
+    updatePresentationDetail();
   }, [slides]);
 
+  useEffect(() => {
+    getPresentation();
+  }, []);
+
   const [selectedSlide, setSelectedSlide] = useState(0);
-  const { id } = router.query;
-  //  console.log(id);
 
   const renderData = () => {
     let res = [["Option", "Count"]];
@@ -75,13 +54,13 @@ const PresentationDetailPage = () => {
     });
     return res;
   };
+
   return (
     <div className={styles.wrapper}>
       <Grid container spacing={3}>
         <Grid container item xs={12}>
           <Grid item xs={9}>
-            <h1>SELECTED SLIDE: {JSON.stringify(selectedSlide)}</h1>
-            {JSON.stringify(slides[selectedSlide])}
+            <h1>{presentation?.name}</h1>
           </Grid>
           <Grid item xs={3}>
             <Button sx={{ margin: "0 0 20px 20px" }} variant="contained">
@@ -91,9 +70,10 @@ const PresentationDetailPage = () => {
             <Button
               sx={{ margin: "0 0 20px 20px" }}
               variant="contained"
-              onClick={() =>
-                (window.location.href = `/presentation/${id}/slideshow`)
-              }
+              onClick={async () => {
+                await updatePresentationDetail({ isPresent: true });
+                router.push(`/presentation/${id}/slideshow`);
+              }}
             >
               <SlideshowIcon />
               &nbsp;Present
@@ -106,21 +86,19 @@ const PresentationDetailPage = () => {
             <Button
               style={{ marginLeft: "20px" }}
               onClick={() => {
-                // const idx = slides[slides.length - 1].id + 1;
                 const newSlides = [
                   ...slides,
                   {
-                    // id: idx,
                     type: "Multiple Choice",
                     content: {
-                      question: "Question",
+                      question: "Your question",
                       options: [
                         {
-                          label: "Option1",
+                          label: "Option 1",
                           data: 0,
                         },
                         {
-                          label: "Option1",
+                          label: "Option 2",
                           data: 0,
                         },
                       ],
@@ -141,19 +119,8 @@ const PresentationDetailPage = () => {
           <Grid item md={2} container spacing={2}>
             <div className={styles.slidesList}>
               {slides.map((slide, index) => (
-                <Grid
-                  item
-                  xs={12}
-                  key={index}
-                  className={clsx(
-                    styles.slideItem,
-                    index === selectedSlide && styles.selected
-                  )}
-                >
-                  <Card
-                    onClick={() => setSelectedSlide(index)}
-                    class={styles.previewSlideItem}
-                  >
+                <Grid item xs={12} key={index} className={clsx(styles.slideItem, index === selectedSlide && styles.selected)}>
+                  <Card onClick={() => setSelectedSlide(index)} class={styles.previewSlideItem}>
                     {index}
                   </Card>
                   <Button
@@ -180,12 +147,7 @@ const PresentationDetailPage = () => {
               {slides.length ? (
                 <>
                   <h2>{slides[selectedSlide]?.content?.question}</h2>
-                  <Chart
-                    chartType="Bar"
-                    width="400px"
-                    height="300px"
-                    data={renderData()}
-                  />
+                  <Chart chartType="Bar" width="400px" height="300px" data={renderData()} />
                 </>
               ) : (
                 <h2>Empty slide</h2>
@@ -196,9 +158,7 @@ const PresentationDetailPage = () => {
             <Grid item md={4} container>
               <Grid item container xs={12}>
                 <Grid item xs={12}>
-                  <FormLabel className={styles.formLabel}>
-                    Your Question
-                  </FormLabel>
+                  <FormLabel className={styles.formLabel}>Your Question</FormLabel>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -234,14 +194,10 @@ const PresentationDetailPage = () => {
                         label="Option 1"
                         placeholder="Type option 1"
                         fullWidth
-                        value={
-                          slides[selectedSlide].content.options[index].label
-                        }
+                        value={slides[selectedSlide].content.options[index].label}
                         onChange={(e) => {
                           // full code to control option in slides state
-                          const newOptions = [
-                            ...slides[selectedSlide].content.options,
-                          ];
+                          const newOptions = [...slides[selectedSlide].content.options];
                           newOptions.splice(index, 1, {
                             ...newOptions[index],
                             label: e.target.value,
@@ -261,9 +217,7 @@ const PresentationDetailPage = () => {
                       <Button
                         size="small"
                         onClick={() => {
-                          const newOptions = [
-                            ...slides[selectedSlide].content.options,
-                          ];
+                          const newOptions = [...slides[selectedSlide].content.options];
                           newOptions.splice(index, 1);
                           const replaceSlide = {
                             ...slides[selectedSlide],
@@ -287,9 +241,7 @@ const PresentationDetailPage = () => {
                   <Button
                     variant="contained"
                     onClick={() => {
-                      const newOptions = [
-                        ...slides[selectedSlide].content.options,
-                      ];
+                      const newOptions = [...slides[selectedSlide].content.options];
                       newOptions.push({
                         label: `Option ${newOptions.length + 1}`,
                         data: 0,
