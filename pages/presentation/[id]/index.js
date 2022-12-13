@@ -8,7 +8,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
 import ShareIcon from "@mui/icons-material/Share";
-import { getPresentationDetail, updatePresentation } from "../../../client/presentation";
+import {
+  getPresentationDetail,
+  updatePresentation,
+} from "../../../client/presentation";
 
 const PresentationDetailPage = () => {
   const router = useRouter();
@@ -119,8 +122,19 @@ const PresentationDetailPage = () => {
           <Grid item md={2} container spacing={2}>
             <div className={styles.slidesList}>
               {slides.map((slide, index) => (
-                <Grid item xs={12} key={index} className={clsx(styles.slideItem, index === selectedSlide && styles.selected)}>
-                  <Card onClick={() => setSelectedSlide(index)} class={styles.previewSlideItem}>
+                <Grid
+                  item
+                  xs={12}
+                  key={index}
+                  className={clsx(
+                    styles.slideItem,
+                    index === selectedSlide && styles.selected
+                  )}
+                >
+                  <Card
+                    onClick={() => setSelectedSlide(index)}
+                    class={styles.previewSlideItem}
+                  >
                     {index}
                   </Card>
                   <Button
@@ -142,12 +156,17 @@ const PresentationDetailPage = () => {
             </div>
           </Grid>
 
-          <Grid item md={6}>
+          <Grid item md={6} sm={12} xs={12}>
             <div className={styles.previewSlide}>
               {slides.length ? (
                 <>
                   <h2>{slides[selectedSlide]?.content?.question}</h2>
-                  <Chart chartType="Bar" width="400px" height="300px" data={renderData()} />
+                  <Chart
+                    chartType="Bar"
+                    width="90%"
+                    height="90%"
+                    data={renderData()}
+                  />
                 </>
               ) : (
                 <h2>Empty slide</h2>
@@ -155,10 +174,12 @@ const PresentationDetailPage = () => {
             </div>
           </Grid>
           {slides.length ? (
-            <Grid item md={4} container>
+            <Grid item md={4} sm={12} container className={styles.content}>
               <Grid item container xs={12}>
                 <Grid item xs={12}>
-                  <FormLabel className={styles.formLabel}>Your Question</FormLabel>
+                  <FormLabel className={styles.formLabel}>
+                    Your Question
+                  </FormLabel>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -194,10 +215,14 @@ const PresentationDetailPage = () => {
                         label="Option 1"
                         placeholder="Type option 1"
                         fullWidth
-                        value={slides[selectedSlide].content.options[index].label}
+                        value={
+                          slides[selectedSlide].content.options[index].label
+                        }
                         onChange={(e) => {
                           // full code to control option in slides state
-                          const newOptions = [...slides[selectedSlide].content.options];
+                          const newOptions = [
+                            ...slides[selectedSlide].content.options,
+                          ];
                           newOptions.splice(index, 1, {
                             ...newOptions[index],
                             label: e.target.value,
@@ -217,7 +242,9 @@ const PresentationDetailPage = () => {
                       <Button
                         size="small"
                         onClick={() => {
-                          const newOptions = [...slides[selectedSlide].content.options];
+                          const newOptions = [
+                            ...slides[selectedSlide].content.options,
+                          ];
                           newOptions.splice(index, 1);
                           const replaceSlide = {
                             ...slides[selectedSlide],
@@ -241,7 +268,9 @@ const PresentationDetailPage = () => {
                   <Button
                     variant="contained"
                     onClick={() => {
-                      const newOptions = [...slides[selectedSlide].content.options];
+                      const newOptions = [
+                        ...slides[selectedSlide].content.options,
+                      ];
                       newOptions.push({
                         label: `Option ${newOptions.length + 1}`,
                         data: 0,
