@@ -62,7 +62,7 @@ const PresentationDetailPage = () => {
           <Grid item xs={9}>
             <h1>{presentation?.name}</h1>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={3} className={styles.buttonGroup}>
             <Button sx={{ margin: "0 0 20px 20px" }} variant="contained">
               <ShareIcon />
               &nbsp;Share
