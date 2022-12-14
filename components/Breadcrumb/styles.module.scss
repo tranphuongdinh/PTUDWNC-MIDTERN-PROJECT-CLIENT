@@ -1,0 +1,14 @@
+.breadcrumb {
+    height: 20px;
+    width: fit-content;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    left: 50px;
+    a {
+        line-height: 20px;
+        color: rgb(74, 101, 201);
+        font-size: 12px;
+        cursor: pointer !important;
+    }
+}
