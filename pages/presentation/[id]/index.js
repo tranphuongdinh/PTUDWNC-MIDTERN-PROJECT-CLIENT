@@ -1,4 +1,11 @@
-import { Button, Card, Container, FormLabel, Grid, TextField } from "@mui/material";
+import {
+  Button,
+  Card,
+  Container,
+  FormLabel,
+  Grid,
+  TextField,
+} from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
@@ -8,7 +15,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
 import ShareIcon from "@mui/icons-material/Share";
-import { getPresentationDetail, updatePresentation } from "../../../client/presentation";
+import {
+  getPresentationDetail,
+  updatePresentation,
+} from "../../../client/presentation";
 
 const PresentationDetailPage = () => {
   const router = useRouter();
@@ -47,7 +57,7 @@ const PresentationDetailPage = () => {
 
   const [selectedSlide, setSelectedSlide] = useState(0);
 
-  const renderData = () => {
+  const renderData = (selectedSlide) => {
     let res = [["Option", "Count"]];
     slides[selectedSlide].content.options.map((option) => {
       res.push([option.label, option.data]);
@@ -117,9 +127,29 @@ const PresentationDetailPage = () => {
           <Grid item md={2} container spacing={2}>
             <div className={styles.slidesList}>
               {slides.map((slide, index) => (
-                <Grid item xs={12} key={index} className={clsx(styles.slideItem, index === selectedSlide && styles.selected)}>
-                  <Card onClick={() => setSelectedSlide(index)} class={styles.previewSlideItem}>
-                    {index}
+                <Grid
+                  item
+                  xs={12}
+                  key={index}
+                  className={clsx(
+                    styles.slideItem,
+                    index === selectedSlide && styles.selected
+                  )}
+                >
+                  <span className={styles.index}>{index}</span>
+
+                  <Card
+                    onClick={() => setSelectedSlide(index)}
+                    class={styles.previewSlideItem}
+                  >
+                    <p>{slides[index]?.content?.question}</p>
+
+                    <Chart
+                      chartType="Bar"
+                      width="70%"
+                      height="70%"
+                      data={renderData(index)}
+                    />
                   </Card>
                   <Button
                     className={styles.deleteButton}
@@ -145,7 +175,12 @@ const PresentationDetailPage = () => {
               {slides.length ? (
                 <>
                   <h2>{slides[selectedSlide]?.content?.question}</h2>
-                  <Chart chartType="Bar" width="90%" height="90%" data={renderData()} />
+                  <Chart
+                    chartType="Bar"
+                    width="90%"
+                    height="90%"
+                    data={renderData(selectedSlide)}
+                  />
                 </>
               ) : (
                 <h2>Empty slide</h2>
@@ -156,7 +191,9 @@ const PresentationDetailPage = () => {
             <Grid item md={4} sm={12} container className={styles.content}>
               <Grid item container xs={12}>
                 <Grid item xs={12}>
-                  <FormLabel className={styles.formLabel}>Your Question</FormLabel>
+                  <FormLabel className={styles.formLabel}>
+                    Your Question
+                  </FormLabel>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -192,10 +229,14 @@ const PresentationDetailPage = () => {
                         label="Option 1"
                         placeholder="Type option 1"
                         fullWidth
-                        value={slides[selectedSlide].content.options[index].label}
+                        value={
+                          slides[selectedSlide].content.options[index].label
+                        }
                         onChange={(e) => {
                           // full code to control option in slides state
-                          const newOptions = [...slides[selectedSlide].content.options];
+                          const newOptions = [
+                            ...slides[selectedSlide].content.options,
+                          ];
                           newOptions.splice(index, 1, {
                             ...newOptions[index],
                             label: e.target.value,
@@ -215,7 +256,9 @@ const PresentationDetailPage = () => {
                       <Button
                         size="small"
                         onClick={() => {
-                          const newOptions = [...slides[selectedSlide].content.options];
+                          const newOptions = [
+                            ...slides[selectedSlide].content.options,
+                          ];
                           newOptions.splice(index, 1);
                           const replaceSlide = {
                             ...slides[selectedSlide],
@@ -239,7 +282,9 @@ const PresentationDetailPage = () => {
                   <Button
                     variant="contained"
                     onClick={() => {
-                      const newOptions = [...slides[selectedSlide].content.options];
+                      const newOptions = [
+                        ...slides[selectedSlide].content.options,
+                      ];
                       newOptions.push({
                         label: `Option ${newOptions.length + 1}`,
                         data: 0,
