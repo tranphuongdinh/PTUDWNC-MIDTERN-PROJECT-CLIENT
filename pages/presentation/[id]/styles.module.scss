@@ -92,9 +92,9 @@
 }
 
 .presentationSlideCol {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 
   h1 {
     margin: 20px 0;
