@@ -24,6 +24,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { createInviteLinkGroup, getGroupDetail, removeFromGroup, sendInviteEmail, updateRoleInGroup } from "../../../client/group";
 import { getUserByIds } from "../../../client/user";
+import Breadcrumb from "../../../components/Breadcrumb";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { AuthContext } from "../../../context/authContext";
 import { sleep } from "../../../utils";
@@ -143,6 +144,12 @@ export default function GroupDetailPage() {
     <LoadingScreen />
   ) : (
     <Grid container spacing={6} className={styles.wrapper}>
+      <Breadcrumb
+        paths={[
+          { label: "Home", href: "/" },
+          { label: group?.name, href: `/group/${group?._id}` },
+        ]}
+      />
       <Grid item xs={12} style={{ display: "flex", justifyContent: "flex-end" }}>
         <Button variant="contained" ref={anchorElButton} onClick={handleClickButton} startIcon={<PersonAddIcon />}>
           Invite
