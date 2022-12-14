@@ -30,13 +30,13 @@
 }
 
 .buttonGroup {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
 }
 
 .zoomButton {
-  position: fixed;
+  position: fixed !important;
   right: 10px;
   top: 10px;
   z-index: 99;
@@ -108,12 +108,12 @@
 }
 
 .buttonWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 
   button {
-    margin: 20px;
+    margin: 20px !important;
   }
 }
 
