@@ -1,6 +1,6 @@
 import CoPresentIcon from "@mui/icons-material/CoPresent";
 import PresentToAllIcon from "@mui/icons-material/PresentToAll";
-import { Button, Grid, TextField } from "@mui/material";
+import { Button, Grid, IconButton, TextField } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -9,8 +9,9 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { createPresentation } from "../../client/presentation";
+import { createPresentation, deletePresentation } from "../../client/presentation";
 import styles from "./styles.module.scss";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Presentation = ({ user, getUser }) => {
   const { register, handleSubmit } = useForm({
@@ -22,12 +23,11 @@ const Presentation = ({ user, getUser }) => {
   const [openJoinGroupForm, setOpenJoinGroupForm] = useState(false);
 
   const handleCreatePresentation = async (data) => {
-    const {name = '', groupId = ''} = data;
+    const { name = "", groupId = "" } = data;
     try {
-      const res = await createPresentation({name, groupId});
+      const res = await createPresentation({ name, groupId });
       if (res?.status === "OK") {
         toast.success("Create presentation successfully!");
-        await sleep(1500);
         await getUser();
       } else {
         toast.error(res?.message);
@@ -37,6 +37,21 @@ const Presentation = ({ user, getUser }) => {
     }
     setOpenCreatePresentation(false);
   };
+
+  const handleRemovePresentation = async (id) => {
+    try {
+      const res = await deletePresentation(id);
+      if (res?.status === "OK") {
+        toast.success("Delete presentation successfully!");
+        await getUser();
+      } else {
+        toast.error(res?.message);
+      }
+    } catch (e) {
+      toast.error(e?.response?.data?.message);
+    }
+  };
+
   const handleJoinGroup = async (data) => {
     window.location.href = data.link;
     setOpenJoinGroupForm(false);
@@ -62,10 +77,22 @@ const Presentation = ({ user, getUser }) => {
               {user?.presentationIds?.map((presentation) => (
                 <>
                   <Grid item xs={12} md={6} lg={4} xl={3} key={presentation?._id}>
-                    <Link href={`/presentation/${presentation?._id}`}>
-                      <div className={styles.card}>
-                        <span>{presentation?.name}</span>
-                      </div>
+                    <Link href={`/presentation/${presentation?._id}`} legacyBehavior>
+                      <a>
+                        <div className={styles.card}>
+                          <IconButton
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleRemovePresentation(presentation?._id);
+                            }}
+                            className={styles.removeButton}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                          <span>{presentation?.name}</span>
+                        </div>
+                      </a>
                     </Link>
                   </Grid>
                 </>

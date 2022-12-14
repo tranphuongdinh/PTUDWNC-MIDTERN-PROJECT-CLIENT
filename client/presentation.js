@@ -4,7 +4,7 @@ export const createPresentation = async (data) => request("POST", "/presentation
 
 export const updatePresentation = async (data) => request("PUT", "/presentation/update", data);
 
-export const deletePresentation = async (id) => request("DELETE", "/presentation/update", { id });
+export const deletePresentation = async (id) => request("DELETE", "/presentation/delete", { id });
 
 export const getPresentationDetail = async (id) => request("GET", `/presentation/detail/${id}`);
 

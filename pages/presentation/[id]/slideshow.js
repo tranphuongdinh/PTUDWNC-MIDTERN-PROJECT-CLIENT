@@ -13,25 +13,31 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import { SocketContext } from "../../../context/socketContext";
+import LoadingScreen from "../../../components/LoadingScreen";
 
 const SlideShow = () => {
   const { socket } = useContext(SocketContext);
 
   const handle = useFullScreenHandle();
   const router = useRouter();
-  const { user } = useContext(AuthContext);
+  const { user, isLoadingAuth } = useContext(AuthContext);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [presentation, setPresentation] = useState({});
   const [slides, setSlides] = useState([]);
 
   const getPresentation = async () => {
+    setIsLoading(true);
     try {
       const { id } = router.query;
       const res = await getPresentationDetail(id);
       const presentation = res?.data?.[0];
       setPresentation(presentation);
       setSlides(JSON.parse(presentation?.slides) || []);
-    } catch (e) {}
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
+    }
   };
 
   const updatePresentationDetail = async (config = {}) => {
@@ -83,9 +89,19 @@ const SlideShow = () => {
         setIsAnswered(false);
       }
     });
+
+    socket.on("startPresent", (data) => {
+      if (!presentation?.isPresent && data === presentation?._id) router.reload();
+    });
+
+    socket.on("stopPresent", (data) => {
+      if (presentation?.isPresent && data === presentation?._id) router.reload();
+    });
   }, [presentation]);
 
-  return (
+  return isLoading || isLoadingAuth ? (
+    <LoadingScreen />
+  ) : (
     <>
       {user?._id && presentation?.ownerId === user?._id ? (
         <FullScreen handle={handle}>
@@ -132,6 +148,7 @@ const SlideShow = () => {
                   variant="contained"
                   onClick={async () => {
                     await updatePresentationDetail({ isPresent: false });
+                    socket.emit("clientStopPresent", presentation?._id);
                     router.back();
                   }}
                   color="error"
@@ -157,20 +174,10 @@ const SlideShow = () => {
             </Grid>
           </Grid>
         </FullScreen>
-      ) : (
+      ) : presentation?.isPresent ? (
         <FullScreen handle={handle}>
           <PresentButton />
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "50px",
-              width: "100vw",
-              height: "100vh",
-            }}
-          >
+          <div className={styles.userVoteViewWrapper}>
             {isAnswered ? (
               <div>Thank you for you answer</div>
             ) : (
@@ -200,6 +207,10 @@ const SlideShow = () => {
             )}
           </div>
         </FullScreen>
+      ) : (
+        <div className={styles.userVoteViewWrapper}>
+          <span>This presentation has not been started yet.</span>
+        </div>
       )}
     </>
   );
