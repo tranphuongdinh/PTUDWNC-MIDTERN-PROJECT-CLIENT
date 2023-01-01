@@ -300,19 +300,16 @@ const PresentationDetail = ({ id }) => {
             </Grid>
             {slides.length ? (
               <Grid item md={4} sm={12} container className={styles.content}>
-                <Grid item container xs={12}>
-                  <Grid item xs={12}>
-                    <FormLabel className={styles.formLabel}>
-                      Controller
-                    </FormLabel>
-                  </Grid>
+                <div>
+                  <h3>Edit your slide</h3>
 
-                  <Grid item xs={12}>
+                  <div item xs={12}>
                     {slides[selectedSlide].type === "Multiple Choice" ? (
                       <TextField
                         label="Your question"
                         placeholder="Type your question"
                         fullWidth
+                        style={{ marginTop: "30px" }}
                         value={slides[selectedSlide].content.question}
                         onChange={(e) => {
                           const replaceSlide = {
@@ -332,6 +329,7 @@ const PresentationDetail = ({ id }) => {
                         label="Heading"
                         placeholder="Heading"
                         fullWidth
+                        style={{ marginTop: "30px" }}
                         value={slides[selectedSlide].content.heading}
                         onChange={(e) => {
                           const replaceSlide = {
@@ -352,6 +350,7 @@ const PresentationDetail = ({ id }) => {
                         label="Sub Heading"
                         placeholder="Sub Heading"
                         fullWidth
+                        style={{ marginTop: "30px" }}
                         value={slides[selectedSlide].content.subHeading}
                         onChange={(e) => {
                           const replaceSlide = {
@@ -372,6 +371,7 @@ const PresentationDetail = ({ id }) => {
                         label="Paragraph"
                         placeholder="Paragraph"
                         fullWidth
+                        style={{ marginTop: "30px" }}
                         value={slides[selectedSlide].content.paragraph}
                         onChange={(e) => {
                           const replaceSlide = {
@@ -387,93 +387,96 @@ const PresentationDetail = ({ id }) => {
                         }}
                       />
                     )}
-                  </Grid>
-                </Grid>
-
-                {slides[selectedSlide].type === "Multiple Choice" &&
-                  slides[selectedSlide].content.options.length > 0 &&
-                  slides[selectedSlide].content.options.map((option, index) => (
-                    <div key={index}>
-                      <TextField
-                        label="Option 1"
-                        placeholder="Type option 1"
-                        fullWidth
-                        value={
-                          slides[selectedSlide].content.options[index].label
-                        }
-                        onChange={(e) => {
-                          // full code to control option in slides state
-                          const newOptions = [
-                            ...slides[selectedSlide].content.options,
-                          ];
-                          newOptions.splice(index, 1, {
-                            ...newOptions[index],
-                            label: e.target.value,
-                          });
-                          const replaceSlide = {
-                            ...slides[selectedSlide],
-                            content: {
-                              ...slides[selectedSlide].content,
-                              options: [...newOptions],
-                            },
-                          };
-                          const tmp = [...slides];
-                          tmp.splice(selectedSlide, 1, replaceSlide);
-                          setSlides([...tmp]);
-                        }}
-                      />
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          const newOptions = [
-                            ...slides[selectedSlide].content.options,
-                          ];
-                          newOptions.splice(index, 1);
-                          const replaceSlide = {
-                            ...slides[selectedSlide],
-                            content: {
-                              ...slides[selectedSlide].content,
-                              options: [...newOptions],
-                            },
-                          };
-                          const tmp = [...slides];
-                          tmp.splice(selectedSlide, 1, replaceSlide);
-                          setSlides([...tmp]);
-                        }}
-                      >
-                        <DeleteIcon style={{ fontSize: "18px" }} />
-                        &nbsp;Delete option {index + 1}
-                      </Button>
-                    </div>
-                  ))}
-
-                <Grid item xs={12}>
-                  <Button
-                    startIcon={<AddIcon />}
-                    variant="contained"
-                    onClick={() => {
-                      const newOptions = [
-                        ...slides[selectedSlide].content.options,
-                      ];
-                      newOptions.push({
-                        label: `Option ${newOptions.length + 1}`,
-                        data: 0,
-                      });
-                      const replaceSlide = {
-                        ...slides[selectedSlide],
-                        content: {
-                          ...slides[selectedSlide].content,
-                          options: [...newOptions],
-                        },
-                      };
-                      const tmp = [...slides];
-                      tmp.splice(selectedSlide, 1, replaceSlide);
-                      setSlides([...tmp]);
-                    }}
-                  >
-                    Add option
-                  </Button>
-                </Grid>
+                    {slides[selectedSlide].type === "Multiple Choice" &&
+                      slides[selectedSlide].content.options.length > 0 &&
+                      slides[selectedSlide].content.options.map(
+                        (option, index) => (
+                          <div key={index}>
+                            <TextField
+                              label="Option 1"
+                              placeholder="Type option 1"
+                              fullWidth
+                              style={{ marginTop: "30px" }}
+                              value={
+                                slides[selectedSlide].content.options[index]
+                                  .label
+                              }
+                              onChange={(e) => {
+                                // full code to control option in slides state
+                                const newOptions = [
+                                  ...slides[selectedSlide].content.options,
+                                ];
+                                newOptions.splice(index, 1, {
+                                  ...newOptions[index],
+                                  label: e.target.value,
+                                });
+                                const replaceSlide = {
+                                  ...slides[selectedSlide],
+                                  content: {
+                                    ...slides[selectedSlide].content,
+                                    options: [...newOptions],
+                                  },
+                                };
+                                const tmp = [...slides];
+                                tmp.splice(selectedSlide, 1, replaceSlide);
+                                setSlides([...tmp]);
+                              }}
+                            />
+                            <Button
+                              size="small"
+                              onClick={() => {
+                                const newOptions = [
+                                  ...slides[selectedSlide].content.options,
+                                ];
+                                newOptions.splice(index, 1);
+                                const replaceSlide = {
+                                  ...slides[selectedSlide],
+                                  content: {
+                                    ...slides[selectedSlide].content,
+                                    options: [...newOptions],
+                                  },
+                                };
+                                const tmp = [...slides];
+                                tmp.splice(selectedSlide, 1, replaceSlide);
+                                setSlides([...tmp]);
+                              }}
+                            >
+                              <DeleteIcon style={{ fontSize: "18px" }} />
+                              &nbsp;Delete option {index + 1}
+                            </Button>
+                          </div>
+                        )
+                      )}
+                  </div>
+                  {slides[selectedSlide].type === "Multiple Choice" && (
+                    <Button
+                      startIcon={<AddIcon />}
+                      variant="contained"
+                      style={{ marginTop: "30px" }}
+                      onClick={() => {
+                        const newOptions = [
+                          ...slides[selectedSlide].content.options,
+                        ];
+                        newOptions.push({
+                          label: `Option ${newOptions.length + 1}`,
+                          data: 0,
+                        });
+                        const replaceSlide = {
+                          ...slides[selectedSlide],
+                          content: {
+                            ...slides[selectedSlide].content,
+                            options: [...newOptions],
+                          },
+                        };
+                        const tmp = [...slides];
+                        tmp.splice(selectedSlide, 1, replaceSlide);
+                        setSlides([...tmp]);
+                      }}
+                    >
+                      Add option
+                    </Button>
+                  )}
+                </div>
               </Grid>
             ) : null}
           </Grid>
