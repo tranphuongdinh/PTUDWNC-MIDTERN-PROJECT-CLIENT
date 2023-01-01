@@ -7,13 +7,11 @@ const renderChartData = (options) => {
   return res;
 };
 
-const MultipleChoicePresentation = ({
-  options = [],
-  question = "",
-  type = "default",
-  width = "100%",
-  height = "100%",
-}) => {
+const MultipleChoicePresentation = (props) => {
+  const { question, options, type = "default" } = props;
+  const width = type === "default" ? "90%" : "70%";
+  const height = type === "default" ? "90%" : "70%";
+
   return (
     <>
       {type === "preview" ? <p>{question}</p> : <h2>{question}</h2>}
