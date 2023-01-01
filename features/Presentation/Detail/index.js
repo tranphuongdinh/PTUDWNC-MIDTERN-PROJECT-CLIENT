@@ -10,7 +10,6 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import clsx from "clsx";
-import { Chart } from "react-google-charts";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
@@ -24,6 +23,7 @@ import { toast } from "react-toastify";
 import { useContext } from "react";
 import { SocketContext } from "../../../context/socketContext";
 import Breadcrumb from "../../../components/Breadcrumb";
+import MultipleChoice from "../../../components/Presentation/MultipleChoice";
 
 const PresentationDetail = ({ id }) => {
   const router = useRouter();
@@ -162,13 +162,12 @@ const PresentationDetail = ({ id }) => {
                       onClick={() => setSelectedSlide(index)}
                       class={styles.previewSlideItem}
                     >
-                      <p>{slides[index]?.content?.question}</p>
-
-                      <Chart
-                        chartType="Bar"
+                      <MultipleChoice
+                        options={slides[index]?.content?.options}
+                        question={slides[index]?.content?.question}
                         width="70%"
                         height="70%"
-                        data={renderData(index)}
+                        type="preview"
                       />
                     </Card>
                     <Button
@@ -193,15 +192,12 @@ const PresentationDetail = ({ id }) => {
             <Grid item md={6} sm={12} xs={12}>
               <div className={styles.previewSlide}>
                 {slides.length ? (
-                  <>
-                    <h2>{slides[selectedSlide]?.content?.question}</h2>
-                    <Chart
-                      chartType="Bar"
-                      width="90%"
-                      height="90%"
-                      data={renderData(selectedSlide)}
-                    />
-                  </>
+                  <MultipleChoice
+                    options={slides[selectedSlide]?.content?.options}
+                    question={slides[selectedSlide]?.content?.question}
+                    width="90%"
+                    height="90%"
+                  />
                 ) : (
                   <h2>Empty slide</h2>
                 )}

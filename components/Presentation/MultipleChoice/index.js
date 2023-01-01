@@ -7,17 +7,15 @@ const renderChartData = (options) => {
   return res;
 };
 
-const MultipleChoicePresentation = (slide) => {
-  const {
-    options = [],
-    question = "",
-    type = "default",
-    width = "100%",
-    height = "100%",
-  } = slide;
-
+const MultipleChoicePresentation = ({
+  options = [],
+  question = "",
+  type = "default",
+  width = "100%",
+  height = "100%",
+}) => {
   return (
-    <div>
+    <>
       {type === "preview" ? <p>{question}</p> : <h2>{question}</h2>}
       <Chart
         chartType="Bar"
@@ -25,7 +23,7 @@ const MultipleChoicePresentation = (slide) => {
         height={height}
         data={renderChartData(options)}
       />
-    </div>
+    </>
   );
 };
 
