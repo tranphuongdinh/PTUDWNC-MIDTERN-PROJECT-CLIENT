@@ -28,6 +28,7 @@ import Heading from "../../../components/Presentation/Heading";
 import Paragraph from "../../../components/Presentation/Paragraph";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import GroupsIcon from "@mui/icons-material/Groups";
 
 const PresentationItem = (props) => {
   const { presentType, ...rest } = props;
@@ -99,6 +100,16 @@ const PresentationDetail = ({ id }) => {
               <h1 style={{ marginLeft: 20 }}>{presentation?.name}</h1>
             </Grid>
             <Grid item xs={12} md={6} className={styles.buttonGroup}>
+              <Button
+                sx={{ margin: "10px 0 10px 20px" }}
+                variant="contained"
+                onClick={() => {
+                  router.push(`/presentation/${id}/collaboration`);
+                }}
+              >
+                <GroupsIcon />
+                &nbsp;Collaborate
+              </Button>
               <CopyToClipboard
                 text={`${window?.location?.href}/slideshow`}
                 onCopy={() => toast.success("Presentation link copied!")}
