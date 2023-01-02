@@ -1,4 +1,5 @@
 import CoPresentIcon from "@mui/icons-material/CoPresent";
+import DeleteIcon from "@mui/icons-material/Delete";
 import PresentToAllIcon from "@mui/icons-material/PresentToAll";
 import { Button, Grid, IconButton, TextField } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
@@ -8,10 +9,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { createPresentation, deletePresentation } from "../../client/presentation";
+import { customToast } from "../../utils";
 import styles from "./styles.module.scss";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 const Presentation = ({ user, getUser }) => {
   const { register, handleSubmit } = useForm({
@@ -27,13 +27,13 @@ const Presentation = ({ user, getUser }) => {
     try {
       const res = await createPresentation({ name, groupId });
       if (res?.status === "OK") {
-        toast.success("Create presentation successfully!");
+        await customToast("SUCCESS", "Create presentation successfully!");
         await getUser();
       } else {
-        toast.error(res?.message);
+        await customToast("ERROR", res?.message);
       }
     } catch (e) {
-      toast.error(e?.response?.data?.message);
+      await customToast("ERROR", e?.response?.data?.message);
     }
     setOpenCreatePresentation(false);
   };
@@ -42,13 +42,13 @@ const Presentation = ({ user, getUser }) => {
     try {
       const res = await deletePresentation(id);
       if (res?.status === "OK") {
-        toast.success("Delete presentation successfully!");
+        await customToast("SUCCESS", "Delete presentation successfully!");
         await getUser();
       } else {
-        toast.error(res?.message);
+        await customToast("ERROR", res?.message);
       }
     } catch (e) {
-      toast.error(e?.response?.data?.message);
+      await customToast("ERROR", e?.response?.data?.message);
     }
   };
 

@@ -1,11 +1,10 @@
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import { activeAccount } from "../../client/auth";
 import { sendVerificationEmail } from "../../client/user";
 import styles from "../../features/Login/styles.module.scss";
-import { sleep } from "../../utils";
+import { customToast } from "../../utils";
 
 const ActivePage = () => {
   const router = useRouter();
@@ -21,13 +20,12 @@ const ActivePage = () => {
         const data = { userId, activeCode };
         const res = await activeAccount(data);
         if (res?.status === "OK") {
-          toast.success(res?.message);
-          await sleep(1500);
+          await customToast("SUCCESS", res?.message);
           window.location.href = "/";
         }
         setIsVerifying(false);
       } catch (e) {
-        toast.error(e?.response?.data?.message);
+        await customToast("ERROR", e?.response?.data?.message);
         setIsVerifying(false);
       }
     }
@@ -37,11 +35,10 @@ const ActivePage = () => {
     try {
       const res = await sendVerificationEmail();
       if (res.status === "OK") {
-        toast.success(res?.message);
-        await sleep(1500);
+        await customToast("SUCCESS", res?.message);
       }
     } catch (e) {
-      toast.error(e?.response?.data?.message);
+      await customToast("ERROR", e?.response?.data?.message);
       setIsVerifying(false);
     }
   };

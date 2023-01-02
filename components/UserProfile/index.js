@@ -6,10 +6,9 @@ import { Avatar, Button, TextField } from "@mui/material";
 import Box from "@mui/material/Box";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import * as yup from "yup";
 import { updateUserInfo } from "../../client/user";
-import { sleep } from "../../utils";
+import { customToast } from "../../utils";
 import styles from "./styles.module.scss";
 
 const UserProfile = ({ user }) => {
@@ -41,14 +40,13 @@ const UserProfile = ({ user }) => {
       try {
         const res = await updateUserInfo(formData);
         if (res.status === "OK") {
-          toast.success("Update information successfully!");
-          await sleep(1500);
+          await customToast("Update information successfully!");
         } else {
-          toast.error(res.message);
+          await customToast("ERROR", res.message);
         }
         setUpdateMode(false);
       } catch (error) {
-        toast.error(error.response.data.message);
+        await customToast("ERROR", error.response.data.message);
         setUpdateMode(false);
       }
     }

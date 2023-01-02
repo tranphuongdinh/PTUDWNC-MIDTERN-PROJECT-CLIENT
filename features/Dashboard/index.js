@@ -9,9 +9,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { createGroup } from "../../client/group";
-import { sleep } from "../../utils";
+import { customToast } from "../../utils";
 import styles from "./styles.module.scss";
 
 const Dashboard = ({ user, getUser }) => {
@@ -26,14 +25,13 @@ const Dashboard = ({ user, getUser }) => {
     try {
       const res = await createGroup(data);
       if (res?.status === "OK") {
-        toast.success("Create group successfully!");
-        await sleep(1500);
+        await customToast("SUCCESS", "Create group successfully!");
         await getUser();
       } else {
-        toast.error(res?.message);
+        await customToast("ERROR", res?.message);
       }
     } catch (e) {
-      toast.error(e?.response?.data?.message);
+      await customToast("ERROR", e?.response?.data?.message);
     }
     setOpenCreateGroupForm(false);
   };

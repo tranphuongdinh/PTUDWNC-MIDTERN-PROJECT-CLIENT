@@ -1,12 +1,11 @@
 import { useRouter } from "next/router";
 import React, { createContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { loginFunc, loginGoogleFunc, registerFunc } from "../client/auth";
+import { loginFunc, loginGoogleFunc, registerFunc, resetAccount } from "../client/auth";
 import { getGroupByIds } from "../client/group";
 import { getPresentationByIds } from "../client/presentation";
 import { getUserInfo } from "../client/user";
 import LoadingScreen from "../components/LoadingScreen";
-import { sleep } from "../utils";
+import { customToast } from "../utils";
 
 const AuthContext = createContext();
 
@@ -48,8 +47,6 @@ const AuthContextProvider = ({ children }) => {
 
           userInfo.memberGroups = userInfo.joinedGroupIds.filter((group) => group.memberIds.includes(userInfo._id));
 
-          console.log(userInfo)
-
           setUser({ ...user, ...userInfo });
           setIsAuthenticated(true);
           localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
@@ -83,19 +80,18 @@ const AuthContextProvider = ({ children }) => {
       const res = await loginFunc(data);
       if (res?.status === "OK") {
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
-        toast.success("Login successful!");
-        await sleep(1500);
+        await customToast("SUCCESS", "Login successful!");
         if (!res?.data?.[0]?.isActive) {
           window.location.href = "/active";
         } else {
           window.location.href = "/";
         }
       } else {
-        toast.error(res?.message);
+        await customToast("ERROR", res?.message);
         setIsLoadingAuth(false);
       }
     } catch (e) {
-      toast.error(e?.response?.data?.message || "Login failed!");
+      await customToast("ERROR", e?.response?.data?.message || "Login failed!");
       setIsLoadingAuth(false);
     }
   };
@@ -108,15 +104,14 @@ const AuthContextProvider = ({ children }) => {
         setUser(res?.data?.[0]);
         setIsAuthenticated(true);
         localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
-        toast.success("Login successful!");
-        await sleep(1500);
+        await customToast("SUCCESS", "Login successful!");
         window.location.href = "/";
       } else {
-        toast.error(res.message);
+        await customToast("ERROR", res.message);
         setIsLoadingAuth(false);
       }
     } catch (e) {
-      toast.error(e?.response?.data?.message || "Login failed!");
+      await customToast("ERROR", e?.response?.data?.message || "Login failed!");
       setIsLoadingAuth(false);
     }
   };
@@ -127,11 +122,24 @@ const AuthContextProvider = ({ children }) => {
       const res = await registerFunc(data);
       localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
       setIsLoadingAuth(false);
-      toast.success("Register successful!");
-      await sleep(1500);
+      await customToast("SUCCESS", "Register successful!");
       window.location.href = "/active";
     } catch (e) {
-      toast.error(e?.response?.data?.message || "Register failed!");
+      await customToast("ERROR", e?.response?.data?.message || "Register failed!");
+      setIsLoadingAuth(false);
+    }
+  };
+
+  const forgotPassword = async (data) => {
+    try {
+      const res = await resetAccount(data);
+      if (res?.status === "OK") {
+        await customToast("INFO", "Your password has been reset, please check your email!", 5000);
+      } else {
+        await customToast("ERROR", res?.message || "Reset password failed!");
+      }
+    } catch (e) {
+      await customToast("ERROR", e?.response?.data?.message || "Reset password failed!");
       setIsLoadingAuth(false);
     }
   };
@@ -152,6 +160,7 @@ const AuthContextProvider = ({ children }) => {
         login,
         loginWithGoogle,
         logout,
+        forgotPassword,
         signup,
         isLoadingAuth,
       }}

@@ -7,3 +7,5 @@ export const loginFunc = async (data) => await request("POST", "auth/login", dat
 export const loginGoogleFunc = async (data) => await request("POST", "auth/login/google", data);
 
 export const activeAccount = async (data) => await request("POST", "auth/verify", data);
+
+export const resetAccount = async (data) => await request("POST", "auth/reset", data);
