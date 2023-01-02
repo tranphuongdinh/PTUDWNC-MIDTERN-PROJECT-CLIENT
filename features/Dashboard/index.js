@@ -89,11 +89,11 @@ const Dashboard = ({ user, getUser }) => {
       </Grid>
 
       <Grid item xs={12} className={styles.groupWrapper}>
-        <h1>Joined Groups</h1>
+        <h1>Groups that you are Co-owner</h1>
 
-        {user?.joinedGroupIds.length > 0 ? (
+        {user?.coOwnerGroups.length > 0 ? (
           <Grid container spacing={3}>
-            {user?.joinedGroupIds?.map((group) => (
+            {user.coOwnerGroups.map((group) => (
               <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
                 <Link href={`/group/${group?._id}`}>
                   <div className={styles.card}>
@@ -105,9 +105,34 @@ const Dashboard = ({ user, getUser }) => {
           </Grid>
         ) : (
           <p className={styles.emptyText}>
-            You have not joined any group.&nbsp;
+            You are not a co-owner of any group.&nbsp;
             <a onClick={() => setOpenJoinGroupForm(true)} style={{ cursor: "pointer", color: "#1976d2" }}>
-              Join now!
+              Join a group now!
+            </a>
+          </p>
+        )}
+      </Grid>
+
+      <Grid item xs={12} className={styles.groupWrapper}>
+        <h1>Groups that you are member</h1>
+
+        {user?.memberGroups?.length > 0 ? (
+          <Grid container spacing={3}>
+            {user.memberGroups.map((group) => (
+              <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
+                <Link href={`/group/${group?._id}`}>
+                  <div className={styles.card}>
+                    <span>{group?.name}</span>
+                  </div>
+                </Link>
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <p className={styles.emptyText}>
+            You are not a member of any group.&nbsp;
+            <a onClick={() => setOpenJoinGroupForm(true)} style={{ cursor: "pointer", color: "#1976d2" }}>
+              Join a group now!
             </a>
           </p>
         )}

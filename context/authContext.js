@@ -40,9 +40,15 @@ const AuthContextProvider = ({ children }) => {
 
           userInfo.myGroupIds = userInfo.myGroupIds.map((code) => groupListMap[code]);
 
-          userInfo.joinedGroupIds = userInfo.joinedGroupIds.map((code) => groupListMap[code]);
+          userInfo.joinedGroups = userInfo.joinedGroupIds.map((code) => groupListMap[code]);
 
           userInfo.presentationIds = userInfo.presentationIds.map((code) => presentationListMap[code]);
+
+          userInfo.coOwnerGroups = userInfo.joinedGroups.filter((group) => group.coOwnerIds.includes(userInfo._id));
+
+          userInfo.memberGroups = userInfo.joinedGroupIds.filter((group) => group.memberIds.includes(userInfo._id));
+
+          console.log(userInfo)
 
           setUser({ ...user, ...userInfo });
           setIsAuthenticated(true);
