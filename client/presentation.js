@@ -9,3 +9,7 @@ export const deletePresentation = async (id) => request("DELETE", "/presentation
 export const getPresentationDetail = async (id) => request("GET", `/presentation/detail/${id}`);
 
 export const getPresentationByIds = async (ids) => request("POST", "/presentation/list", { ids });
+
+export const addCollaborator = async (data) => request("POST", "/presentation/collaboration/add", data);
+
+export const removeFromPresentation = async (data) => request("DELETE", "/presentation/collaboration/remove", data);

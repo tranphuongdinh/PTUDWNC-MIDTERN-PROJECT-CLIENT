@@ -5,7 +5,15 @@ import PeopleIcon from "@mui/icons-material/People";
 import Person2Icon from "@mui/icons-material/Person2";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import SendIcon from "@mui/icons-material/Send";
-import { Button, Grid, IconButton, Menu, MenuItem, TextField, Tooltip } from "@mui/material";
+import {
+  Button,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -23,7 +31,19 @@ import React, { useContext, useEffect, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { createInviteLinkGroup, getGroupDetail, removeFromGroup, sendInviteEmail, updateRoleInGroup } from "../../../client/group";
+import {
+  createInviteLinkGroup,
+  getGroupDetail,
+  removeFromGroup,
+  sendInviteEmail,
+  updateRoleInGroup,
+  deleteGroupById,
+} from "../../../client/group";
+import {
+  getPresentationDetail,
+  addCollaborator,
+  removeFromPresentation,
+} from "../../../client/presentation";
 import { getUserByIds } from "../../../client/user";
 import Breadcrumb from "../../../components/Breadcrumb";
 import LoadingScreen from "../../../components/LoadingScreen";
@@ -31,8 +51,8 @@ import { AuthContext } from "../../../context/authContext";
 import { customToast } from "../../../utils";
 import styles from "./styles.module.scss";
 
-export default function CollaborationPage() {
-  const [group, setGroup] = useState(null);
+export default function GroupDetailPage() {
+  const [presentation, setPresentation] = useState(null);
   const [inviteLink, setInviteLink] = useState("");
   const router = useRouter();
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
@@ -51,34 +71,37 @@ export default function CollaborationPage() {
   const [openInviteMemberForm, setOpenInviteMemberForm] = useState(false);
 
   const handleInviteMember = async (data) => {
+    console.log({
+      collaboratorEmail: data.memberEmail,
+      presentationId: presentation._id,
+      userId: presentation.ownerId,
+    });
     try {
-      const inviteLink = await getInviteLink(group?._id);
-      const submitData = {
-        email: data.memberEmail,
-        ownerName: group?.owner?.name,
-        link: inviteLink,
-      };
-
-      const res = await sendInviteEmail(submitData);
+      const res = await addCollaborator({
+        collaboratorEmail: data.memberEmail,
+        presentationId: presentation._id,
+        userId: presentation.ownerId,
+      });
 
       if (res?.status === "OK") {
-        await customToast("SUCCESS", "Invite link has been sent!");
+        await customToast("SUCCESS", "Inviting collaborate has been sent!");
+        setOpenInviteMemberForm(false);
       }
-
-      setOpenInviteMemberForm(false);
     } catch (e) {
       await customToast("ERROR", e?.response?.data?.message);
       setOpenInviteMemberForm(false);
     }
   };
 
-  const getInviteLink = async (id) => {
+  const getInviteLink = async (collaboratorId) => {
     try {
-      const inviteLinkRes = await createInviteLinkGroup({ groupId: id });
+      const inviteLinkRes = await addCollaborator({
+        collaboratorId: collaboratorId,
+        presentationId: presentation._id,
+        userId: presentation.ownerId,
+      });
       if (inviteLinkRes?.status === "OK") {
-        const { code = "", groupId = "" } = inviteLinkRes?.data[0];
-        const inviteLink = window.location.origin + "/invite?" + "groupId=" + groupId + "&code=" + code;
-        return inviteLink;
+        alert("invite success");
       }
     } catch (e) {
       return "";
@@ -87,28 +110,38 @@ export default function CollaborationPage() {
 
   const getInfoOfGroup = async () => {
     try {
-      const res = await getGroupDetail(groupInfo?._id);
+      const res = await getPresentationDetail(router.query.id);
       if (res.status === "OK") {
-        const groupInfo = res.data[0];
+        console.log(res.data);
+        let presentationInfo = res.data[0];
 
-        const inviteLink = await getInviteLink(groupInfo?._id);
-        if (inviteLink) setInviteLink(inviteLink);
+        // const inviteLink = await getInviteLink(presentationInfo?._id);
+        // if (inviteLink) setInviteLink(inviteLink);
 
-        const userListRes = await getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]);
+        const userListRes = await getUserByIds([
+          presentationInfo.ownerId,
+          ...presentationInfo.collaborators,
+        ]);
         const userListMap = {};
 
         userListRes?.data?.forEach((user) => (userListMap[user?._id] = user));
 
-        groupInfo.owner = userListMap[groupInfo.ownerId];
-        groupInfo.members = groupInfo.memberIds.map((id) => userListMap[id]);
-        groupInfo.coOwners = groupInfo.coOwnerIds.map((id) => userListMap[id]);
-        groupInfo.total = groupInfo.memberIds.length + groupInfo.coOwnerIds.length + 1;
-        setGroup(groupInfo);
+        presentationInfo = {
+          ...presentationInfo,
+          owner: userListMap[presentationInfo.ownerId],
+        };
+        // presentationInfo.collaborators = presentationInfo.collaborators.map(
+        //   (id) => userListMap[id]
+        // );
+        // presentationInfo.coOwners = presentationInfo.coOwnerIds.map((id) => userListMap[id]);
+        // presentationInfo.total =
+        //   presentationInfo.collaborators.length +  1;
+        setPresentation(presentationInfo);
       } else {
-        router.push("/");
+        // router.push("/");
       }
     } catch (e) {
-      router.push("/");
+      // router.push("/");
       setIsLoading(false);
     }
     setIsLoading(false);
@@ -120,8 +153,12 @@ export default function CollaborationPage() {
 
   const handleUpgradeRole = async (member, isUpgrade) => {
     try {
-      const data = { memberId: member?._id, groupId: group?._id, isUpgrade };
-      await updateRoleInGroup(data);
+      const data = {
+        memberId: member?._id,
+        groupId: presentation?._id,
+        isUpgrade,
+      };
+      // await updateRoleInGroup(data);
       await customToast("SUCCESS", "Update role successfully!");
       router.reload();
     } catch (e) {
@@ -131,14 +168,27 @@ export default function CollaborationPage() {
 
   const handleRemove = async (member) => {
     try {
-      const data = { userId: member?._id, groupId: group?._id };
-      await removeFromGroup(data);
-      await customToast("SUCCESS", `Remove member ${member.name} successfully!`);
-      router.reload();
+      const data = {
+        userId: presentation?.ownerId,
+        presentationId: presentation?._id,
+        collaboratorId: member?._id,
+      };
+      const res = await removeFromPresentation(data);
+      if (res?.status === "OK") {
+        await customToast(
+          "SUCCESS",
+          `Remove member ${member.name} successfully!`
+        );
+        router.reload();
+      } else {
+        await customToast("ERROR", e.response?.data?.message);
+      }
+
     } catch (e) {
       await customToast("ERROR", e.response?.data?.message);
     }
   };
+
 
   return isLoading || isLoadingAuth || !user ? (
     <LoadingScreen />
@@ -147,17 +197,26 @@ export default function CollaborationPage() {
       <Breadcrumb
         paths={[
           { label: "Home", href: "/" },
-          { label: group?.name, href: `/group/${group?._id}` },
+          {
+            label: presentation?.name,
+            href: `/presentation/${presentation?._id}`,
+          },
         ]}
       />
-      <Grid item xs={12} style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button variant="contained" ref={anchorElButton} onClick={handleClickButton} startIcon={<PersonAddIcon />}>
+      <Grid
+        item
+        xs={12}
+        style={{ display: "flex", justifyContent: "flex-end" }}
+      >
+        <Button
+          variant="contained"
+          ref={anchorElButton}
+          onClick={handleClickButton}
+          startIcon={<PersonAddIcon />}
+        >
           Invite
         </Button>
-        <Button variant="outlined" color="error" ref={anchorElButton} onClick={() => setOpenConfirmDelete(true)} startIcon={<DeleteForeverIcon />}>
-          Delete Group
-        </Button>
-
+    
         <Menu
           id="basic-menu"
           anchorEl={anchorElButton}
@@ -178,29 +237,27 @@ export default function CollaborationPage() {
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <CopyToClipboard text={inviteLink}>
-            <MenuItem
-              onClick={() => {
-                toast.promise(
-                  async () => {
-                    const newInviteLink = await getInviteLink(group?._id);
-                    setInviteLink(newInviteLink);
-                  },
-                  {
-                    pending: "Getting invite link...",
-                    success: "Invite link copied!",
-                    error: "Unexpected error",
-                  }
-                );
-                setAnchorElButton(null);
-              }}
-            >
-              <ListItemIcon>
-                <ContentCopyIcon fontSize="small" />
-              </ListItemIcon>
-              Copy invite link
-            </MenuItem>
-          </CopyToClipboard>
+          <MenuItem
+          // onClick={() => {
+          //   toast.promise(
+          //     async () => {
+          //       const newInviteLink = await getInviteLink(presentation?._id);
+          //       setInviteLink(newInviteLink);
+          //     },
+          //     {
+          //       pending: "Getting invite link...",
+          //       success: "Invite link copied!",
+          //       error: "Unexpected error",
+          //     }
+          //   );
+          //   setAnchorElButton(null);
+          // }}
+          >
+            <ListItemIcon>
+              <ContentCopyIcon fontSize="small" />
+            </ListItemIcon>
+            Copy invite link
+          </MenuItem>
           <MenuItem
             onClick={() => {
               setOpenInviteMemberForm(true);
@@ -215,7 +272,7 @@ export default function CollaborationPage() {
         </Menu>
       </Grid>
       <Grid item xs={12}>
-        <h1 style={{ textAlign: "center" }}>{group?.name}</h1>
+        <h1 style={{ textAlign: "center" }}>{presentation?.name}</h1>
       </Grid>
       <Grid item xs={12}>
         <TableContainer component={Paper}>
@@ -225,62 +282,35 @@ export default function CollaborationPage() {
                 <TableCell align="center">Name</TableCell>
                 <TableCell align="center">Email</TableCell>
                 <TableCell align="center">Role</TableCell>
-                {user?._id === group?.ownerId && <TableCell align="center">Action</TableCell>}
+                {user?._id === presentation?.ownerId && (
+                  <TableCell align="center">Action</TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow key={group?.ownerId} className={styles.ownerRow}>
-                <TableCell align="center">{group?.owner?.name}</TableCell>
-                <TableCell align="center">{group?.owner?.email}</TableCell>
+              <TableRow key={presentation?.ownerId} className={styles.ownerRow}>
+                <TableCell align="center">
+                  {presentation?.owner?.name}
+                </TableCell>
+                <TableCell align="center">
+                  {presentation?.owner?.email}
+                </TableCell>
                 <TableCell align="center">OWNER</TableCell>
-                {user?._id === group?.ownerId && (
-                  <TableCell align="center">
-                    <Tooltip title="Add new member">
-                      <IconButton onClick={() => setOpenInviteMemberForm(true)}>
-                        <PersonAddIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                )}
+               
               </TableRow>
 
-              {group?.coOwners?.map((coOwner) => (
-                <TableRow key={coOwner?._id} className={styles.coOwnerRow}>
-                  <TableCell align="center">{coOwner?.name}</TableCell>
-                  <TableCell align="center">{coOwner?.email}</TableCell>
-                  <TableCell align="center">CO OWNER</TableCell>
-                  {user?._id === group?.ownerId && (
-                    <TableCell align="center">
-                      <Tooltip title="Become member">
-                        <IconButton color="secondary" onClick={() => handleUpgradeRole(coOwner, false)} style={{ marginRight: "10px" }}>
-                          <Person2Icon />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Kick this co-owner out">
-                        <IconButton color="error" onClick={() => handleRemove(coOwner)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-
-              {group?.members?.map((member) => (
+              {presentation?.collaborators?.map((member) => (
                 <TableRow key={member?._id} className={styles.memberRow}>
                   <TableCell align="center">{member?.name}</TableCell>
                   <TableCell align="center">{member?.email}</TableCell>
-                  <TableCell align="center">MEMBER</TableCell>
-                  {user?._id === group?.ownerId && (
+                  <TableCell align="center">COLLABORATOR</TableCell>
+                  {user?._id === presentation?.ownerId && (
                     <TableCell align="center">
-                      <Tooltip title="Become co-owner">
-                        <IconButton color="primary" onClick={() => handleUpgradeRole(member, true)} style={{ marginRight: "10px" }}>
-                          <PeopleIcon />
-                        </IconButton>
-                      </Tooltip>
                       <Tooltip title="Kick this member out">
-                        <IconButton color="error" onClick={() => handleRemove(member)}>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleRemove(member)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -293,25 +323,55 @@ export default function CollaborationPage() {
         </TableContainer>
       </Grid>
 
-      <Dialog open={openInviteMemberForm} onClose={() => setOpenInviteMemberForm(false)} style={{ width: "100%" }}>
+      <Dialog
+        open={openInviteMemberForm}
+        onClose={() => setOpenInviteMemberForm(false)}
+        style={{ width: "100%" }}
+      >
         <form onSubmit={handleSubmit(handleInviteMember)}>
-          <DialogTitle id="alert-dialog-title">Invite a member by email</DialogTitle>
+          <DialogTitle id="alert-dialog-title">
+            Invite a member by email
+          </DialogTitle>
           <DialogContent style={{ overflowY: "initial" }}>
-            <TextField label="Member's email" placeholder="Enter member's email" {...register("memberEmail")} type="email" required />
+            <TextField
+              label="Member's email"
+              placeholder="Enter member's email"
+              {...register("memberEmail")}
+              type="email"
+              required
+            />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenInviteMemberForm(false)}>Cancel</Button>
+            <Button onClick={() => setOpenInviteMemberForm(false)}>
+              Cancel
+            </Button>
             <Button type="submit">Invite</Button>
           </DialogActions>
         </form>
       </Dialog>
-      <Dialog open={openConfirmDelete} onClose={() => setOpenConfirmDelete(false)}>
-        <DialogTitle id="alert-dialog-title">Xác nhận xóa group</DialogTitle>
+      <Dialog
+        open={openConfirmDelete}
+        onClose={() => setOpenConfirmDelete(false)}
+      >
+        <DialogTitle id="alert-dialog-title">
+          Please confirm to delete this group
+        </DialogTitle>
 
         <DialogActions>
-          <Button onClick={() => setOpenConfirmDelete(false)}>Xác nhận</Button>
-          <Button onClick={() => setOpenConfirmDelete(false)} autoFocus>
-            Hủy
+          <Button
+            variant="contained"
+            color="error"
+            // onClick={handleDeleteGroup}
+          >
+            Delete
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenConfirmDelete(false)}
+            autoFocus
+          >
+            Cancel
           </Button>
         </DialogActions>
       </Dialog>
