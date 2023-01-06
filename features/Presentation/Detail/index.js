@@ -55,7 +55,7 @@ const PresentationDetail = ({ id }) => {
       const res = await getPresentationDetail(id);
       const presentation = res?.data?.[0];
       setPresentation(presentation);
-      setSlides(JSON.parse(presentation?.slides) || []);
+      setSlides(JSON.parse(presentation?.slides) || null);
     } catch (e) {}
   };
 
@@ -102,7 +102,7 @@ const PresentationDetail = ({ id }) => {
           { label: presentation?.name, href: `/presentation/${id}` },
         ]}
       />
-      {slides.length > 0 ? (
+      {slides ? (
         <Container className={styles.wrapper}>
           <Grid container spacing={3}>
             <Grid container item xs={12}>
