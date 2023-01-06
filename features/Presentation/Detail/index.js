@@ -84,13 +84,15 @@ const PresentationDetail = ({ id }) => {
       if (res?.status === "OK") {
         await customToast("SUCCESS", "Delete presentation successfully!");
         await getUser();
-        window.location.href = "/presentation";
+        router.reload();
       } else {
         await customToast("ERROR", res?.message);
       }
     } catch (e) {
       await customToast("ERROR", e?.response?.data?.message);
     }
+    window.location.href = "/presentation";
+
   };
 
   return (
