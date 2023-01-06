@@ -49,6 +49,7 @@ const PresentationDetail = ({ id }) => {
     try {
       const res = await getPresentationDetail(id);
       const presentation = res?.data?.[0];
+      console.log(presentation)
       setPresentation(presentation);
       setSlides(JSON.parse(presentation?.slides) || []);
     } catch (e) {}
@@ -97,7 +98,7 @@ const PresentationDetail = ({ id }) => {
                 }}
               >
                 <GroupsIcon />
-                &nbsp;Collaborate
+                &nbsp;Manage collaborators
               </Button>
               <CopyToClipboard text={`${window?.location?.href}/slideshow`} onCopy={async () => await customToast("SUCCESS", "Presentation link copied!")}>
                 <Button sx={{ margin: "10px 0 10px 20px" }} variant="contained">

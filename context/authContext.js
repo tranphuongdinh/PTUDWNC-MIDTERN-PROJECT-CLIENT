@@ -27,7 +27,9 @@ const AuthContextProvider = ({ children }) => {
 
           const groupListRes = await getGroupByIds([...userInfo.myGroupIds, ...userInfo.joinedGroupIds]);
 
-          const presentationListRes = await getPresentationByIds(userInfo.presentationIds);
+          const presentationListRes = await getPresentationByIds([]);
+
+          console.log(presentationListRes)
 
           const groupListMap = {};
 
@@ -41,7 +43,9 @@ const AuthContextProvider = ({ children }) => {
 
           userInfo.joinedGroups = userInfo.joinedGroupIds.map((code) => groupListMap[code]);
 
-          userInfo.presentationIds = userInfo.presentationIds.map((code) => presentationListMap[code]);
+          userInfo.myPresentations = userInfo.presentationIds.map((code) => presentationListMap[code]);
+
+          userInfo.collabPresentations = presentationListRes?.data?.filter(presentation => presentation?.collaborators?.includes(userInfo._id));
 
           userInfo.coOwnerGroups = userInfo.joinedGroups.filter((group) => group.coOwnerIds.includes(userInfo._id));
 

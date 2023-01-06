@@ -72,9 +72,9 @@ const Presentation = ({ user, getUser }) => {
       <Grid item xs={12} className={styles.groupWrapper}>
         <h1>My Presentations</h1>
         <div>
-          {user?.myGroupIds.length > 0 ? (
+          {user?.myPresentations.length > 0 ? (
             <Grid container spacing={3}>
-              {user?.presentationIds?.map((presentation) => (
+              {user?.myPresentations?.map((presentation) => (
                 <>
                   <Grid item xs={12} md={6} lg={4} xl={3} key={presentation?._id}>
                     <Link href={`/presentation/${presentation?._id}`} legacyBehavior>
@@ -105,6 +105,29 @@ const Presentation = ({ user, getUser }) => {
                 Create now!
               </a>
             </p>
+          )}
+        </div>
+      </Grid>
+
+      <Grid item xs={12} className={styles.groupWrapper}>
+        <h1>Collab Presentations</h1>
+        <div>
+          {user?.collabPresentations.length > 0 && (
+            <Grid container spacing={3}>
+              {user?.collabPresentations?.map((presentation) => (
+                <>
+                  <Grid item xs={12} md={6} lg={4} xl={3} key={presentation?._id}>
+                    <Link href={`/presentation/${presentation?._id}`} legacyBehavior>
+                      <a>
+                        <div className={styles.card}>
+                          <span>{presentation?.name}</span>
+                        </div>
+                      </a>
+                    </Link>
+                  </Grid>
+                </>
+              ))}
+            </Grid>
           )}
         </div>
       </Grid>
