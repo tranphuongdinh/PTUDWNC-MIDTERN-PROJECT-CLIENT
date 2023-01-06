@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "../styles.module.scss";
 
 const ParagraphPresentation = (props) => {
   const {
@@ -9,15 +10,15 @@ const ParagraphPresentation = (props) => {
   return (
     <>
       {type === "preview" ? (
-        <>
+        <div className={styles.slide}>
           <p>{heading}</p>
           <p>{paragraph}</p>
-        </>
+        </div>
       ) : (
-        <>
+        <div className={styles.slide}>
           <h2>{heading}</h2>
           <p>{paragraph}</p>
-        </>
+        </div>
       )}
     </>
   );
