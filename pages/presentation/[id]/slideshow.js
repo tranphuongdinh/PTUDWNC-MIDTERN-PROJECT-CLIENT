@@ -359,14 +359,15 @@ const SlideShow = () => {
             gap: "20px",
             alignItems: "center",
             marginTop: "50px",
+            padding: "20px",
           }}
         >
-          <h4>Questions from viewers:</h4>
+          <h3 style={{textAlign: "left", width: "100%"}}>Questions from viewers:</h3>
 
           {Array.isArray(questionList) &&
             questionList.length > 0 &&
             questionList.map((question, index) => (
-              <div key={question._id}>
+              <div key={question._id} className={styles.fullWidth}>
                 {user?._id && presentation?.ownerId && (
                   <Tooltip title="Check this question answered">
                     <Checkbox {...label} />
@@ -397,28 +398,30 @@ const SlideShow = () => {
             ))}
 
           {presentation?.ownerId !== user?._id && (
-            <div>
+            <div style={{width: "100%", textAlign:"left"}}>
               <h3>Send your question:</h3>
-              <TextField
-                id="outlined-basic"
-                variant="outlined"
-                multiline
-                maxRows={5}
-                minRows={3}
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-              />
-              <IconButton
-                onClick={() => {
-                  socket.emit("clientSendQuestion", {
-                    presentationId: presentation?._id,
-                    userName: user?.name,
-                    content: question,
-                  });
-                }}
-              >
-                <SendIcon />
-              </IconButton>
+              <div className={styles.fullWidth}>
+                <TextField
+                  id="outlined-basic"
+                  variant="outlined"
+                  multiline
+                  maxRows={5}
+                  minRows={3}
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                />
+                <IconButton
+                  onClick={() => {
+                    socket.emit("clientSendQuestion", {
+                      presentationId: presentation?._id,
+                      userName: user?.name,
+                      content: question,
+                    });
+                  }}
+                >
+                  <SendIcon />
+                </IconButton>
+              </div>
             </div>
           )}
         </div>
