@@ -241,7 +241,6 @@ export default function GroupDetailPage() {
 
         <DialogActions>
           <Button
-            className="custom-button"
             variant="contained"
             color="error"
             // onClick={handleDeleteGroup}

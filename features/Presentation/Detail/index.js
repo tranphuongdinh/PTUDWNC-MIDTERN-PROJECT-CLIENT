@@ -152,7 +152,6 @@ const PresentationDetail = ({ id }) => {
                 </Button>
                 {user?._id === presentation?.ownerId && (
                   <Button
-                    className="custom-button"
                     sx={{ margin: "10px 0 10px 20px" }}
                     onClick={(e) => {
                       e.preventDefault();
@@ -161,7 +160,7 @@ const PresentationDetail = ({ id }) => {
                     }}
                     startIcon={<DeleteIcon />}
                     color="error"
-                    variant="contained"
+                    variant="outlined"
                   >
                     Delete
                   </Button>

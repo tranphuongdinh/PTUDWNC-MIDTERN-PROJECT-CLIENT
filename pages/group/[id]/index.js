@@ -207,7 +207,6 @@ export default function GroupDetailPage() {
           Invite
         </Button>
         <Button
-          className="custom-button"
           variant="outlined"
           color="error"
           ref={anchorElButton}
@@ -410,16 +409,10 @@ export default function GroupDetailPage() {
         </DialogTitle>
 
         <DialogActions>
-          <Button
-            className="custom-button"
-            variant="contained"
-            color="error"
-            onClick={handleDeleteGroup}
-          >
+          <Button variant="contained" color="error" onClick={handleDeleteGroup}>
             Delete
           </Button>
           <Button
-            className="custom-button"
             variant="contained"
             color="primary"
             onClick={() => setOpenConfirmDelete(false)}
