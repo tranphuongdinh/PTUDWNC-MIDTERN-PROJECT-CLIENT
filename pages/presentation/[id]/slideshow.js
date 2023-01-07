@@ -282,6 +282,16 @@ const SlideShow = () => {
       ) : presentation?.isPresent ? (
         <FullScreen handle={handle}>
           <PresentButton />
+          <Button
+            sx={{
+              position: "absolute",
+              right: "10px",
+              bottom: "10px",
+            }}
+            onClick={() => setOpenQuestion(true)}
+          >
+            Open Question
+          </Button>
           <div className={styles.userVoteViewWrapper}>
             {isAnswered ? (
               <div>Thank you for you answer</div>
@@ -293,24 +303,40 @@ const SlideShow = () => {
                   gap: "30px",
                 }}
               >
-                <h1>{slides[viewIndex]?.content?.question}</h1>
-                {slides[viewIndex]?.content.options.map((option, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => {
-                      option.data += 1;
-                      const updatedPresentation = {
-                        ...presentation,
-                        slides: JSON.stringify(slides),
-                      };
-                      socket.emit("vote", updatedPresentation);
-                      setIsAnswered(true);
-                    }}
-                    variant="contained"
-                  >
-                    {option.label}
-                  </Button>
-                ))}
+                {slides[viewIndex].type === "Heading" && (
+                  <HeadingPresentation
+                    heading={slides[viewIndex].content.heading}
+                    subHeading={slides[viewIndex].content.subHeading}
+                  />
+                )}
+                {slides[viewIndex].type === "Paragraph" && (
+                  <HeadingPresentation
+                    heading={slides[viewIndex].content.heading}
+                    paragraph={slides[viewIndex].content.paragraph}
+                  />
+                )}
+                {slides[viewIndex].type === "Multiple Choice" && (
+                  <>
+                    <h1>{slides[viewIndex]?.content?.question}</h1>
+                    {slides[viewIndex]?.content.options.map((option, index) => (
+                      <Button
+                        key={index}
+                        onClick={() => {
+                          option.data += 1;
+                          const updatedPresentation = {
+                            ...presentation,
+                            slides: JSON.stringify(slides),
+                          };
+                          socket.emit("vote", updatedPresentation);
+                          setIsAnswered(true);
+                        }}
+                        variant="contained"
+                      >
+                        {option.label}
+                      </Button>
+                    ))}
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -327,7 +353,7 @@ const SlideShow = () => {
       >
         <div
           style={{
-            width: "20vw",
+            width: "30vw",
             display: "flex",
             flexDirection: "column",
             gap: "20px",
@@ -341,9 +367,12 @@ const SlideShow = () => {
             questionList.length > 0 &&
             questionList.map((question, index) => (
               <div key={question._id}>
-                <Tooltip title="Check this question answered">
-                  <Checkbox {...label} />
-                </Tooltip>
+                {user?._id && presentation?.ownerId && (
+                  <Tooltip title="Check this question answered">
+                    <Checkbox {...label} />
+                  </Tooltip>
+                )}
+
                 <TextField
                   disabled
                   id="outlined-disabled"
@@ -367,7 +396,7 @@ const SlideShow = () => {
               </div>
             ))}
 
-          {presentation?.ownerId === user?._id && (
+          {presentation?.ownerId !== user?._id && (
             <div>
               <h3>Send your question:</h3>
               <TextareaAutosize
