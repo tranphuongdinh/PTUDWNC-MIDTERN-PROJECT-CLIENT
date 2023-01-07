@@ -1,30 +1,53 @@
-import { Button, Grid, IconButton, Tooltip } from "@mui/material";
+import {
+  Button,
+  Grid,
+  IconButton,
+  TextareaAutosize,
+  Tooltip,
+} from "@mui/material";
 import React, { useRef, useState } from "react";
 import { Chart } from "react-google-charts";
 import { useRouter } from "next/router";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import { ZoomInMapRounded, ZoomOutMapRounded } from "@mui/icons-material";
+import {
+  CheckBox,
+  ZoomInMapRounded,
+  ZoomOutMapRounded,
+} from "@mui/icons-material";
 import styles from "./styles.module.scss";
 import { useContext } from "react";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import TextField from "@mui/material/TextField";
 import { AuthContext } from "../../../context/authContext";
 import { useEffect } from "react";
-import { getPresentationDetail, updatePresentation } from "../../../client/presentation";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import {
+  getPresentationDetail,
+  updatePresentation,
+} from "../../../client/presentation";
+import SendIcon from "@mui/icons-material/Send";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import { SocketContext } from "../../../context/socketContext";
 import LoadingScreen from "../../../components/LoadingScreen";
+import Drawer from "@mui/material/Drawer";
+import MultipleChoicePresentation from "../../../components/Presentation/MultipleChoice";
+import ParagraphPresentation from "../../../components/Presentation/Paragraph";
+import HeadingPresentation from "../../../components/Presentation/Heading";
+import { io } from "socket.io-client";
 
 const SlideShow = () => {
   const { socket } = useContext(SocketContext);
-
+  const [openQuestion, setOpenQuestion] = useState(false);
   const handle = useFullScreenHandle();
   const router = useRouter();
   const { user, isLoadingAuth } = useContext(AuthContext);
-
+  const [question, setQuestion] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [presentation, setPresentation] = useState({});
   const [slides, setSlides] = useState([]);
+  const [questionList, setQuestionList] = useState([]);
 
   const getPresentation = async () => {
     setIsLoading(true);
@@ -56,17 +79,13 @@ const SlideShow = () => {
 
   const [isAnswered, setIsAnswered] = useState(false);
 
-  const renderData = (isNext = false) => {
-    let res = [["Options", "Count"]];
-    slides[isNext ? index + 1 : index]?.content?.options.map((option) => {
-      res.push([option.label, option.data]);
-    });
-    return res;
-  };
-
   const PresentButton = () => (
     <Tooltip title={handle.active ? "Exit full screen" : "Go to full screen"}>
-      <IconButton onClick={handle.active ? handle.exit : handle.enter} className={styles.zoomButton} color="primary">
+      <IconButton
+        onClick={handle.active ? handle.exit : handle.enter}
+        className={styles.zoomButton}
+        color="primary"
+      >
         {handle.active ? <ZoomInMapRounded /> : <ZoomOutMapRounded />}
       </IconButton>
     </Tooltip>
@@ -91,13 +110,33 @@ const SlideShow = () => {
     });
 
     socket.on("startPresent", (data) => {
-      if (!presentation?.isPresent && data === presentation?._id) router.reload();
+      if (!presentation?.isPresent && data === presentation?._id)
+        router.reload();
     });
 
     socket.on("stopPresent", (data) => {
-      if (presentation?.isPresent && data === presentation?._id) router.reload();
+      if (presentation?.isPresent && data === presentation?._id)
+        router.reload();
     });
   }, [presentation]);
+
+  useEffect(() => {
+    socket.on("sendQuestion", (data) => {
+      if (data) {
+        setQuestionList([...questionList, data]);
+      }
+    });
+    socket.on("updateQuestion", (data) => {
+      if (data) {
+        const idx = questionList.find((question) => question._id === data._id);
+        if (idx !== -1) {
+          const tmp = [...questionList];
+          tmp.splice(idx, 1, data);
+          setQuestionList(tmp);
+        }
+      }
+    });
+  }, [question]);
 
   return isLoading || isLoadingAuth ? (
     <LoadingScreen />
@@ -117,7 +156,13 @@ const SlideShow = () => {
               height: "100vh",
             }}
           >
-            <Grid item xl={8} md={7} xs={12} className={styles.presentationSlideCol}>
+            <Grid
+              item
+              xl={8}
+              md={7}
+              xs={12}
+              className={styles.presentationSlideCol}
+            >
               <div className={styles.buttonWrapper}>
                 {index > 0 && (
                   <Button
@@ -125,7 +170,10 @@ const SlideShow = () => {
                     variant="contained"
                     onClick={() => {
                       setIndex(index - 1);
-                      socket.emit("clientChangeSlideIndex", { presentationId: presentation?._id, viewIndex: index - 1 });
+                      socket.emit("clientChangeSlideIndex", {
+                        presentationId: presentation?._id,
+                        viewIndex: index - 1,
+                      });
                     }}
                   >
                     Previous Slide
@@ -137,7 +185,10 @@ const SlideShow = () => {
                     variant="contained"
                     onClick={() => {
                       setIndex(index + 1);
-                      socket.emit("clientChangeSlideIndex", { presentationId: presentation?._id, viewIndex: index + 1 });
+                      socket.emit("clientChangeSlideIndex", {
+                        presentationId: presentation?._id,
+                        viewIndex: index + 1,
+                      });
                     }}
                   >
                     Next Slide
@@ -155,16 +206,63 @@ const SlideShow = () => {
                 >
                   Stop Present
                 </Button>
+                <Button onClick={() => setOpenQuestion(true)}>
+                  Open Question
+                </Button>
               </div>
-              <h1>{slides[index]?.content?.question}</h1>
-              <Chart chartType="Bar" width="90%" height="60vh" data={renderData()} />
+              {slides[index].type === "Multiple Choice" && (
+                <MultipleChoicePresentation
+                  width="90%"
+                  height="60vh"
+                  options={slides[index].content.options}
+                  question={slides[index].content.question}
+                />
+              )}
+              {slides[index].type === "Heading" && (
+                <HeadingPresentation
+                  heading={slides[index].content.heading}
+                  subHeading={slides[index].content.subHeading}
+                />
+              )}
+              {slides[index].type === "Paragraph" && (
+                <ParagraphPresentation
+                  heading={slides[index].content.heading}
+                  paragraph={slides[index].content.paragraph}
+                />
+              )}
             </Grid>
-            <Grid item xs={12} md={5} xl={4} className={styles.previewPresentationSlideCol}>
-              {index + 1 < slides.length && <h2 className={styles.previewTitle}>Preview next slide:</h2>}
+            <Grid
+              item
+              xs={12}
+              md={5}
+              xl={4}
+              className={styles.previewPresentationSlideCol}
+            >
+              {index + 1 < slides.length && (
+                <h2 className={styles.previewTitle}>Preview next slide:</h2>
+              )}
               {index + 1 < slides.length ? (
                 <>
-                  <h1>{slides[index + 1]?.content?.question}</h1>
-                  <Chart chartType="Bar" width="100%" height="60vh" data={renderData(true)} />
+                  {slides[index + 1].type === "Multiple Choice" && (
+                    <MultipleChoicePresentation
+                      width="90%"
+                      height="60vh"
+                      options={slides[index + 1].content.options}
+                      question={slides[index + 1].content.question}
+                    />
+                  )}
+                  {slides[index + 1].type === "Heading" && (
+                    <HeadingPresentation
+                      heading={slides[index + 1].content.heading}
+                      subHeading={slides[index + 1].content.subHeading}
+                    />
+                  )}
+                  {slides[index + 1].type === "Paragraph" && (
+                    <ParagraphPresentation
+                      heading={slides[index + 1].content.heading}
+                      paragraph={slides[index + 1].content.paragraph}
+                    />
+                  )}
                 </>
               ) : (
                 <p style={{ textAlign: "center" }}>
@@ -194,7 +292,10 @@ const SlideShow = () => {
                     key={index}
                     onClick={() => {
                       option.data += 1;
-                      const updatedPresentation = { ...presentation, slides: JSON.stringify(slides) };
+                      const updatedPresentation = {
+                        ...presentation,
+                        slides: JSON.stringify(slides),
+                      };
                       socket.emit("vote", updatedPresentation);
                       setIsAnswered(true);
                     }}
@@ -212,6 +313,82 @@ const SlideShow = () => {
           <span>This presentation has not been started yet.</span>
         </div>
       )}
+      <Drawer
+        anchor="right"
+        open={openQuestion}
+        onClose={() => setOpenQuestion(false)}
+      >
+        <div
+          style={{
+            width: "20vw",
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+            alignItems: "center",
+            marginTop: "50px",
+          }}
+        >
+          <h4>Questions from viewers:</h4>
+
+          {questionList.map((question, index) => (
+            <div key={index}>
+              <Tooltip title="Check this question answered">
+                <CheckBox
+                  checked={false}
+                  onChange={() => {}}
+                  color="success"
+                  value={true}
+                />
+              </Tooltip>
+              <TextField
+                disabled
+                id="outlined-disabled"
+                label={question?._id || "Username"}
+                defaultValue={question?.content || "question"}
+              />
+              <IconButton
+                onClick={() => {
+                  const numVote = question.vote + 1;
+                  const updatedQuestion = {
+                    ...question,
+                    vote: numVote,
+                  };
+
+                  socket.emit("clientUpdateQuestion", updatedQuestion);
+                }}
+              >
+                <ThumbUpIcon />
+              </IconButton>
+              {question?.vote || 0}
+            </div>
+          ))}
+
+          {presentation?.ownerId === user?._id && (
+            <div>
+              <h3>Send your question:</h3>
+              <TextareaAutosize
+                sx={{ width: "100%" }}
+                minRows={5}
+                id="outlined-basic"
+                variant="outlined"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+              />
+              <IconButton
+                onClick={() => {
+                  socket.emit("clientSendQuestion", {
+                    presentationId: presentation?._id,
+                    userName: user?.name,
+                    content: question,
+                  });
+                }}
+              >
+                <SendIcon />
+              </IconButton>
+            </div>
+          )}
+        </div>
+      </Drawer>
     </>
   );
 };
