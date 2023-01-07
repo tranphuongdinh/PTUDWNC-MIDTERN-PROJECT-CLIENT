@@ -9,11 +9,9 @@ import React, { useRef, useState } from "react";
 import { Chart } from "react-google-charts";
 import { useRouter } from "next/router";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import {
-  CheckBox,
-  ZoomInMapRounded,
-  ZoomOutMapRounded,
-} from "@mui/icons-material";
+import { ZoomInMapRounded, ZoomOutMapRounded } from "@mui/icons-material";
+import Checkbox from "@mui/material/Checkbox";
+
 import styles from "./styles.module.scss";
 import { useContext } from "react";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
@@ -23,6 +21,7 @@ import { useEffect } from "react";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import {
   getPresentationDetail,
+  getQuestionList,
   updatePresentation,
 } from "../../../client/presentation";
 import SendIcon from "@mui/icons-material/Send";
@@ -55,6 +54,9 @@ const SlideShow = () => {
       const { id } = router.query;
       const res = await getPresentationDetail(id);
       const presentation = res?.data?.[0];
+      const questionRes = await getQuestionList(id);
+      const lst = questionRes?.data;
+      setQuestionList(lst || []);
       setPresentation(presentation);
       setSlides(JSON.parse(presentation?.slides) || []);
       setIsLoading(false);
@@ -78,6 +80,7 @@ const SlideShow = () => {
   const [viewIndex, setViewIndex] = useState(0);
 
   const [isAnswered, setIsAnswered] = useState(false);
+  const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
   const PresentButton = () => (
     <Tooltip title={handle.active ? "Exit full screen" : "Go to full screen"}>
@@ -92,7 +95,9 @@ const SlideShow = () => {
   );
 
   useEffect(() => {
-    if (router.isReady) getPresentation();
+    if (router.isReady) {
+      getPresentation();
+    }
   }, [router.isReady]);
 
   useEffect(() => {
@@ -128,11 +133,13 @@ const SlideShow = () => {
     });
     socket.on("updateQuestion", (data) => {
       if (data) {
-        const idx = questionList.find((question) => question._id === data._id);
+        const idx = questionList.findIndex(
+          (question) => question._id === data._id
+        );
         if (idx !== -1) {
           const tmp = [...questionList];
           tmp.splice(idx, 1, data);
-          setQuestionList(tmp);
+          setQuestionList([...tmp]);
         }
       }
     });
@@ -330,38 +337,35 @@ const SlideShow = () => {
         >
           <h4>Questions from viewers:</h4>
 
-          {questionList.map((question, index) => (
-            <div key={index}>
-              <Tooltip title="Check this question answered">
-                <CheckBox
-                  checked={false}
-                  onChange={() => {}}
-                  color="success"
-                  value={true}
+          {Array.isArray(questionList) &&
+            questionList.length > 0 &&
+            questionList.map((question, index) => (
+              <div key={question._id}>
+                <Tooltip title="Check this question answered">
+                  <Checkbox {...label} />
+                </Tooltip>
+                <TextField
+                  disabled
+                  id="outlined-disabled"
+                  label={question?._id || "Username"}
+                  defaultValue={question?.content || "question"}
                 />
-              </Tooltip>
-              <TextField
-                disabled
-                id="outlined-disabled"
-                label={question?._id || "Username"}
-                defaultValue={question?.content || "question"}
-              />
-              <IconButton
-                onClick={() => {
-                  const numVote = question.vote + 1;
-                  const updatedQuestion = {
-                    ...question,
-                    vote: numVote,
-                  };
+                <IconButton
+                  onClick={() => {
+                    const numVote = question.vote + 1;
+                    const updatedQuestion = {
+                      ...question,
+                      vote: numVote,
+                    };
 
-                  socket.emit("clientUpdateQuestion", updatedQuestion);
-                }}
-              >
-                <ThumbUpIcon />
-              </IconButton>
-              {question?.vote || 0}
-            </div>
-          ))}
+                    socket.emit("clientUpdateQuestion", updatedQuestion);
+                  }}
+                >
+                  <ThumbUpIcon />
+                </IconButton>
+                {question?.vote || 0}
+              </div>
+            ))}
 
           {presentation?.ownerId === user?._id && (
             <div>

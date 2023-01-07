@@ -13,3 +13,5 @@ export const getPresentationByIds = async (ids) => request("POST", "/presentatio
 export const addCollaborator = async (data) => request("POST", "/presentation/collaboration/add", data);
 
 export const removeFromPresentation = async (data) => request("PUT", "/presentation/collaboration/remove", data);
+
+export const getQuestionList = async (id) => request("GET",`/presentation/questions/${id}`);
