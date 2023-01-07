@@ -4,7 +4,7 @@ export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const customToast = async (type, content, timeout = 1500) => {
+export const customToast = async (type, content, timeout = 2000) => {
   switch (type) {
     case "SUCCESS":
       toast.success(content);
