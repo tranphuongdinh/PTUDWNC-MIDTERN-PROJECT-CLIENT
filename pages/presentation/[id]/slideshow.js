@@ -399,11 +399,12 @@ const SlideShow = () => {
           {presentation?.ownerId !== user?._id && (
             <div>
               <h3>Send your question:</h3>
-              <TextareaAutosize
-                sx={{ width: "100%" }}
-                minRows={5}
+              <TextField
                 id="outlined-basic"
                 variant="outlined"
+                multiline
+                maxRows={5}
+                minRows={3}
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
               />
