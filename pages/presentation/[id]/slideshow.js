@@ -376,7 +376,7 @@ const SlideShow = () => {
                 <TextField
                   disabled
                   id="outlined-disabled"
-                  label={question?._id || "Username"}
+                  label={question?.userName || "Username"}
                   defaultValue={question?.content || "question"}
                 />
                 <IconButton
