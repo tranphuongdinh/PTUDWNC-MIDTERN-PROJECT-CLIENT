@@ -393,20 +393,23 @@ const SlideShow = () => {
               <div key={question._id} className={styles.fullWidth}>
                 {user?._id && presentation?.ownerId && (
                   <Tooltip title="Check this question answered">
-                    <Checkbox  checked={question.answered} onChange={() => {
-                      const updatedQuestionList = [...questionList];
-                      const res = !question.answered;
-                      updatedQuestionList.splice(index, 1, {
-                        ...question,
-                        answered: res,
-                      });
-                      // setQuestionList([...updatedQuestionList]);
-                      socket.emit("clientUpdateQuestion", {
-                        ...question,
-                        answered: res,
-                      });
-                      sortQuestionList(updatedQuestionList);
-                    }} />
+                    <Checkbox
+                      checked={question.answered}
+                      onChange={() => {
+                        const updatedQuestionList = [...questionList];
+                        const res = !question.answered;
+                        updatedQuestionList.splice(index, 1, {
+                          ...question,
+                          answered: res,
+                        });
+                        // setQuestionList([...updatedQuestionList]);
+                        socket.emit("clientUpdateQuestion", {
+                          ...question,
+                          answered: res,
+                        });
+                        sortQuestionList(updatedQuestionList);
+                      }}
+                    />
                   </Tooltip>
                 )}
 
@@ -418,14 +421,18 @@ const SlideShow = () => {
                 />
                 <IconButton
                   onClick={() => {
-                    const numVote = question.vote + 1;
-                    const updatedQuestion = {
+                    const updatedQuestionList = [...questionList];
+                    const res = question.vote + 1;
+                    updatedQuestionList.splice(index, 1, {
                       ...question,
-                      vote: numVote,
-                    };
+                      vote: res,
+                    });
 
-                    socket.emit("clientUpdateQuestion", updatedQuestion);
-                    // sortQuestionList();
+                    socket.emit("clientUpdateQuestion", {
+                      ...question,
+                      vote: res,
+                    });
+                    sortQuestionList(updatedQuestionList);
                   }}
                 >
                   <ThumbUpIcon />
