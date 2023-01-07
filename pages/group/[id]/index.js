@@ -198,6 +198,7 @@ export default function GroupDetailPage() {
         style={{ display: "flex", justifyContent: "flex-end" }}
       >
         <Button
+          className="custom-button"
           variant="contained"
           ref={anchorElButton}
           onClick={handleClickButton}
@@ -206,12 +207,13 @@ export default function GroupDetailPage() {
           Invite
         </Button>
         <Button
+          className="custom-button"
           variant="outlined"
           color="error"
           ref={anchorElButton}
           onClick={() => setOpenConfirmDelete(true)}
           startIcon={<DeleteForeverIcon />}
-          style={{marginLeft: "20px"}}
+          style={{ marginLeft: "20px" }}
         >
           Delete Group
         </Button>
@@ -386,10 +388,16 @@ export default function GroupDetailPage() {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenInviteMemberForm(false)}>
+            <Button
+              className="custom-button"
+              variant="contained"
+              onClick={() => setOpenInviteMemberForm(false)}
+            >
               Cancel
             </Button>
-            <Button type="submit">Invite</Button>
+            <Button variant="contained" type="submit">
+              Invite
+            </Button>
           </DialogActions>
         </form>
       </Dialog>
@@ -402,10 +410,16 @@ export default function GroupDetailPage() {
         </DialogTitle>
 
         <DialogActions>
-          <Button variant="contained" color="error" onClick={handleDeleteGroup}>
+          <Button
+            className="custom-button"
+            variant="contained"
+            color="error"
+            onClick={handleDeleteGroup}
+          >
             Delete
           </Button>
           <Button
+            className="custom-button"
             variant="contained"
             color="primary"
             onClick={() => setOpenConfirmDelete(false)}

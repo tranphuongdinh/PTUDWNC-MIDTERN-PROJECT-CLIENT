@@ -43,7 +43,15 @@ function Login() {
         <h2 className={styles.loginTitle}>Welcome back</h2>
         <div className={styles.formWrapper}>
           <form onSubmit={handleSubmit(login)} className={styles.form}>
-            <TextField {...register("email")} style={{ marginBottom: 20 }} placeholder="Email" label="Email" size="small" error={!!errors.email} helperText={errors.email?.message} />
+            <TextField
+              {...register("email")}
+              style={{ marginBottom: 20 }}
+              placeholder="Email"
+              label="Email"
+              size="small"
+              error={!!errors.email}
+              helperText={errors.email?.message}
+            />
 
             <TextField
               {...register("password")}
@@ -55,11 +63,18 @@ function Login() {
               error={!!errors.password}
               helperText={errors.password?.message}
             />
-            <LoadingButton loading={isLoadingAuth} variant="contained" type="submit">
+            <LoadingButton
+              loading={isLoadingAuth}
+              variant="contained"
+              type="submit"
+            >
               LOGIN
             </LoadingButton>
 
-            <span className={styles.forgotPasswordBtn} onClick={() => setOpenModal(true)}>
+            <span
+              className={styles.forgotPasswordBtn}
+              onClick={() => setOpenModal(true)}
+            >
               Forgot password?
             </span>
           </form>
@@ -67,7 +82,9 @@ function Login() {
             size="large"
             auto_select
             shape="circle"
-            onSuccess={(credentialResponse) => loginWithGoogle({ credential: credentialResponse.credential })}
+            onSuccess={(credentialResponse) =>
+              loginWithGoogle({ credential: credentialResponse.credential })
+            }
             onError={async (e) => {
               await customToast("ERROR", e || "Unexpected error");
             }}
@@ -84,7 +101,11 @@ function Login() {
         </div>
       </div>
 
-      <Dialog open={openModal} onClose={() => setOpenModal(false)} style={{ width: "100%" }}>
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        style={{ width: "100%" }}
+      >
         <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)}>
           <DialogTitle id="alert-dialog-title">Enter your email</DialogTitle>
           <DialogContent style={{ overflowY: "initial" }}>
@@ -98,8 +119,16 @@ function Login() {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenCreateGroupForm(false)}>Cancel</Button>
-            <Button type="submit">Submit</Button>
+            <Button
+              className="custom-button"
+              variant="contained"
+              onClick={() => setOpenCreateGroupForm(false)}
+            >
+              Cancel
+            </Button>
+            <Button className="custom-button" variant="contained" type="submit">
+              Submit
+            </Button>
           </DialogActions>
         </form>
       </Dialog>

@@ -46,6 +46,7 @@ const Presentation = ({ user, getUser }) => {
     <Grid container spacing={6} className={styles.wrapper}>
       <Grid item xs={12} className={styles.actionButtonWrapper}>
         <Button
+          className="custom-button"
           onClick={() => setOpenCreatePresentation(true)}
           variant="contained"
           startIcon={<PresentToAllIcon />}
@@ -55,6 +56,7 @@ const Presentation = ({ user, getUser }) => {
         </Button>
 
         <Button
+          className="custom-button"
           onClick={() => setOpenJoinGroupForm(true)}
           variant="contained"
           startIcon={<CoPresentIcon />}
@@ -114,8 +116,18 @@ const Presentation = ({ user, getUser }) => {
             <Grid container spacing={3}>
               {user?.collabPresentations?.map((presentation) => (
                 <>
-                  <Grid item xs={12} md={6} lg={3} xl={3} key={presentation?._id}>
-                    <Link href={`/presentation/${presentation?._id}`} legacyBehavior>
+                  <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    lg={3}
+                    xl={3}
+                    key={presentation?._id}
+                  >
+                    <Link
+                      href={`/presentation/${presentation?._id}`}
+                      legacyBehavior
+                    >
                       <a>
                         <div className={styles.card}>
                           <span>{presentation?.name}</span>
@@ -130,7 +142,11 @@ const Presentation = ({ user, getUser }) => {
         </div>
       </Grid>
 
-      <Dialog open={openCreatePresentationForm} onClose={() => setOpenCreatePresentation(false)} style={{ width: "100%" }}>
+      <Dialog
+        open={openCreatePresentationForm}
+        onClose={() => setOpenCreatePresentation(false)}
+        style={{ width: "100%" }}
+      >
         <form onSubmit={handleSubmit(handleCreatePresentation)}>
           <DialogTitle id="alert-dialog-title">
             Create new presentation
@@ -144,10 +160,16 @@ const Presentation = ({ user, getUser }) => {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenCreatePresentation(false)}>
+            <Button
+              className="custom-button"
+              variant="contained"
+              onClick={() => setOpenCreatePresentation(false)}
+            >
               Cancel
             </Button>
-            <Button type="submit">Create</Button>
+            <Button className="custom-button" variant="contained" type="submit">
+              Create
+            </Button>
           </DialogActions>
         </form>
       </Dialog>
@@ -170,8 +192,16 @@ const Presentation = ({ user, getUser }) => {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenJoinGroupForm(false)}>Cancel</Button>
-            <Button type="submit">Join</Button>
+            <Button
+              className="custom-button"
+              variant="contained"
+              onClick={() => setOpenJoinGroupForm(false)}
+            >
+              Cancel
+            </Button>
+            <Button className="custom-button" variant="contained" type="submit">
+              Join
+            </Button>
           </DialogActions>
         </form>
       </Dialog>

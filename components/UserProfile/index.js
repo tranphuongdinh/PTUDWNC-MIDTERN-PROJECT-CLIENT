@@ -60,15 +60,38 @@ const UserProfile = ({ user }) => {
     <div className={styles.wapper}>
       <div className={styles.profile}>
         <Avatar className={styles.avatar}>{user?.name[0]}</Avatar>
-        <Box className={styles.info} component="form" noValidate autoComplete="off" onSubmit={handleSubmit((data) => handleUpdateUserInfo(data))}>
+        <Box
+          className={styles.info}
+          component="form"
+          noValidate
+          autoComplete="off"
+          onSubmit={handleSubmit((data) => handleUpdateUserInfo(data))}
+        >
           <Box>
             <Controller
               name="name"
               defaultValue={name}
               control={control}
-              render={({ field }) => <TextField className={styles.infoField} label="Name" variant="outlined" type="name" disabled={!updateMode} style={{ display: "inline-flex" }} {...field} />}
+              render={({ field }) => (
+                <TextField
+                  className={styles.infoField}
+                  label="Name"
+                  variant="outlined"
+                  type="name"
+                  disabled={!updateMode}
+                  style={{ display: "inline-flex" }}
+                  {...field}
+                />
+              )}
             />
-            <TextField className={styles.infoField} id="email" label="Email" variant="outlined" value={user?.email} disabled />
+            <TextField
+              className={styles.infoField}
+              id="email"
+              label="Email"
+              variant="outlined"
+              value={user?.email}
+              disabled
+            />
             <Controller
               name="password"
               defaultValue=""
@@ -153,7 +176,7 @@ const UserProfile = ({ user }) => {
             {!updateMode && (
               <Button
                 variant="contained"
-                className="btnPrimary"
+                className="btnPrimary custom-button"
                 type="button"
                 sx={{ marginRight: "20px" }}
                 onClick={() => {
@@ -165,7 +188,12 @@ const UserProfile = ({ user }) => {
               </Button>
             )}
             {updateMode && (
-              <Button variant="contained" className="btnPrimary" type="submit" sx={{ marginRight: "20px" }}>
+              <Button
+                variant="contained"
+                className="btnPrimary custom-button"
+                type="submit"
+                sx={{ marginRight: "20px" }}
+              >
                 <SaveIcon />
                 &nbsp;Save
               </Button>
@@ -173,7 +201,7 @@ const UserProfile = ({ user }) => {
             {updateMode && (
               <Button
                 variant="contained"
-                className="btnLightPrimiary"
+                className="btnLightPrimiary custom-button"
                 type="button"
                 onClick={() => {
                   handleChangeMode(false);

@@ -49,11 +49,26 @@ const ActivePage = () => {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.loginwrapper} style={{ display: "flex", justifyContent: "center", flexDirection: "column", textAlign: "center" }}>
-        {isVerifying ? "Please wait while we verify your account..." : "We sent a verification link to your email to verify your email address and activate your account."}
+      <div
+        className={styles.loginwrapper}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column",
+          textAlign: "center",
+        }}
+      >
+        {isVerifying
+          ? "Please wait while we verify your account..."
+          : "We sent a verification link to your email to verify your email address and activate your account."}
 
         {!isVerifying && (
-          <Button onClick={handleResendVerificationEmail} variant="contained" style={{ marginTop: 20 }}>
+          <Button
+            className="custom-button"
+            onClick={handleResendVerificationEmail}
+            variant="contained"
+            style={{ marginTop: 20 }}
+          >
             RE-SEND VERIFICATION EMAIL
           </Button>
         )}
