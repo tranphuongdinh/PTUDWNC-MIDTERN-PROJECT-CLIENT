@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import GroupsIcon from "@mui/icons-material/Groups";
 import ShareIcon from "@mui/icons-material/Share";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
-import { Button, Card, Container, Grid, TextField } from "@mui/material";
+import { Button, Card, Container, FormControl, Grid, InputLabel, Select, TextField } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import clsx from "clsx";
@@ -108,6 +108,15 @@ const PresentationDetail = ({ id }) => {
             <Grid container item xs={12}>
               <Grid item xs={12} md={4}>
                 <h1 style={{ marginLeft: 20 }}>{presentation?.name}</h1>
+
+                <FormControl fullWidth>
+                  <InputLabel>Assign to a group</InputLabel>
+                  <Select label="Group" onChange={(e) =>{console.log(e.target.value)}}>
+                    {
+                      user?.myGroupIds?.map(group => <MenuItem value={group} key={group._id}>{group.name}</MenuItem>)
+                    }
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} md={8} className={styles.buttonGroup}>
                 {user?._id === presentation?.ownerId && (
