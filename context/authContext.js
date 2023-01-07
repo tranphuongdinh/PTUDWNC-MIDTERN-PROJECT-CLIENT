@@ -29,8 +29,6 @@ const AuthContextProvider = ({ children }) => {
 
           const presentationListRes = await getPresentationByIds([]);
 
-          console.log(presentationListRes)
-
           const groupListMap = {};
 
           const presentationListMap = {};
@@ -45,7 +43,7 @@ const AuthContextProvider = ({ children }) => {
 
           userInfo.myPresentations = userInfo.presentationIds.map((code) => presentationListMap[code]);
 
-          userInfo.collabPresentations = presentationListRes?.data?.filter(presentation => presentation?.collaborators?.includes(userInfo._id));
+          userInfo.collabPresentations = presentationListRes?.data?.filter((presentation) => presentation?.collaborators?.includes(userInfo._id));
 
           userInfo.coOwnerGroups = userInfo.joinedGroups.filter((group) => group.coOwnerIds.includes(userInfo._id));
 
