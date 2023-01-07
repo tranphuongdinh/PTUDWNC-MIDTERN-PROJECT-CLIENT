@@ -47,6 +47,9 @@ const SlideShow = () => {
   const [presentation, setPresentation] = useState({});
   const [slides, setSlides] = useState([]);
   const [questionList, setQuestionList] = useState([]);
+  const [renderQuestionList, setRenderQuestionList] = useState([
+    ...questionList,
+  ]);
 
   const getPresentation = async () => {
     setIsLoading(true);
@@ -128,7 +131,8 @@ const SlideShow = () => {
   useEffect(() => {
     socket.on("sendQuestion", (data) => {
       if (data) {
-        setQuestionList([...questionList, data]);
+        sortQuestionList([...questionList, data]);
+        // setQuestionList([...questionList, data]);
       }
     });
     socket.on("updateQuestion", (data) => {
@@ -139,11 +143,28 @@ const SlideShow = () => {
         if (idx !== -1) {
           const tmp = [...questionList];
           tmp.splice(idx, 1, data);
-          setQuestionList([...tmp]);
+          // setQuestionList([...tmp]);
+          sortQuestionList(tmp);
         }
       }
     });
   }, [question]);
+
+  const sortQuestionList = (updatedQuestionList) => {
+     const tmp = [...updatedQuestionList];
+     tmp.sort((a, b) => a.answered - b.answered || b.vote - a.vote);
+    setQuestionList([...tmp]);
+  }
+
+  // useEffect(() => {
+  //   const tmp = [...questionList];
+  //   tmp.sort((a, b) => a.answered - b.answered || a.vote - b.vote);
+
+  //   setRenderQuestionList([...tmp]);
+
+
+  //   console.log('update list', tmp);
+  // }, [questionList]);
 
   return isLoading || isLoadingAuth ? (
     <LoadingScreen />
@@ -362,7 +383,9 @@ const SlideShow = () => {
             padding: "20px",
           }}
         >
-          <h3 style={{textAlign: "left", width: "100%"}}>Questions from viewers:</h3>
+          <h3 style={{ textAlign: "left", width: "100%" }}>
+            Questions from viewers:
+          </h3>
 
           {Array.isArray(questionList) &&
             questionList.length > 0 &&
@@ -370,7 +393,20 @@ const SlideShow = () => {
               <div key={question._id} className={styles.fullWidth}>
                 {user?._id && presentation?.ownerId && (
                   <Tooltip title="Check this question answered">
-                    <Checkbox {...label} />
+                    <Checkbox  checked={question.answered} onChange={() => {
+                      const updatedQuestionList = [...questionList];
+                      const res = !question.answered;
+                      updatedQuestionList.splice(index, 1, {
+                        ...question,
+                        answered: res,
+                      });
+                      // setQuestionList([...updatedQuestionList]);
+                      socket.emit("clientUpdateQuestion", {
+                        ...question,
+                        answered: res,
+                      });
+                      sortQuestionList(updatedQuestionList);
+                    }} />
                   </Tooltip>
                 )}
 
@@ -389,6 +425,7 @@ const SlideShow = () => {
                     };
 
                     socket.emit("clientUpdateQuestion", updatedQuestion);
+                    // sortQuestionList();
                   }}
                 >
                   <ThumbUpIcon />
@@ -398,7 +435,7 @@ const SlideShow = () => {
             ))}
 
           {presentation?.ownerId !== user?._id && (
-            <div style={{width: "100%", textAlign:"left"}}>
+            <div style={{ width: "100%", textAlign: "left" }}>
               <h3>Send your question:</h3>
               <div className={styles.fullWidth}>
                 <TextField
