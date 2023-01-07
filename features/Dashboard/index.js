@@ -65,7 +65,7 @@ const Dashboard = ({ user, getUser }) => {
             <Grid container spacing={3}>
               {user?.myGroupIds?.map((group) => (
                 <>
-                  <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
+                  <Grid item xs={12} md={6} lg={3} xl={3} key={group?._id}>
                     <Link href={`/group/${group?._id}`}>
                       <div className={styles.card}>
                         <span>{group?.name}</span>
@@ -92,7 +92,7 @@ const Dashboard = ({ user, getUser }) => {
         {user?.coOwnerGroups.length > 0 ? (
           <Grid container spacing={3}>
             {user.coOwnerGroups.map((group) => (
-              <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
+              <Grid item xs={12} md={6} lg={3} xl={3} key={group?._id}>
                 <Link href={`/group/${group?._id}`}>
                   <div className={styles.card}>
                     <span>{group?.name}</span>
@@ -117,7 +117,7 @@ const Dashboard = ({ user, getUser }) => {
         {user?.memberGroups?.length > 0 ? (
           <Grid container spacing={3}>
             {user.memberGroups.map((group) => (
-              <Grid item xs={12} md={6} lg={4} xl={3} key={group?._id}>
+              <Grid item xs={12} md={6} lg={3} xl={3} key={group?._id}>
                 <Link href={`/group/${group?._id}`}>
                   <div className={styles.card}>
                     <span>{group?.name}</span>

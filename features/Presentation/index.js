@@ -75,7 +75,7 @@ const Presentation = ({ user, getUser }) => {
                     item
                     xs={12}
                     md={6}
-                    lg={4}
+                    lg={3}
                     xl={3}
                     key={presentation?._id}
                   >
@@ -114,7 +114,7 @@ const Presentation = ({ user, getUser }) => {
             <Grid container spacing={3}>
               {user?.collabPresentations?.map((presentation) => (
                 <>
-                  <Grid item xs={12} md={6} lg={4} xl={3} key={presentation?._id}>
+                  <Grid item xs={12} md={6} lg={3} xl={3} key={presentation?._id}>
                     <Link href={`/presentation/${presentation?._id}`} legacyBehavior>
                       <a>
                         <div className={styles.card}>
