@@ -148,7 +148,7 @@ const SlideShow = () => {
         }
       }
     });
-  }, [question]);
+  });
 
   const sortQuestionList = (updatedQuestionList) => {
      const tmp = [...updatedQuestionList];
@@ -407,7 +407,7 @@ const SlideShow = () => {
                           ...question,
                           answered: res,
                         });
-                        sortQuestionList(updatedQuestionList);
+                        // sortQuestionList(updatedQuestionList);
                       }}
                     />
                   </Tooltip>
@@ -432,7 +432,7 @@ const SlideShow = () => {
                       ...question,
                       vote: res,
                     });
-                    sortQuestionList(updatedQuestionList);
+                    // sortQuestionList(updatedQuestionList);
                   }}
                 >
                   <ThumbUpIcon />
