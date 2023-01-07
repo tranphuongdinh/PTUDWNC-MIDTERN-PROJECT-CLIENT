@@ -117,7 +117,7 @@ export default function GroupDetailPage() {
       <Breadcrumb
         paths={[
           { label: "Home", href: "/" },
-          { label: "Presentation", href: "/presetation" },
+          { label: "Presentation", href: "/presentation" },
           {
             label: presentation?.name,
             href: `/presentation/${presentation?._id}`,
