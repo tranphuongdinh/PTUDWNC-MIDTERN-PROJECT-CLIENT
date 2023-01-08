@@ -80,7 +80,7 @@ const Dashboard = ({ user, getUser }) => {
         <div>
           {user?.myGroupIds.length > 0 ? (
             <Grid container spacing={3}>
-              {user?.myGroupIds?.map((group) => (
+              {user?.myGroups?.map((group) => (
                 <>
                   <Grid item xs={12} md={6} lg={3} xl={3} key={group?._id}>
                     <Link href={`/group/${group?._id}`}>

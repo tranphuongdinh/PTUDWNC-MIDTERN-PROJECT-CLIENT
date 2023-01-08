@@ -37,7 +37,7 @@ const AuthContextProvider = ({ children }) => {
 
           presentationListRes.data.forEach((presentation) => (presentationListMap[presentation?._id] = presentation));
 
-          userInfo.myGroupIds = userInfo.myGroupIds.map((code) => groupListMap[code]);
+          userInfo.myGroups = userInfo.myGroupIds.map((code) => groupListMap[code]);
 
           userInfo.joinedGroups = userInfo.joinedGroupIds.map((code) => groupListMap[code]);
 
@@ -173,3 +173,4 @@ const AuthContextProvider = ({ children }) => {
 };
 
 export { AuthContextProvider, AuthContext };
+
