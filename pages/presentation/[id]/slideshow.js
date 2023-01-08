@@ -194,6 +194,7 @@ const SlideShow = () => {
               <div className={styles.buttonWrapper}>
                 {index > 0 && (
                   <Button
+                    className="custom-button"
                     startIcon={<SkipPreviousIcon />}
                     variant="contained"
                     onClick={() => {
@@ -209,6 +210,7 @@ const SlideShow = () => {
                 )}
                 {index < slides.length - 1 && (
                   <Button
+                    className="custom-button"
                     startIcon={<SkipNextIcon />}
                     variant="contained"
                     onClick={() => {
@@ -234,7 +236,11 @@ const SlideShow = () => {
                 >
                   Stop Present
                 </Button>
-                <Button onClick={() => setOpenQuestion(true)}>
+                <Button
+                  className="custom-button"
+                  variant="contained"
+                  onClick={() => setOpenQuestion(true)}
+                >
                   Open Question
                 </Button>
               </div>
@@ -304,6 +310,8 @@ const SlideShow = () => {
         <FullScreen handle={handle}>
           <PresentButton />
           <Button
+            className="custom-button"
+            variant="contained"
             sx={{
               position: "absolute",
               right: "10px",

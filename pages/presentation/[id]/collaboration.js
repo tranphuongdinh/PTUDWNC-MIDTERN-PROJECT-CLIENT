@@ -117,15 +117,24 @@ export default function GroupDetailPage() {
       <Breadcrumb
         paths={[
           { label: "Home", href: "/" },
-          { label: "Presentation", href: "/presetation" },
+          { label: "Presentation", href: "/presentation" },
           {
             label: presentation?.name,
             href: `/presentation/${presentation?._id}`,
           },
         ]}
       />
-      <Grid item xs={12} style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button variant="contained" onClick={() => setOpenInviteCollaboratorForm(true)} startIcon={<PersonAddIcon />}>
+      <Grid
+        item
+        xs={12}
+        style={{ display: "flex", justifyContent: "flex-end" }}
+      >
+        <Button
+          className="custom-button"
+          variant="contained"
+          onClick={() => setOpenInviteCollaboratorForm(true)}
+          startIcon={<PersonAddIcon />}
+        >
           Invite
         </Button>
       </Grid>
@@ -140,17 +149,25 @@ export default function GroupDetailPage() {
                 <TableCell align="center">Name</TableCell>
                 <TableCell align="center">Email</TableCell>
                 <TableCell align="center">Role</TableCell>
-                {user?._id === presentation?.ownerId && <TableCell align="center">Action</TableCell>}
+                {user?._id === presentation?.ownerId && (
+                  <TableCell align="center">Action</TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow key={presentation?.ownerId} className={styles.ownerRow}>
-                <TableCell align="center">{presentation?.owner?.name}</TableCell>
-                <TableCell align="center">{presentation?.owner?.email}</TableCell>
+                <TableCell align="center">
+                  {presentation?.owner?.name}
+                </TableCell>
+                <TableCell align="center">
+                  {presentation?.owner?.email}
+                </TableCell>
                 <TableCell align="center">OWNER</TableCell>
                 <TableCell align="center">
                   <Tooltip title="Add new member">
-                    <IconButton onClick={() => setOpenInviteCollaboratorForm(true)}>
+                    <IconButton
+                      onClick={() => setOpenInviteCollaboratorForm(true)}
+                    >
                       <PersonAddIcon />
                     </IconButton>
                   </Tooltip>
@@ -165,7 +182,10 @@ export default function GroupDetailPage() {
                   <TableCell align="center">
                     {user?._id === presentation?.ownerId && (
                       <Tooltip title="Remove collaborator">
-                        <IconButton color="error" onClick={() => handleRemove(collaborator)}>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleRemove(collaborator)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -178,20 +198,46 @@ export default function GroupDetailPage() {
         </TableContainer>
       </Grid>
 
-      <Dialog open={openInviteCollaboratorForm} onClose={() => setOpenInviteCollaboratorForm(false)} style={{ width: "100%" }}>
+      <Dialog
+        open={openInviteCollaboratorForm}
+        onClose={() => setOpenInviteCollaboratorForm(false)}
+        style={{ width: "100%" }}
+      >
         <form onSubmit={handleSubmit(handleInviteCollaborator)}>
-          <DialogTitle id="alert-dialog-title">Invite a collaborator by email</DialogTitle>
+          <DialogTitle id="alert-dialog-title">
+            Invite a collaborator by email
+          </DialogTitle>
           <DialogContent style={{ overflowY: "initial" }}>
-            <TextField label="Collaborator's email" placeholder="Enter collaborator's email" {...register("collaboratorEmail")} type="email" required fullWidth />
+            <TextField
+              label="Collaborator's email"
+              placeholder="Enter collaborator's email"
+              {...register("collaboratorEmail")}
+              type="email"
+              required
+              fullWidth
+            />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenInviteCollaboratorForm(false)}>Cancel</Button>
-            <Button type="submit">Invite</Button>
+            <Button
+              className="custom-button"
+              variant="contained"
+              onClick={() => setOpenInviteCollaboratorForm(false)}
+            >
+              Cancel
+            </Button>
+            <Button className="custom-button" variant="contained" type="submit">
+              Invite
+            </Button>
           </DialogActions>
         </form>
       </Dialog>
-      <Dialog open={openConfirmDelete} onClose={() => setOpenConfirmDelete(false)}>
-        <DialogTitle id="alert-dialog-title">Please confirm to delete this group</DialogTitle>
+      <Dialog
+        open={openConfirmDelete}
+        onClose={() => setOpenConfirmDelete(false)}
+      >
+        <DialogTitle id="alert-dialog-title">
+          Please confirm to delete this group
+        </DialogTitle>
 
         <DialogActions>
           <Button
@@ -201,7 +247,13 @@ export default function GroupDetailPage() {
           >
             Delete
           </Button>
-          <Button variant="contained" color="primary" onClick={() => setOpenConfirmDelete(false)} autoFocus>
+          <Button
+            className="custom-button"
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenConfirmDelete(false)}
+            autoFocus
+          >
             Cancel
           </Button>
         </DialogActions>

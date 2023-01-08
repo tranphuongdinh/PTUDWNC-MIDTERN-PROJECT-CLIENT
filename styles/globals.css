@@ -22,3 +22,11 @@ a {
 .fullscreen-enabled {
     background: #fff;
 }
+
+.custom-button {
+    background-color: #4e4e4e !important;
+}
+
+h1, h2, h3, h4, h5 {
+    color: #222222;
+}

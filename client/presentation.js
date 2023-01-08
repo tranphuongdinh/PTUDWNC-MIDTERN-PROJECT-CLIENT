@@ -15,3 +15,9 @@ export const addCollaborator = async (data) => request("POST", "/presentation/co
 export const removeFromPresentation = async (data) => request("PUT", "/presentation/collaboration/remove", data);
 
 export const getQuestionList = async (id) => request("GET",`/presentation/questions/${id}`);
+
+export const assignPresentationToGroup = async (data) => request("POST", "/presentation/assign-group", data);
+
+export const removeGroupFromPresentation = async (data) => request("POST", "/presentation/remove-assign-group", data);
+
+export const getGroupPresentation = async () => request("GET",`/presentation/assign-group/`);

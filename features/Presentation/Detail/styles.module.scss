@@ -92,12 +92,12 @@
     }
   }
   .selected {
-    background-color: rgb(186, 221, 255) !important;
+    background-color: #f2f2f2 !important;
     &::before {
       content: "";
       width: 5px;
       height: 100%;
-      background-color: rgb(0, 166, 255);
+      background-color: #888888;
       position: absolute;
       top: 0;
       left: 0;

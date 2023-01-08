@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import GroupsIcon from "@mui/icons-material/Groups";
 import ShareIcon from "@mui/icons-material/Share";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
-import { Button, Card, Container, FormControl, Grid, InputLabel, Select, TextField } from "@mui/material";
+import { Button, Card, Container, FormControl, Grid, IconButton, InputLabel, Select, TextField } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import clsx from "clsx";
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { deletePresentation, getPresentationDetail, updatePresentation } from "../../../client/presentation";
+import { assignPresentationToGroup, deletePresentation, getGroupPresentation, getPresentationDetail, updatePresentation } from "../../../client/presentation";
 import Breadcrumb from "../../../components/Breadcrumb";
 import Heading from "../../../components/Presentation/Heading";
 import MultipleChoice from "../../../components/Presentation/MultipleChoice";
@@ -42,6 +42,9 @@ const PresentationDetail = ({ id }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [selectedSlide, setSelectedSlide] = useState(0);
+
+  const [assignGroup, setAssignGroup] = useState('');
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -50,12 +53,13 @@ const PresentationDetail = ({ id }) => {
   };
 
   const getPresentation = async () => {
-    try {
-      const res = await getPresentationDetail(id);
-      const presentation = res?.data?.[0];
-      setPresentation(presentation);
-      setSlides(JSON.parse(presentation?.slides) || null);
-    } catch (e) {}
+    const [presentationRes, assignGroupRes] = await Promise.all([getPresentationDetail(id), getGroupPresentation()])
+    const presentation = presentationRes?.data?.[0];
+    const assignGroup = assignGroupRes?.data?.find(item => item.presentationId === id)?.groupId || '';
+
+    setPresentation(presentation);
+    setAssignGroup(assignGroup);
+    setSlides(JSON.parse(presentation?.slides) || null);
   };
 
   const updatePresentationDetail = async (config = {}) => {
@@ -82,7 +86,6 @@ const PresentationDetail = ({ id }) => {
       const res = await deletePresentation(id);
       if (res?.status === "OK") {
         await customToast("SUCCESS", "Delete presentation successfully!");
-        await getUser();
         router.reload();
       } else {
         await customToast("ERROR", res?.message);
@@ -90,8 +93,27 @@ const PresentationDetail = ({ id }) => {
     } catch (e) {
       await customToast("ERROR", e?.response?.data?.message);
     }
-    window.location.href = "/presentation";
+    router.push("/presentation")
   };
+
+  const handleAssignGroup = async (e) => {
+    try {
+      const groupId = e.target.value;
+      setAssignGroup(groupId);
+      const res =  await assignPresentationToGroup({groupId, presentationId: presentation._id});
+      if (res?.status === "OK") {
+        if (groupId) {
+          await customToast("SUCCESS", `Assign group to ${presentation.name} successfully!`);
+        } else {
+          await customToast("SUCCESS", `Presentation ${presentation.name} is public now`);
+        }
+      } else {
+        await customToast("ERROR", res?.message);
+      }
+    } catch (e) {
+      await customToast("ERROR", e?.response?.data?.message);
+    }
+  }
 
   return (
     <>
@@ -107,13 +129,14 @@ const PresentationDetail = ({ id }) => {
           <Grid container spacing={3}>
             <Grid container item xs={12}>
               <Grid item xs={12} md={4}>
-                <h1 style={{ marginLeft: 20 }}>{presentation?.name}</h1>
+                <h1>{presentation?.name}</h1>
 
-                <FormControl fullWidth>
-                  <InputLabel>Assign to a group</InputLabel>
-                  <Select label="Group" onChange={(e) =>{console.log(e.target.value)}}>
+                <FormControl fullWidth sx={{marginTop: 2}}>
+                  <InputLabel id="assign-group-label">Assign to a group</InputLabel>
+                  <Select label="Group" onChange={handleAssignGroup} value={assignGroup} labelId="assign-group-label">
+                    <MenuItem value="" key="public">Public</MenuItem>
                     {
-                      user?.myGroupIds?.map(group => <MenuItem value={group} key={group._id}>{group.name}</MenuItem>)
+                      user?.myGroupIds?.map(group => <MenuItem value={group._id} key={group._id}>{group.name}</MenuItem>)
                     }
                   </Select>
                 </FormControl>
@@ -121,19 +144,33 @@ const PresentationDetail = ({ id }) => {
               <Grid item xs={12} md={8} className={styles.buttonGroup}>
                 {user?._id === presentation?.ownerId && (
                   <Link href={`/presentation/${id}/collaboration`}>
-                    <Button sx={{ margin: "10px 0 10px 20px" }} variant="contained">
+                    <Button
+                      className="custom-button"
+                      sx={{ margin: "10px 0 10px 20px" }}
+                      variant="contained"
+                    >
                       <GroupsIcon />
                       &nbsp;Manage collaborators
                     </Button>
                   </Link>
                 )}
-                <CopyToClipboard text={`${window?.location?.href}/slideshow`} onCopy={async () => await customToast("SUCCESS", "Presentation link copied!")}>
-                  <Button sx={{ margin: "10px 0 10px 20px" }} variant="contained">
+                <CopyToClipboard
+                  text={`${window?.location?.href}/slideshow`}
+                  onCopy={async () =>
+                    await customToast("SUCCESS", "Presentation link copied!")
+                  }
+                >
+                  <Button
+                    className="custom-button"
+                    sx={{ margin: "10px 0 10px 20px" }}
+                    variant="contained"
+                  >
                     <ShareIcon />
                     &nbsp;Share
                   </Button>
                 </CopyToClipboard>
                 <Button
+                  className="custom-button"
                   sx={{ margin: "10px 0 10px 20px" }}
                   variant="contained"
                   onClick={async () => {
@@ -155,7 +192,7 @@ const PresentationDetail = ({ id }) => {
                     }}
                     startIcon={<DeleteIcon />}
                     color="error"
-                    variant="contained"
+                    variant="outlined"
                   >
                     Delete
                   </Button>
@@ -166,7 +203,8 @@ const PresentationDetail = ({ id }) => {
             <Grid container item xs={12}>
               <div>
                 <Button
-                  style={{ marginLeft: "20px" }}
+                sx={{marginBottom: 1}}
+                  className="custom-button"
                   id="basic-button"
                   aria-controls={open ? "basic-menu" : undefined}
                   aria-haspopup="true"
@@ -286,13 +324,28 @@ const PresentationDetail = ({ id }) => {
               <Grid item md={2} container spacing={2}>
                 <div className={styles.slidesList}>
                   {slides.map((slide, index) => (
-                    <Grid item xs={12} key={index} className={clsx(styles.slideItem, index === selectedSlide && styles.selected)}>
+                    <Grid
+                      item
+                      xs={12}
+                      key={index}
+                      className={clsx(
+                        styles.slideItem,
+                        index === selectedSlide && styles.selected
+                      )}
+                    >
                       <span className={styles.index}>{index}</span>
 
-                      <Card onClick={() => setSelectedSlide(index)} class={styles.previewSlideItem}>
-                        <PresentationItem presentType={slides[index].type} {...slides[index].content} type="preview" />
+                      <Card
+                        onClick={() => setSelectedSlide(index)}
+                        class={styles.previewSlideItem}
+                      >
+                        <PresentationItem
+                          presentType={slides[index].type}
+                          {...slides[index].content}
+                          type="preview"
+                        />
                       </Card>
-                      <Button
+                      <IconButton
                         className={styles.deleteButton}
                         onClick={() => {
                           if (index === selectedSlide) {
@@ -303,16 +356,26 @@ const PresentationDetail = ({ id }) => {
                           tmp.splice(index, 1);
                           setSlides([...tmp]);
                         }}
+                        variant="contained"
                       >
                         <DeleteIcon />
-                      </Button>
+                      </IconButton>
                     </Grid>
                   ))}
                 </div>
               </Grid>
 
               <Grid item md={6} sm={12} xs={12}>
-                <div className={styles.previewSlide}>{slides.length ? <PresentationItem presentType={slides[selectedSlide].type} {...slides[selectedSlide].content} /> : <h2>Empty slide</h2>}</div>
+                <div className={styles.previewSlide}>
+                  {slides.length ? (
+                    <PresentationItem
+                      presentType={slides[selectedSlide].type}
+                      {...slides[selectedSlide].content}
+                    />
+                  ) : (
+                    <h2>Empty slide</h2>
+                  )}
+                </div>
               </Grid>
               {slides.length ? (
                 <Grid item md={4} sm={12} container className={styles.content}>
@@ -405,63 +468,77 @@ const PresentationDetail = ({ id }) => {
                       )}
                       {slides[selectedSlide].type === "Multiple Choice" &&
                         slides[selectedSlide].content.options.length > 0 &&
-                        slides[selectedSlide].content.options.map((option, index) => (
-                          <div key={index}>
-                            <TextField
-                              label="Option 1"
-                              placeholder="Type option 1"
-                              fullWidth
-                              style={{ marginTop: "30px" }}
-                              value={slides[selectedSlide].content.options[index].label}
-                              onChange={(e) => {
-                                // full code to control option in slides state
-                                const newOptions = [...slides[selectedSlide].content.options];
-                                newOptions.splice(index, 1, {
-                                  ...newOptions[index],
-                                  label: e.target.value,
-                                });
-                                const replaceSlide = {
-                                  ...slides[selectedSlide],
-                                  content: {
-                                    ...slides[selectedSlide].content,
-                                    options: [...newOptions],
-                                  },
-                                };
-                                const tmp = [...slides];
-                                tmp.splice(selectedSlide, 1, replaceSlide);
-                                setSlides([...tmp]);
-                              }}
-                            />
-                            <Button
-                              size="small"
-                              onClick={() => {
-                                const newOptions = [...slides[selectedSlide].content.options];
-                                newOptions.splice(index, 1);
-                                const replaceSlide = {
-                                  ...slides[selectedSlide],
-                                  content: {
-                                    ...slides[selectedSlide].content,
-                                    options: [...newOptions],
-                                  },
-                                };
-                                const tmp = [...slides];
-                                tmp.splice(selectedSlide, 1, replaceSlide);
-                                setSlides([...tmp]);
-                              }}
-                            >
-                              <DeleteIcon style={{ fontSize: "18px" }} />
-                              &nbsp;Delete option {index + 1}
-                            </Button>
-                          </div>
-                        ))}
+                        slides[selectedSlide].content.options.map(
+                          (option, index) => (
+                            <div key={index}>
+                              <TextField
+                                label="Option 1"
+                                placeholder="Type option 1"
+                                fullWidth
+                                style={{ marginTop: "30px" }}
+                                value={
+                                  slides[selectedSlide].content.options[index]
+                                    .label
+                                }
+                                onChange={(e) => {
+                                  // full code to control option in slides state
+                                  const newOptions = [
+                                    ...slides[selectedSlide].content.options,
+                                  ];
+                                  newOptions.splice(index, 1, {
+                                    ...newOptions[index],
+                                    label: e.target.value,
+                                  });
+                                  const replaceSlide = {
+                                    ...slides[selectedSlide],
+                                    content: {
+                                      ...slides[selectedSlide].content,
+                                      options: [...newOptions],
+                                    },
+                                  };
+                                  const tmp = [...slides];
+                                  tmp.splice(selectedSlide, 1, replaceSlide);
+                                  setSlides([...tmp]);
+                                }}
+                              />
+                              <Button
+                                className="custom-button"
+                                variant="contained"
+                                size="small"
+                                onClick={() => {
+                                  const newOptions = [
+                                    ...slides[selectedSlide].content.options,
+                                  ];
+                                  newOptions.splice(index, 1);
+                                  const replaceSlide = {
+                                    ...slides[selectedSlide],
+                                    content: {
+                                      ...slides[selectedSlide].content,
+                                      options: [...newOptions],
+                                    },
+                                  };
+                                  const tmp = [...slides];
+                                  tmp.splice(selectedSlide, 1, replaceSlide);
+                                  setSlides([...tmp]);
+                                }}
+                              >
+                                <DeleteIcon style={{ fontSize: "18px" }} />
+                                &nbsp;Delete option {index + 1}
+                              </Button>
+                            </div>
+                          )
+                        )}
                     </div>
                     {slides[selectedSlide].type === "Multiple Choice" && (
                       <Button
+                        className="custom-button"
                         startIcon={<AddIcon />}
                         variant="contained"
                         style={{ marginTop: "30px" }}
                         onClick={() => {
-                          const newOptions = [...slides[selectedSlide].content.options];
+                          const newOptions = [
+                            ...slides[selectedSlide].content.options,
+                          ];
                           newOptions.push({
                             label: `Option ${newOptions.length + 1}`,
                             data: 0,
