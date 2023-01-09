@@ -169,7 +169,7 @@ const PresentationDetail = ({ id }) => {
                   variant="contained"
                   onClick={async () => {
                     await updatePresentationDetail({ isPresent: true });
-                    socket.emit("clientStartPresent", presentation?._id);
+                    socket.emit("clientStartPresent", { presentationId: presentation?._id, groupId: presentation?.groupId, presentationName: presentation?.name });
                     router.push(`/presentation/${id}/slideshow`);
                   }}
                 >

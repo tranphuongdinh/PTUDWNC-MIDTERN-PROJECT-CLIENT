@@ -5,15 +5,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import Person2Icon from "@mui/icons-material/Person2";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import SendIcon from "@mui/icons-material/Send";
-import {
-  Button,
-  Grid,
-  IconButton,
-  Menu,
-  MenuItem,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Button, Chip, Grid, IconButton, Menu, MenuItem, TextField, Tooltip } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -31,20 +23,15 @@ import React, { useContext, useEffect, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import {
-  createInviteLinkGroup,
-  getGroupDetail,
-  removeFromGroup,
-  sendInviteEmail,
-  updateRoleInGroup,
-  deleteGroupById,
-} from "../../../client/group";
+import { createInviteLinkGroup, getGroupDetail, removeFromGroup, sendInviteEmail, updateRoleInGroup, deleteGroupById } from "../../../client/group";
 import { getUserByIds } from "../../../client/user";
 import Breadcrumb from "../../../components/Breadcrumb";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { AuthContext } from "../../../context/authContext";
 import { customToast } from "../../../utils";
 import styles from "./styles.module.scss";
+import Link from "next/link";
+import { SocketContext } from "../../../context/socketContext";
 
 export default function GroupDetailPage() {
   const [group, setGroup] = useState(null);
@@ -53,6 +40,8 @@ export default function GroupDetailPage() {
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const { user, isLoadingAuth } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { socket } = useContext(SocketContext);
 
   const [anchorElButton, setAnchorElButton] = React.useState(null);
   const openMenu = Boolean(anchorElButton);
@@ -63,6 +52,7 @@ export default function GroupDetailPage() {
   const { register, handleSubmit, errors } = useForm({
     mode: "onChange",
   });
+
   const [openInviteMemberForm, setOpenInviteMemberForm] = useState(false);
 
   const handleInviteMember = async (data) => {
@@ -92,13 +82,7 @@ export default function GroupDetailPage() {
       const inviteLinkRes = await createInviteLinkGroup({ groupId: id });
       if (inviteLinkRes?.status === "OK") {
         const { code = "", groupId = "" } = inviteLinkRes?.data[0];
-        const inviteLink =
-          window.location.origin +
-          "/invite?" +
-          "groupId=" +
-          groupId +
-          "&code=" +
-          code;
+        const inviteLink = window.location.origin + "/invite?" + "groupId=" + groupId + "&code=" + code;
         return inviteLink;
       }
     } catch (e) {
@@ -115,11 +99,7 @@ export default function GroupDetailPage() {
         const inviteLink = await getInviteLink(groupInfo?._id);
         if (inviteLink) setInviteLink(inviteLink);
 
-        const userListRes = await getUserByIds([
-          groupInfo.ownerId,
-          ...groupInfo.memberIds,
-          ...groupInfo.coOwnerIds,
-        ]);
+        const userListRes = await getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]);
         const userListMap = {};
 
         userListRes?.data?.forEach((user) => (userListMap[user?._id] = user));
@@ -127,8 +107,10 @@ export default function GroupDetailPage() {
         groupInfo.owner = userListMap[groupInfo.ownerId];
         groupInfo.members = groupInfo.memberIds.map((id) => userListMap[id]);
         groupInfo.coOwners = groupInfo.coOwnerIds.map((id) => userListMap[id]);
-        groupInfo.total =
-          groupInfo.memberIds.length + groupInfo.coOwnerIds.length + 1;
+        groupInfo.total = groupInfo.memberIds.length + groupInfo.coOwnerIds.length + 1;
+
+        groupInfo.currentPresentation = user?.myPresentations?.find((presentation) => presentation.groupId === groupInfo._id);
+
         setGroup(groupInfo);
       } else {
         router.push("/");
@@ -142,7 +124,19 @@ export default function GroupDetailPage() {
 
   useEffect(() => {
     getInfoOfGroup();
-  }, []);
+
+    socket.on("startPresent", (data) => {
+      if (data.presentationId === group?.currentPresentation?._id) router.reload();
+    });
+
+    socket.on("stopPresent", (data) => {
+      if (data === group?.currentPresentation?._id) router.reload();
+    });
+
+    socket.on("stopPresentByUpdateGroup", (data) => {
+      if (data?.find(p => p._id === group?.currentPresentation?._id)) router.reload();
+    })
+  }, [group]);
 
   const handleUpgradeRole = async (member, isUpgrade) => {
     try {
@@ -159,10 +153,7 @@ export default function GroupDetailPage() {
     try {
       const data = { userId: member?._id, groupId: group?._id };
       await removeFromGroup(data);
-      await customToast(
-        "SUCCESS",
-        `Remove member ${member.name} successfully!`
-      );
+      await customToast("SUCCESS", `Remove member ${member.name} successfully!`);
       router.reload();
     } catch (e) {
       await customToast("ERROR", e.response?.data?.message);
@@ -192,28 +183,11 @@ export default function GroupDetailPage() {
           { label: group?.name, href: `/group/${group?._id}` },
         ]}
       />
-      <Grid
-        item
-        xs={12}
-        style={{ display: "flex", justifyContent: "flex-end" }}
-      >
-        <Button
-          className="custom-button"
-          variant="contained"
-          ref={anchorElButton}
-          onClick={handleClickButton}
-          startIcon={<PersonAddIcon />}
-        >
+      <Grid item xs={12} style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button className="custom-button" variant="contained" ref={anchorElButton} onClick={handleClickButton} startIcon={<PersonAddIcon />}>
           Invite
         </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          ref={anchorElButton}
-          onClick={() => setOpenConfirmDelete(true)}
-          startIcon={<DeleteForeverIcon />}
-          style={{ marginLeft: "20px" }}
-        >
+        <Button variant="outlined" color="error" ref={anchorElButton} onClick={() => setOpenConfirmDelete(true)} startIcon={<DeleteForeverIcon />} style={{ marginLeft: "20px" }}>
           Delete Group
         </Button>
 
@@ -284,9 +258,7 @@ export default function GroupDetailPage() {
                 <TableCell align="center">Name</TableCell>
                 <TableCell align="center">Email</TableCell>
                 <TableCell align="center">Role</TableCell>
-                {user?._id === group?.ownerId && (
-                  <TableCell align="center">Action</TableCell>
-                )}
+                {user?._id === group?.ownerId && <TableCell align="center">Action</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -313,20 +285,13 @@ export default function GroupDetailPage() {
                   {user?._id === group?.ownerId && (
                     <TableCell align="center">
                       <Tooltip title="Become member">
-                        <IconButton
-                          color="secondary"
-                          onClick={() => handleUpgradeRole(coOwner, false)}
-                          style={{ marginRight: "10px" }}
-                        >
+                        <IconButton color="secondary" onClick={() => handleUpgradeRole(coOwner, false)} style={{ marginRight: "10px" }}>
                           <Person2Icon />
                         </IconButton>
                       </Tooltip>
 
                       <Tooltip title="Kick this co-owner out">
-                        <IconButton
-                          color="error"
-                          onClick={() => handleRemove(coOwner)}
-                        >
+                        <IconButton color="error" onClick={() => handleRemove(coOwner)}>
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -343,19 +308,12 @@ export default function GroupDetailPage() {
                   {user?._id === group?.ownerId && (
                     <TableCell align="center">
                       <Tooltip title="Become co-owner">
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleUpgradeRole(member, true)}
-                          style={{ marginRight: "10px" }}
-                        >
+                        <IconButton color="primary" onClick={() => handleUpgradeRole(member, true)} style={{ marginRight: "10px" }}>
                           <PeopleIcon />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Kick this member out">
-                        <IconButton
-                          color="error"
-                          onClick={() => handleRemove(member)}
-                        >
+                        <IconButton color="error" onClick={() => handleRemove(member)}>
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -368,30 +326,34 @@ export default function GroupDetailPage() {
         </TableContainer>
       </Grid>
 
-      <Dialog
-        open={openInviteMemberForm}
-        onClose={() => setOpenInviteMemberForm(false)}
-        style={{ width: "100%" }}
-      >
+      {group.currentPresentation && (
+        <>
+          <Grid item xs={12}>
+            <h1>Current presentations</h1>
+          </Grid>
+
+          <Grid item xs={12}>
+            <div className={styles.card}>
+              <span>
+                Name: <b>{group.currentPresentation?.name}</b>
+              </span>
+              <p>
+                Status: <span>{group.currentPresentation?.isPresent ? <Chip label="Presenting" color="success" /> : <Chip label="Not started" color="error" />}</span>
+              </p>
+              {group.currentPresentation?.isPresent && <Button variant="contained">Join</Button>}
+            </div>
+          </Grid>
+        </>
+      )}
+
+      <Dialog open={openInviteMemberForm} onClose={() => setOpenInviteMemberForm(false)} style={{ width: "100%" }}>
         <form onSubmit={handleSubmit(handleInviteMember)}>
-          <DialogTitle id="alert-dialog-title">
-            Invite a member by email
-          </DialogTitle>
+          <DialogTitle id="alert-dialog-title">Invite a member by email</DialogTitle>
           <DialogContent style={{ overflowY: "initial" }}>
-            <TextField
-              label="Member's email"
-              placeholder="Enter member's email"
-              {...register("memberEmail")}
-              type="email"
-              required
-            />
+            <TextField label="Member's email" placeholder="Enter member's email" {...register("memberEmail")} type="email" required fullWidth />
           </DialogContent>
           <DialogActions>
-            <Button
-              className="custom-button"
-              variant="contained"
-              onClick={() => setOpenInviteMemberForm(false)}
-            >
+            <Button className="custom-button" variant="contained" onClick={() => setOpenInviteMemberForm(false)}>
               Cancel
             </Button>
             <Button variant="contained" type="submit">
@@ -400,24 +362,14 @@ export default function GroupDetailPage() {
           </DialogActions>
         </form>
       </Dialog>
-      <Dialog
-        open={openConfirmDelete}
-        onClose={() => setOpenConfirmDelete(false)}
-      >
-        <DialogTitle id="alert-dialog-title">
-          Please confirm to delete this group
-        </DialogTitle>
+      <Dialog open={openConfirmDelete} onClose={() => setOpenConfirmDelete(false)}>
+        <DialogTitle id="alert-dialog-title">Please confirm to delete this group</DialogTitle>
 
         <DialogActions>
           <Button variant="contained" color="error" onClick={handleDeleteGroup}>
             Delete
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setOpenConfirmDelete(false)}
-            autoFocus
-          >
+          <Button variant="contained" color="primary" onClick={() => setOpenConfirmDelete(false)} autoFocus>
             Cancel
           </Button>
         </DialogActions>

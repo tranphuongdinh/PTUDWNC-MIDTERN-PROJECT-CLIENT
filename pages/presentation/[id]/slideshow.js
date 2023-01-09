@@ -45,6 +45,7 @@ const SlideShow = () => {
       setPresentation(presentation);
       setSlides(JSON.parse(presentation?.slides) || []);
       setIsLoading(false);
+      socket.emit("clientStartPresent", { presentationId: presentation?._id, groupId: presentation?.groupId, presentationName: presentation?.name });
     } catch (e) {
       setIsLoading(false);
     }
@@ -96,7 +97,7 @@ const SlideShow = () => {
     });
 
     socket.on("startPresent", (data) => {
-      if (!presentation?.isPresent && data === presentation?._id) router.reload();
+      if (!presentation?.isPresent && data.presentationId === presentation?._id) router.reload();
     });
 
     socket.on("stopPresent", (data) => {

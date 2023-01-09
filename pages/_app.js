@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }) {
     <>
       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <SocketProvider>
-          <ToastContainer position="top-right" autoClose={1500} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="colored" />
+          <ToastContainer position="top-right" autoClose={1500} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="colored" limit={1}/>
           <AuthContextProvider>
             <NextNProgress color="#1976d2" />
             <Head>

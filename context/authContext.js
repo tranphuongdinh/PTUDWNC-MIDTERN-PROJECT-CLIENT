@@ -6,6 +6,10 @@ import { getPresentationByIds } from "../client/presentation";
 import { getUserInfo } from "../client/user";
 import LoadingScreen from "../components/LoadingScreen";
 import { customToast } from "../utils";
+import { useContext } from "react";
+import { SocketContext } from "./socketContext";
+import { toast } from "react-toastify";
+import { Button } from "@mui/material";
 
 const AuthContext = createContext();
 
@@ -13,6 +17,8 @@ const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
+  const { socket } = useContext(SocketContext);
 
   const router = useRouter();
 
@@ -75,6 +81,42 @@ const AuthContextProvider = ({ children }) => {
       setIsAuthenticated(false);
     }
   }, []);
+
+  useEffect(() => {
+    socket.on("startPresent", async (data) => {
+      if (!router.pathname.includes("presentation") && data?.groupId && (user?.myGroupIds?.includes(data.groupId) || user?.joinedGroupIds?.includes(data.groupId))) {
+        toast(
+          <div>
+            <p>Presentation {data?.presentationName} is presenting, do you want to join now?</p>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button variant="contained" color="success" sx={{ marginLeft: 3, marginTop: 1 }} onClick={() => (window.location.href = `/presentation/${data.presentationId}/slideshow`)}>
+                JOIN
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                sx={{ marginLeft: 3, marginTop: 1 }}
+                onClick={() => {
+                  toast.dismiss();
+                  router.reload();
+                }}
+              >
+                NOT NOW
+              </Button>
+            </div>
+          </div>,
+          {
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }
+    });
+  }, [user]);
 
   const login = async (data) => {
     try {
@@ -173,4 +215,3 @@ const AuthContextProvider = ({ children }) => {
 };
 
 export { AuthContextProvider, AuthContext };
-
