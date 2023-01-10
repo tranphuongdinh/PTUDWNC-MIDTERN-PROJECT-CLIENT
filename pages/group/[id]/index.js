@@ -96,8 +96,10 @@ export default function GroupDetailPage() {
       if (res.status === "OK") {
         const groupInfo = res.data[0];
 
-        const inviteLink = await getInviteLink(groupInfo?._id);
-        if (inviteLink) setInviteLink(inviteLink);
+        if (user?._id === groupInfo.ownerIdp) {
+          const inviteLink = await getInviteLink(groupInfo?._id);
+          if (inviteLink) setInviteLink(inviteLink);
+        }
 
         const userListRes = await getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]);
         const userListMap = {};
