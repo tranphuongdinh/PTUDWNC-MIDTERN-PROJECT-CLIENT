@@ -1,6 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-
+import { v4 as uuidv4 } from "uuid";
 import GroupsIcon from "@mui/icons-material/Groups";
 import ShareIcon from "@mui/icons-material/Share";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
@@ -103,7 +103,7 @@ const PresentationDetail = ({ id }) => {
     } catch (e) {
       await customToast("ERROR", e?.response?.data?.message);
     }
-    router.push("/presentation");
+    window.location.href = "/presentation";
   };
 
   const handleAssignGroup = async (e) => {
@@ -240,6 +240,7 @@ const PresentationDetail = ({ id }) => {
                       const newSlides = [
                         ...slides,
                         {
+                          id: uuidv4(),
                           type: "Multiple Choice",
                           content: {
                             question: "Your question",
@@ -267,6 +268,7 @@ const PresentationDetail = ({ id }) => {
                       const newSlides = [
                         ...slides,
                         {
+                          id: uuidv4(),
                           type: "Heading",
                           content: {
                             heading: "This is heading",
@@ -285,6 +287,7 @@ const PresentationDetail = ({ id }) => {
                       const newSlides = [
                         ...slides,
                         {
+                          id: uuidv4(),
                           type: "Paragraph",
                           content: {
                             heading: "This is heading",
@@ -368,12 +371,11 @@ const PresentationDetail = ({ id }) => {
                 <Grid item md={4} sm={12} container className={styles.content}>
                   <div>
                     <h3>Edit your slide</h3>
-                    {presentation?.history?.filter((item) => item.slideIndex == selectedSlide)?.length > 0 && (
+                    {presentation?.history?.filter((item) => item.slideId === slides[selectedSlide]?.id)?.length > 0 && (
                       <Button variant="contained" sx={{ marginTop: 2 }} onClick={() => setOpenHistory(true)} className="custom-button">
                         View submissions
                       </Button>
                     )}
-
                     <div item xs={12}>
                       {slides[selectedSlide].type === "Multiple Choice" ? (
                         <TextField
@@ -561,7 +563,7 @@ const PresentationDetail = ({ id }) => {
               <h3 style={{ textAlign: "left", width: "100%" }}>All submissions:</h3>
               <ul style={{ padding: 20 }}>
                 {presentation?.history
-                  ?.filter((item) => item.slideIndex == selectedSlide)
+                  ?.filter((item) => item.slideId === slides[selectedSlide]?.id)
                   ?.map((history) => (
                     <li key={history.time} style={{ marginBottom: 10 }}>
                       <b>{history.userName}</b> choose option <b>{history.option}</b> at <b>{new Date(history.time).toLocaleTimeString()}</b>

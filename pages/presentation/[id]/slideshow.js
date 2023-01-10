@@ -22,8 +22,8 @@ import { AuthContext } from "../../../context/authContext";
 import { SocketContext } from "../../../context/socketContext";
 import styles from "./styles.module.scss";
 import ChatBox from "../../../components/ChatBox";
-import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
-import EventNoteIcon from '@mui/icons-material/EventNote';
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import EventNoteIcon from "@mui/icons-material/EventNote";
 
 const SlideShow = () => {
   const { socket } = useContext(SocketContext);
@@ -55,7 +55,6 @@ const SlideShow = () => {
       setSlides(JSON.parse(presentation?.slides) || []);
       setHistory(presentation?.history || []);
       setIsLoading(false);
-      socket.emit("clientStartPresent", { presentationId: presentation?._id, groupId: presentation?.groupId, presentationName: presentation?.name });
     } catch (e) {
       setIsLoading(false);
     }
@@ -115,11 +114,11 @@ const SlideShow = () => {
     });
 
     socket.on("startPresent", (data) => {
-      if (!presentation?.isPresent && data.presentationId === presentation?._id) router.reload();
+      if (user?._id !== presentation?.ownerId && !presentation?.collaborators?.includes(user?._id) && !presentation?.isPresent && data.presentationId === presentation?._id) router.reload();
     });
 
     socket.on("stopPresent", (data) => {
-      if (presentation?.isPresent && data === presentation?._id) router.reload();
+      if ((!user || (user?._id !== presentation?.ownerId && !presentation?.collaborators?.includes(user?._id))) && data.presentationId === presentation?._id) router.reload();
     });
 
     socket.on("stopPresentByUpdateGroup", (data) => {
@@ -187,6 +186,7 @@ const SlideShow = () => {
                   justifyContent: "center",
                   width: "100vw",
                   height: "100vh",
+                  marginLeft: 0
                 }}
               >
                 <Grid item xl={8} md={7} xs={12} className={styles.presentationSlideCol}>
@@ -243,18 +243,21 @@ const SlideShow = () => {
                       onClick={async () => {
                         await updatePresentationDetail({ isPresent: false });
                         socket.emit("clientStopPresent", presentation?._id);
-                        router.back();
+                        router.push(`/presentation/${presentation._id}`);
+                        return;
                       }}
                       color="error"
                     >
                       Stop Present
                     </Button>
-                    <Button startIcon={<QuestionAnswerIcon/>} className="custom-button" variant="contained" onClick={() => setOpenQuestion(true)}>
+                    <Button startIcon={<QuestionAnswerIcon />} className="custom-button" variant="contained" onClick={() => setOpenQuestion(true)}>
                       Open Question
                     </Button>
-                    <Button startIcon={<EventNoteIcon/>} className="custom-button" variant="contained" onClick={() => setOpenHistory(true)}>
-                      Submissions
-                    </Button>
+                    {history?.filter((item) => item.slideId === slides[viewIndex]?.id)?.length > 0 && (
+                      <Button startIcon={<EventNoteIcon />} className="custom-button" variant="contained" onClick={() => setOpenHistory(true)}>
+                        Submissions
+                      </Button>
+                    )}
                   </div>
                   {slides[index].type === "Multiple Choice" && (
                     <MultipleChoicePresentation width="90%" height="60vh" options={slides[index].content.options} question={slides[index].content.question} />
@@ -323,7 +326,10 @@ const SlideShow = () => {
                               };
                               socket.emit("vote", updatedPresentation);
                               socket.emit("clientUpdateHistory", {
-                                data: [...history, { userName: user?.name || anonymousName || "Anonymous user", time: new Date(), option: option.label, slideIndex: viewIndex }],
+                                data: [
+                                  ...history,
+                                  { userName: user?.name || anonymousName || "Anonymous user", time: new Date(), option: option.label, slideIndex: viewIndex, slideId: slides[viewIndex].id },
+                                ],
                                 presentationId: presentation._id,
                               });
                               setIsAnswered(true);
@@ -392,8 +398,8 @@ const SlideShow = () => {
               <h3 style={{ textAlign: "left", width: "100%" }}>All submissions:</h3>
               <ul style={{ padding: 20 }}>
                 {history
-                  ?.filter((item) => item.slideIndex == viewIndex)
-                  .map((history) => (
+                  ?.filter((item) => item.slideId === slides[viewIndex]?.id)
+                  ?.map((history) => (
                     <li key={history.time} style={{ marginBottom: 10 }}>
                       <b>{history.userName}</b> choose option <b>{history.option}</b> at <b>{new Date(history.time).toLocaleTimeString()}</b>
                     </li>
@@ -420,7 +426,7 @@ const SlideShow = () => {
                 questionList.length > 0 &&
                 questionList.map((question, index) => (
                   <div key={question._id} className={styles.fullWidth}>
-                    {(user?._id === presentation?.ownerId) && (
+                    {user?._id === presentation?.ownerId && (
                       <Tooltip title="Check this question answered">
                         <Checkbox
                           checked={question.answered}
