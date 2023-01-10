@@ -27,6 +27,11 @@ a {
     background-color: #4e4e4e !important;
 }
 
+.custom-button-outlined {
+    border-color: #4e4e4e !important;
+    color: #4e4e4e !important;
+}
+
 h1, h2, h3, h4, h5 {
     color: #222222;
 }
