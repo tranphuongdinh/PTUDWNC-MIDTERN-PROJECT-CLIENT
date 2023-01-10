@@ -31,8 +31,6 @@ const AuthContextProvider = ({ children }) => {
         if (res?.status === "OK") {
           const userInfo = res?.data?.[0];
 
-          setIsAuthenticated(true);
-
           const groupListRes = await getGroupByIds([...userInfo.myGroupIds, ...userInfo.joinedGroupIds]);
 
           const presentationListRes = await getPresentationByIds([]);
@@ -56,6 +54,8 @@ const AuthContextProvider = ({ children }) => {
           userInfo.coOwnerGroups = userInfo.joinedGroups?.filter((group) => group.coOwnerIds?.includes(userInfo._id)) || [];
 
           userInfo.memberGroups = userInfo.joinedGroupIds?.filter((group) => group.memberIds?.includes(userInfo._id)) || [];
+
+          setIsAuthenticated(true);
 
           setUser({ ...user, ...userInfo });
 
