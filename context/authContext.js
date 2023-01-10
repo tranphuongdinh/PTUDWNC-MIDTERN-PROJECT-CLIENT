@@ -31,9 +31,7 @@ const AuthContextProvider = ({ children }) => {
         if (res?.status === "OK") {
           const userInfo = res?.data?.[0];
 
-          const groupListRes = await getGroupByIds([...userInfo.myGroupIds, ...userInfo.joinedGroupIds]);
-
-          const presentationListRes = await getPresentationByIds([]);
+          const [groupListRes, presentationListRes] = await Promise.all([getGroupByIds([...userInfo.myGroupIds, ...userInfo.joinedGroupIds]), getPresentationByIds([])]);
 
           const groupListMap = {};
 
@@ -53,7 +51,7 @@ const AuthContextProvider = ({ children }) => {
 
           userInfo.coOwnerGroups = userInfo.joinedGroups?.filter((group) => group.coOwnerIds?.includes(userInfo._id)) || [];
 
-          userInfo.memberGroups = userInfo.joinedGroupIds?.filter((group) => group.memberIds?.includes(userInfo._id)) || [];
+          userInfo.memberGroups = userInfo.joinedGroups?.filter((group) => group.memberIds?.includes(userInfo._id)) || [];
 
           setIsAuthenticated(true);
 

@@ -32,6 +32,7 @@ import { customToast } from "../../../utils";
 import styles from "./styles.module.scss";
 import Link from "next/link";
 import { SocketContext } from "../../../context/socketContext";
+import { getPresentationByIds } from "../../../client/presentation";
 
 export default function GroupDetailPage() {
   const [group, setGroup] = useState(null);
@@ -101,7 +102,8 @@ export default function GroupDetailPage() {
           if (inviteLink) setInviteLink(inviteLink);
         }
 
-        const userListRes = await getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]);
+        const [userListRes, presentationListRes] = await Promise.all([getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]), getPresentationByIds([])])
+
         const userListMap = {};
 
         userListRes?.data?.forEach((user) => (userListMap[user?._id] = user));
@@ -111,7 +113,7 @@ export default function GroupDetailPage() {
         groupInfo.coOwners = groupInfo.coOwnerIds.map((id) => userListMap[id]);
         groupInfo.total = groupInfo.memberIds.length + groupInfo.coOwnerIds.length + 1;
 
-        groupInfo.currentPresentation = user?.myPresentations?.find((presentation) => presentation.groupId === groupInfo._id);
+        groupInfo.currentPresentation = presentationListRes?.data?.find((presentation) => presentation.groupId === groupInfo._id);
 
         setGroup(groupInfo);
         setIsLoading(false);
