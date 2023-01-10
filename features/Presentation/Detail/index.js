@@ -21,6 +21,7 @@ import { AuthContext } from "../../../context/authContext";
 import { SocketContext } from "../../../context/socketContext";
 import { customToast } from "../../../utils";
 import styles from "./styles.module.scss";
+import LoadingScreen from "../../../components/LoadingScreen";
 
 const PresentationItem = (props) => {
   const { presentType, ...rest } = props;
@@ -42,8 +43,9 @@ const PresentationDetail = ({ id }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [selectedSlide, setSelectedSlide] = useState(0);
-
   const [openHistory, setOpenHistory] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -53,11 +55,22 @@ const PresentationDetail = ({ id }) => {
   };
 
   const getPresentation = async () => {
-    const presentationRes = await getPresentationDetail(id);
-    const presentation = presentationRes?.data?.[0];
+    try {
+      setLoading(true);
+      const presentationRes = await getPresentationDetail(id);
+      const presentation = presentationRes?.data?.[0];
 
-    setPresentation(presentation);
-    setSlides(JSON.parse(presentation?.slides) || null);
+      if (presentation.ownerId !== user?._id && !presentation.collaborators?.includes(user?._id)) {
+        window.location.href = "/";
+        return;
+      }
+
+      setPresentation(presentation);
+      setSlides(JSON.parse(presentation?.slides) || null);
+      setLoading(false);
+    } catch (e) {
+      window.location.href = "/";
+    }
   };
 
   const updatePresentationDetail = async (config = {}) => {
@@ -67,7 +80,7 @@ const PresentationDetail = ({ id }) => {
         slides: JSON.stringify(slides),
         ...config,
       };
-      const res = await updatePresentation(newPresentation);
+      await updatePresentation(newPresentation);
     } catch (e) {}
   };
 
@@ -121,7 +134,9 @@ const PresentationDetail = ({ id }) => {
     }
   };
 
-  return (
+  return loading ? (
+    <LoadingScreen />
+  ) : (
     <>
       <Breadcrumb
         paths={[
@@ -286,34 +301,34 @@ const PresentationDetail = ({ id }) => {
                 </Menu>
               </div>
               {/* <Button
-              style={{ marginLeft: "20px" }}
-              onClick={() => {
-                const newSlides = [
-                  ...slides,
-                  {
-                    type: "Multiple Choice",
-                    content: {
-                      question: "Your question",
-                      options: [
-                        {
-                          label: "Option 1",
-                          data: 0,
-                        },
-                        {
-                          label: "Option 2",
-                          data: 0,
-                        },
-                      ],
+          style={{ marginLeft: "20px" }}
+          onClick={() => {
+            const newSlides = [
+              ...slides,
+              {
+                type: "Multiple Choice",
+                content: {
+                  question: "Your question",
+                  options: [
+                    {
+                      label: "Option 1",
+                      data: 0,
                     },
-                  },
-                ];
-                setSlides(newSlides);
-              }}
-              variant="contained"
-            >
-              <AddIcon />
-              &nbsp;New Slide
-            </Button> */}
+                    {
+                      label: "Option 2",
+                      data: 0,
+                    },
+                  ],
+                },
+              },
+            ];
+            setSlides(newSlides);
+          }}
+          variant="contained"
+        >
+          <AddIcon />
+          &nbsp;New Slide
+        </Button> */}
             </Grid>
 
             <Grid container item xs={12} spacing={3}>
