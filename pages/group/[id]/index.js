@@ -96,7 +96,7 @@ export default function GroupDetailPage() {
       if (res.status === "OK") {
         const groupInfo = res.data[0];
 
-        if (user?._id === groupInfo.ownerIdp) {
+        if (user?._id === groupInfo.ownerId) {
           const inviteLink = await getInviteLink(groupInfo?._id);
           if (inviteLink) setInviteLink(inviteLink);
         }
@@ -114,6 +114,7 @@ export default function GroupDetailPage() {
         groupInfo.currentPresentation = user?.myPresentations?.find((presentation) => presentation.groupId === groupInfo._id);
 
         setGroup(groupInfo);
+        setIsLoading(false);
       } else {
         router.push("/");
       }
@@ -126,7 +127,9 @@ export default function GroupDetailPage() {
 
   useEffect(() => {
     getInfoOfGroup();
+  }, []);
 
+  useEffect(() => {
     socket.on("startPresent", (data) => {
       if (data.presentationId === group?.currentPresentation?._id) router.reload();
     });
@@ -136,8 +139,8 @@ export default function GroupDetailPage() {
     });
 
     socket.on("stopPresentByUpdateGroup", (data) => {
-      if (data?.find(p => p._id === group?.currentPresentation?._id)) router.reload();
-    })
+      if (data?.find((p) => p._id === group?.currentPresentation?._id)) router.reload();
+    });
   }, [group]);
 
   const handleUpgradeRole = async (member, isUpgrade) => {

@@ -31,6 +31,8 @@ const AuthContextProvider = ({ children }) => {
         if (res?.status === "OK") {
           const userInfo = res?.data?.[0];
 
+          setIsAuthenticated(true);
+
           const groupListRes = await getGroupByIds([...userInfo.myGroupIds, ...userInfo.joinedGroupIds]);
 
           const presentationListRes = await getPresentationByIds([]);
@@ -39,24 +41,24 @@ const AuthContextProvider = ({ children }) => {
 
           const presentationListMap = {};
 
-          groupListRes.data.forEach((group) => (groupListMap[group?._id] = group));
+          groupListRes?.data?.forEach((group) => (groupListMap[group?._id] = group));
 
-          presentationListRes.data.forEach((presentation) => (presentationListMap[presentation?._id] = presentation));
+          presentationListRes?.data?.forEach((presentation) => (presentationListMap[presentation?._id] = presentation));
 
-          userInfo.myGroups = userInfo.myGroupIds.map((code) => groupListMap[code]);
+          userInfo.myGroups = userInfo.myGroupIds?.map((code) => groupListMap[code]) || [];
 
-          userInfo.joinedGroups = userInfo.joinedGroupIds.map((code) => groupListMap[code]);
+          userInfo.joinedGroups = userInfo.joinedGroupIds?.map((code) => groupListMap[code]) || [];
 
-          userInfo.myPresentations = userInfo.presentationIds.map((code) => presentationListMap[code]);
+          userInfo.myPresentations = userInfo.presentationIds?.map((code) => presentationListMap[code]) || [];
 
-          userInfo.collabPresentations = presentationListRes?.data?.filter((presentation) => presentation?.collaborators?.includes(userInfo._id));
+          userInfo.collabPresentations = presentationListRes?.data?.filter((presentation) => presentation?.collaborators?.includes(userInfo._id)) || [];
 
-          userInfo.coOwnerGroups = userInfo.joinedGroups.filter((group) => group.coOwnerIds.includes(userInfo._id));
+          userInfo.coOwnerGroups = userInfo.joinedGroups?.filter((group) => group.coOwnerIds?.includes(userInfo._id)) || [];
 
-          userInfo.memberGroups = userInfo.joinedGroupIds.filter((group) => group.memberIds.includes(userInfo._id));
+          userInfo.memberGroups = userInfo.joinedGroupIds?.filter((group) => group.memberIds?.includes(userInfo._id)) || [];
 
           setUser({ ...user, ...userInfo });
-          setIsAuthenticated(true);
+
           localStorage.setItem("access_token", res?.data?.[0]?.access_token || "");
         } else {
           router.push("/login");
