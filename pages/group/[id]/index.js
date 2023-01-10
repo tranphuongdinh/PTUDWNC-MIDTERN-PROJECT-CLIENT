@@ -347,7 +347,9 @@ export default function GroupDetailPage() {
               <p>
                 Status: <span>{group.currentPresentation?.isPresent ? <Chip label="Presenting" color="success" /> : <Chip label="Not started" color="error" />}</span>
               </p>
-              {group.currentPresentation?.isPresent && <Button variant="contained">Join</Button>}
+              {group.currentPresentation?.isPresent && <Button variant="contained" onClick={() => {
+                window.location.href = `/presentation/${group.currentPresentation._id}/slideshow`
+              }}>Join</Button>}
             </div>
           </Grid>
         </>

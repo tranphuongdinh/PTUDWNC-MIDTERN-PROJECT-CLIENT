@@ -76,7 +76,6 @@ const SlideShow = () => {
   const [viewIndex, setViewIndex] = useState(0);
 
   const [isAnswered, setIsAnswered] = useState(false);
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
   const PresentButton = () => (
     <Tooltip title={handle.active ? "Exit full screen" : "Go to full screen"}>
@@ -421,7 +420,7 @@ const SlideShow = () => {
                 questionList.length > 0 &&
                 questionList.map((question, index) => (
                   <div key={question._id} className={styles.fullWidth}>
-                    {user?._id && presentation?.ownerId && (
+                    {(user?._id === presentation?.ownerId) && (
                       <Tooltip title="Check this question answered">
                         <Checkbox
                           checked={question.answered}

@@ -84,7 +84,7 @@ const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {
     socket.on("startPresent", async (data) => {
-      if (!router.pathname.includes("presentation") && data?.groupId && (user?.myGroupIds?.includes(data.groupId) || user?.joinedGroupIds?.includes(data.groupId))) {
+      if (!router.asPath.includes("presentation") && data?.groupId && (user?.myGroupIds?.includes(data.groupId) || user?.joinedGroupIds?.includes(data.groupId))) {
         toast(
           <div>
             <p>Presentation {data?.presentationName} is presenting, do you want to join now?</p>
