@@ -15,7 +15,7 @@ import TableRow from "@mui/material/TableRow";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { addCollaborator, getPresentationDetail, removeFromPresentation } from "../../../client/presentation";
+import { addCollaborator, getPresentationDetail, removeFromPresentation, deletePresentation } from "../../../client/presentation";
 import { getUserByIds } from "../../../client/user";
 import Breadcrumb from "../../../components/Breadcrumb";
 import LoadingScreen from "../../../components/LoadingScreen";
@@ -110,6 +110,21 @@ export default function GroupDetailPage() {
     }
   };
 
+  const handleDeletePresentation = async () => {
+     try {
+      const { id } = router.query;
+      const res = await deletePresentation(id);
+      if (res?.status === "OK") {
+        await customToast("SUCCESS", `Remove presentation successfully!`);
+        window.location.href = "/presentation";
+      } else {
+        await customToast("ERROR", e.response?.data?.message);
+      }
+    } catch (e) {
+      await customToast("ERROR", e.response?.data?.message);
+    }
+  }
+
   return isLoading || isLoadingAuth || !user ? (
     <LoadingScreen />
   ) : (
@@ -136,6 +151,15 @@ export default function GroupDetailPage() {
           startIcon={<PersonAddIcon />}
         >
           Invite
+        </Button>
+        <Button
+          sx={{marginLeft: "15px"}}
+          variant="outlined"
+          color="error"
+          onClick={() => setOpenConfirmDelete(true)}
+          startIcon={<DeleteIcon />}
+        >
+          Delete
         </Button>
       </Grid>
       <Grid item xs={12}>
@@ -219,8 +243,8 @@ export default function GroupDetailPage() {
           </DialogContent>
           <DialogActions>
             <Button
-              className="custom-button"
-              variant="contained"
+              className="custom-button-outlined"
+              variant="outlined"
               onClick={() => setOpenInviteCollaboratorForm(false)}
             >
               Cancel
@@ -243,13 +267,13 @@ export default function GroupDetailPage() {
           <Button
             variant="contained"
             color="error"
-            // onClick={handleDeleteGroup}
+            onClick={handleDeletePresentation}
           >
             Delete
           </Button>
           <Button
-            className="custom-button"
-            variant="contained"
+            className="custom-button-outlined"
+            variant="outlined"
             color="primary"
             onClick={() => setOpenConfirmDelete(false)}
             autoFocus

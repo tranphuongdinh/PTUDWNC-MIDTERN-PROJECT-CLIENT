@@ -65,8 +65,8 @@ const Dashboard = ({ user, getUser }) => {
 
         <Link href="/presentation">
           <Button
-            className="custom-button"
-            variant="contained"
+            className="custom-button-outlined"
+            variant="outlined"
             startIcon={<SlideshowIcon />}
             sx={{ margin: "0 0 20px 20px" }}
           >
@@ -179,8 +179,8 @@ const Dashboard = ({ user, getUser }) => {
           </DialogContent>
           <DialogActions>
             <Button
-              className="custom-button"
-              variant="contained"
+              className="custom-button-outlined"
+              variant="outlined"
               onClick={() => setOpenCreateGroupForm(false)}
             >
               Cancel
@@ -211,8 +211,8 @@ const Dashboard = ({ user, getUser }) => {
           </DialogContent>
           <DialogActions>
             <Button
-              className="custom-button"
-              variant="contained"
+              className="custom-button-outlined"
+              variant="outlined"
               onClick={() => setOpenJoinGroupForm(false)}
             >
               Cancel

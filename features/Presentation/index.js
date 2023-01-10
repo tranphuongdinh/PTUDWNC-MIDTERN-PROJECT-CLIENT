@@ -56,9 +56,9 @@ const Presentation = ({ user, getUser }) => {
         </Button>
 
         <Button
-          className="custom-button"
+          className="custom-button-outlined"
           onClick={() => setOpenJoinGroupForm(true)}
-          variant="contained"
+          variant="outlined"
           startIcon={<CoPresentIcon />}
           sx={{ margin: "0 0 20px 20px" }}
         >
@@ -112,7 +112,7 @@ const Presentation = ({ user, getUser }) => {
       <Grid item xs={12} className={styles.groupWrapper}>
         <h1>Collab Presentations</h1>
         <div>
-          {user?.collabPresentations.length > 0 && (
+          {user?.collabPresentations.length > 0 ? (
             <Grid container spacing={3}>
               {user?.collabPresentations?.map((presentation) => (
                 <>
@@ -138,6 +138,10 @@ const Presentation = ({ user, getUser }) => {
                 </>
               ))}
             </Grid>
+          ) : (
+            <p className={styles.emptyText}>
+              You have not collaborated with any presentation.&nbsp;
+            </p>
           )}
         </div>
       </Grid>
@@ -161,8 +165,8 @@ const Presentation = ({ user, getUser }) => {
           </DialogContent>
           <DialogActions>
             <Button
-              className="custom-button"
-              variant="contained"
+              className="custom-button-outlined"
+              variant="outlined"
               onClick={() => setOpenCreatePresentation(false)}
             >
               Cancel
@@ -193,8 +197,8 @@ const Presentation = ({ user, getUser }) => {
           </DialogContent>
           <DialogActions>
             <Button
-              className="custom-button"
-              variant="contained"
+              className="custom-button-outlined"
+              variant="outlined"
               onClick={() => setOpenJoinGroupForm(false)}
             >
               Cancel
