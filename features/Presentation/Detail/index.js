@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import GroupsIcon from "@mui/icons-material/Groups";
 import ShareIcon from "@mui/icons-material/Share";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
-import { Button, Card, Container, FormControl, Grid, IconButton, Select, TextField } from "@mui/material";
+import { Button, Card, Container, Drawer, FormControl, Grid, IconButton, Select, TextField } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import clsx from "clsx";
@@ -42,6 +42,8 @@ const PresentationDetail = ({ id }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [selectedSlide, setSelectedSlide] = useState(0);
+
+  const [openHistory, setOpenHistory] = useState(false);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -351,6 +353,11 @@ const PresentationDetail = ({ id }) => {
                 <Grid item md={4} sm={12} container className={styles.content}>
                   <div>
                     <h3>Edit your slide</h3>
+                    {presentation?.history?.filter((item) => item.slideIndex == selectedSlide)?.length > 0 && (
+                      <Button variant="contained" sx={{ marginTop: 2 }} onClick={() => setOpenHistory(true)} className="custom-button">
+                        View submissions
+                      </Button>
+                    )}
 
                     <div item xs={12}>
                       {slides[selectedSlide].type === "Multiple Choice" ? (
@@ -466,6 +473,7 @@ const PresentationDetail = ({ id }) => {
                               }}
                             />
                             <Button
+                              sx={{ marginTop: 1 }}
                               className="custom-button"
                               variant="contained"
                               size="small"
@@ -522,6 +530,31 @@ const PresentationDetail = ({ id }) => {
               ) : null}
             </Grid>
           </Grid>
+
+          <Drawer anchor="right" open={openHistory} onClose={() => setOpenHistory(false)}>
+            <div
+              style={{
+                width: "30vw",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+                alignItems: "center",
+                marginTop: "50px",
+                padding: "20px",
+              }}
+            >
+              <h3 style={{ textAlign: "left", width: "100%" }}>All submissions:</h3>
+              <ul style={{ padding: 20 }}>
+                {presentation?.history
+                  ?.filter((item) => item.slideIndex == selectedSlide)
+                  ?.map((history) => (
+                    <li key={history.time} style={{ marginBottom: 10 }}>
+                      <b>{history.userName}</b> choose option <b>{history.option}</b> at <b>{new Date(history.time).toLocaleTimeString()}</b>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </Drawer>
         </Container>
       ) : (
         <p style={{ textAlign: "center" }}>This pesentation cannot be found</p>

@@ -1,5 +1,5 @@
 import { ZoomInMapRounded, ZoomOutMapRounded } from "@mui/icons-material";
-import { Button, Grid, IconButton, Tooltip } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, IconButton, Tooltip } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -22,10 +22,13 @@ import { AuthContext } from "../../../context/authContext";
 import { SocketContext } from "../../../context/socketContext";
 import styles from "./styles.module.scss";
 import ChatBox from "../../../components/ChatBox";
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 
 const SlideShow = () => {
   const { socket } = useContext(SocketContext);
   const [openQuestion, setOpenQuestion] = useState(false);
+  const [openHistory, setOpenHistory] = useState(false);
   const handle = useFullScreenHandle();
   const router = useRouter();
   const { user, isLoadingAuth } = useContext(AuthContext);
@@ -34,6 +37,11 @@ const SlideShow = () => {
   const [presentation, setPresentation] = useState({});
   const [slides, setSlides] = useState([]);
   const [questionList, setQuestionList] = useState([]);
+  const [history, setHistory] = useState([]);
+
+  const [openInputAnonymousName, setOpenInputAnonymousName] = useState(!user?.name);
+  const [anonymousName, setAnonymousName] = useState("");
+
   const getPresentation = async () => {
     setIsLoading(true);
     try {
@@ -45,6 +53,7 @@ const SlideShow = () => {
       setQuestionList(lst || []);
       setPresentation(presentation);
       setSlides(JSON.parse(presentation?.slides) || []);
+      setHistory(presentation?.history || []);
       setIsLoading(false);
       socket.emit("clientStartPresent", { presentationId: presentation?._id, groupId: presentation?.groupId, presentationName: presentation?.name });
     } catch (e) {
@@ -59,7 +68,7 @@ const SlideShow = () => {
         ...config,
       };
       const res = await updatePresentation(newPresentation);
-    } catch (e) { }
+    } catch (e) {}
   };
 
   const [index, setIndex] = useState(0);
@@ -79,6 +88,8 @@ const SlideShow = () => {
 
   useEffect(() => {
     if (router.isReady) {
+      setViewIndex(+router.query.page || 0);
+      setIndex(+router.query.page || 0);
       getPresentation();
     }
   }, [router.isReady]);
@@ -92,6 +103,13 @@ const SlideShow = () => {
 
     socket.on("changeSlideIndex", (data) => {
       if (data?.presentationId === presentation?._id) {
+        router.push({
+          ...router,
+          query: {
+            id: presentation._id,
+            page: data.viewIndex,
+          },
+        });
         setViewIndex(data.viewIndex);
         setIsAnswered(false);
       }
@@ -106,8 +124,8 @@ const SlideShow = () => {
     });
 
     socket.on("stopPresentByUpdateGroup", (data) => {
-      if (data?.find(p => p._id === presentation?._id)) router.reload();
-    })
+      if (data?.find((p) => p._id === presentation?._id)) router.reload();
+    });
   }, [presentation]);
 
   useEffect(() => {
@@ -126,6 +144,12 @@ const SlideShow = () => {
           // setQuestionList([...tmp]);
           sortQuestionList(tmp);
         }
+      }
+    });
+
+    socket.on("updateHistory", (newHistory) => {
+      if (newHistory?.presentationId === presentation._id) {
+        setHistory(newHistory.data || []);
       }
     });
   });
@@ -151,10 +175,10 @@ const SlideShow = () => {
     <>
       {!presentation.groupId || user?.myGroupIds?.includes(presentation.groupId) || user?.joinedGroupIds?.includes(presentation.groupId) ? (
         <>
-          {user?._id && presentation?.ownerId === user?._id ? (
+          {user?._id && (presentation?.ownerId === user?._id || presentation?.collaborators?.includes(user?._id)) ? (
             <FullScreen handle={handle}>
               <ChatBox room={presentation?._id} owner={presentation?.ownerId} />
-          <PresentButton />
+              <PresentButton />
               <Grid
                 container
                 spacing={6}
@@ -179,6 +203,13 @@ const SlideShow = () => {
                             presentationId: presentation?._id,
                             viewIndex: index - 1,
                           });
+                          router.push({
+                            ...router,
+                            query: {
+                              id: presentation._id,
+                              page: index - 1,
+                            },
+                          });
                         }}
                       >
                         Previous Slide
@@ -194,6 +225,13 @@ const SlideShow = () => {
                           socket.emit("clientChangeSlideIndex", {
                             presentationId: presentation?._id,
                             viewIndex: index + 1,
+                          });
+                          router.push({
+                            ...router,
+                            query: {
+                              id: presentation._id,
+                              page: index + 1,
+                            },
                           });
                         }}
                       >
@@ -212,8 +250,11 @@ const SlideShow = () => {
                     >
                       Stop Present
                     </Button>
-                    <Button className="custom-button" variant="contained" onClick={() => setOpenQuestion(true)}>
+                    <Button startIcon={<QuestionAnswerIcon/>} className="custom-button" variant="contained" onClick={() => setOpenQuestion(true)}>
                       Open Question
+                    </Button>
+                    <Button startIcon={<EventNoteIcon/>} className="custom-button" variant="contained" onClick={() => setOpenHistory(true)}>
+                      Submissions
                     </Button>
                   </div>
                   {slides[index].type === "Multiple Choice" && (
@@ -242,8 +283,8 @@ const SlideShow = () => {
             </FullScreen>
           ) : presentation?.isPresent ? (
             <FullScreen handle={handle}>
-              <ChatBox room={presentation?._id}  owner={presentation?.ownerId}/>
-          <PresentButton />
+              <ChatBox room={presentation?._id} owner={presentation?.ownerId} />
+              <PresentButton />
               <Button
                 className="custom-button"
                 variant="contained"
@@ -282,6 +323,10 @@ const SlideShow = () => {
                                 slides: JSON.stringify(slides),
                               };
                               socket.emit("vote", updatedPresentation);
+                              socket.emit("clientUpdateHistory", {
+                                data: [...history, { userName: user?.name || anonymousName || "Anonymous user", time: new Date(), option: option.label, slideIndex: viewIndex }],
+                                presentationId: presentation._id,
+                              });
                               setIsAnswered(true);
                             }}
                             variant="contained"
@@ -289,6 +334,39 @@ const SlideShow = () => {
                             {option.label}
                           </Button>
                         ))}
+
+                        {!user?.name && (
+                          <Dialog open={openInputAnonymousName}>
+                            <form>
+                              <DialogContent>
+                                <DialogContentText>Please enter your name to continue</DialogContentText>
+                                <TextField
+                                  autoFocus
+                                  margin="dense"
+                                  placeholder="Enter your name"
+                                  label="Your name"
+                                  type="text"
+                                  fullWidth
+                                  variant="standard"
+                                  onChange={(e) => setAnonymousName(e.target.value)}
+                                  required
+                                />
+                              </DialogContent>
+                              <DialogActions>
+                                <Button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (anonymousName) setOpenInputAnonymousName(false);
+                                  }}
+                                  type="submit"
+                                  variant="contained"
+                                >
+                                  Submit
+                                </Button>
+                              </DialogActions>
+                            </form>
+                          </Dialog>
+                        )}
                       </>
                     )}
                   </div>
@@ -300,6 +378,31 @@ const SlideShow = () => {
               <span>This presentation has not been started yet.</span>
             </div>
           )}
+          <Drawer anchor="right" open={openHistory} onClose={() => setOpenHistory(false)}>
+            <div
+              style={{
+                width: "30vw",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+                alignItems: "center",
+                marginTop: "50px",
+                padding: "20px",
+              }}
+            >
+              <h3 style={{ textAlign: "left", width: "100%" }}>All submissions:</h3>
+              <ul style={{ padding: 20 }}>
+                {history
+                  ?.filter((item) => item.slideIndex == viewIndex)
+                  .map((history) => (
+                    <li key={history.time} style={{ marginBottom: 10 }}>
+                      <b>{history.userName}</b> choose option <b>{history.option}</b> at <b>{new Date(history.time).toLocaleTimeString()}</b>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </Drawer>
+
           <Drawer anchor="right" open={openQuestion} onClose={() => setOpenQuestion(false)}>
             <div
               style={{

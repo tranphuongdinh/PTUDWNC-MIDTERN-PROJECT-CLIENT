@@ -24,7 +24,7 @@ const Presentation = ({ user, getUser }) => {
   const handleCreatePresentation = async (data) => {
     const { name = "", groupId = "" } = data;
     try {
-      const res = await createPresentation({ name, groupId });
+      const res = await createPresentation({ name, groupId, history: [] });
       if (res?.status === "OK") {
         await customToast("SUCCESS", "Create presentation successfully!");
         await getUser();

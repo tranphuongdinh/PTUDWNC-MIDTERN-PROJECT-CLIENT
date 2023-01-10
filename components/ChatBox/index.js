@@ -4,11 +4,12 @@ import Button from '@mui/material/Button';
 import { SocketContext } from "../../context/socketContext";
 import { AuthContext } from "../../context/authContext";
 import SendIcon from '@mui/icons-material/Send';
-
+import ChatIcon from '@mui/icons-material/Chat';
 import styles from "./styles.module.scss";
 import { clearChat, getChatPaging, saveChat } from "../../client/presentation";
 import ChatMessage from "./ChatMessage";
 import useMessageLoading from "./useMessageLoading";
+import { IconButton, Tooltip } from "@mui/material";
 
 export default function ChatBox({ room, owner }) {
     const [openChatBox, setOpenChatBox] = useState(false);
@@ -30,9 +31,6 @@ export default function ChatBox({ room, owner }) {
         if (observer.current) observer.current.disconnect()
         observer.current = new IntersectionObserver(entries => {
             messageLatestRef.current?.scrollIntoView({ behavior: 'smooth' })
-
-            console.log('👽', entries[0].isIntersecting)
-
             if (hasNextPage)
                 setIsWaiting(true)
             let allTimeout
@@ -71,7 +69,6 @@ export default function ChatBox({ room, owner }) {
             if (newMessageList.length > 0 && user._id === owner) {
                 saveChat({ presentationId: room, newChats: newMessageList.map(mess => JSON.stringify(mess)) })
                     .then((res) => {
-                        console.log('Save')
                         setNewMessageList([])
                     })
             }
@@ -105,7 +102,6 @@ export default function ChatBox({ room, owner }) {
         try {
             await clearChat(room)
         } catch (error) {
-            console.log(error)
         }
     }
 
@@ -126,7 +122,11 @@ export default function ChatBox({ room, owner }) {
 
     return (
         <div>
-            <Button variant="contained" onClick={toggleDrawer(true)}>OpenChatBox</Button>
+            <Tooltip title="Open chatbox">
+                <IconButton color="primary" size="large" variant="contained" onClick={toggleDrawer(true)}>
+                    <ChatIcon/>
+                </IconButton>
+            </Tooltip>
             <Drawer
                 anchor={'right'}
                 open={openChatBox}
@@ -136,7 +136,7 @@ export default function ChatBox({ room, owner }) {
                     <div className={styles.chat_header}>
                         <p>Live Chat</p>
                     </div>
-                    <div style={{ display: 'flex', height: '40px', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', padding: 20, justifyContent: 'center', borderLeft: "1px solid #000" }}>
                         <Button variant="outlined" className={styles.message_more} onClick={clearMessage}>Clear</Button>
                         {isWaiting && <img src="/images/spinner.svg" alt="LOADING..." />}
                     </div>

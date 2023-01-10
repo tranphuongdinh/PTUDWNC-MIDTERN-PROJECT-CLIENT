@@ -14,16 +14,18 @@ export const addCollaborator = async (data) => request("POST", "/presentation/co
 
 export const removeFromPresentation = async (data) => request("PUT", "/presentation/collaboration/remove", data);
 
-export const getQuestionList = async (id) => request("GET",`/presentation/questions/${id}`);
+export const getQuestionList = async (id) => request("GET", `/presentation/questions/${id}`);
 
 export const assignPresentationToGroup = async (data) => request("POST", "/presentation/assign-group", data);
 
 export const removeGroupFromPresentation = async (data) => request("POST", "/presentation/remove-assign-group", data);
 
-export const getGroupPresentation = async () => request("GET",`/presentation/assign-group/`);
+export const getGroupPresentation = async () => request("GET", `/presentation/assign-group/`);
 
 export const saveChat = async (data) => request("POST", "/presentation/chat/save", data);
 
-export const clearChat = async (presentationId) => request("DELETE", `/presentation/chat/clear/${presentationId}`)
+export const clearChat = async (presentationId) => request("DELETE", `/presentation/chat/clear/${presentationId}`);
 
 export const getChatPaging = async (page, presentId, options = {}) => request("GET", `/presentation/chat/${page}/${presentId}`, options);
+
+export const updateHistory = async (data, presentationId) => request("PUT", `/presentation/history`, { data, presentationId });
