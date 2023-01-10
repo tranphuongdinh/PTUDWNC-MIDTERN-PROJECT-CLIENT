@@ -21,3 +21,9 @@ export const assignPresentationToGroup = async (data) => request("POST", "/prese
 export const removeGroupFromPresentation = async (data) => request("POST", "/presentation/remove-assign-group", data);
 
 export const getGroupPresentation = async () => request("GET",`/presentation/assign-group/`);
+
+export const saveChat = async (data) => request("POST", "/presentation/chat/save", data);
+
+export const clearChat = async (presentationId) => request("DELETE", `/presentation/chat/clear/${presentationId}`)
+
+export const getChatPaging = async (page, presentId, options = {}) => request("GET", `/presentation/chat/${page}/${presentId}`, options);

@@ -21,6 +21,7 @@ import ParagraphPresentation from "../../../components/Presentation/Paragraph";
 import { AuthContext } from "../../../context/authContext";
 import { SocketContext } from "../../../context/socketContext";
 import styles from "./styles.module.scss";
+import ChatBox from "../../../components/ChatBox";
 
 const SlideShow = () => {
   const { socket } = useContext(SocketContext);
@@ -58,7 +59,7 @@ const SlideShow = () => {
         ...config,
       };
       const res = await updatePresentation(newPresentation);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const [index, setIndex] = useState(0);
@@ -152,7 +153,8 @@ const SlideShow = () => {
         <>
           {user?._id && presentation?.ownerId === user?._id ? (
             <FullScreen handle={handle}>
-              <PresentButton />
+              <ChatBox room={presentation?._id} owner={presentation?.ownerId} />
+          <PresentButton />
               <Grid
                 container
                 spacing={6}
@@ -240,7 +242,8 @@ const SlideShow = () => {
             </FullScreen>
           ) : presentation?.isPresent ? (
             <FullScreen handle={handle}>
-              <PresentButton />
+              <ChatBox room={presentation?._id}  owner={presentation?.ownerId}/>
+          <PresentButton />
               <Button
                 className="custom-button"
                 variant="contained"
