@@ -150,7 +150,7 @@ export default function GroupDetailPage() {
           onClick={() => setOpenInviteCollaboratorForm(true)}
           startIcon={<PersonAddIcon />}
         >
-          Invite
+          Add a collaborator
         </Button>
         <Button
           sx={{marginLeft: "15px"}}
@@ -188,7 +188,7 @@ export default function GroupDetailPage() {
                 </TableCell>
                 <TableCell align="center">OWNER</TableCell>
                 <TableCell align="center">
-                  <Tooltip title="Add new member">
+                  <Tooltip title="Add new collaborator">
                     <IconButton
                       onClick={() => setOpenInviteCollaboratorForm(true)}
                     >

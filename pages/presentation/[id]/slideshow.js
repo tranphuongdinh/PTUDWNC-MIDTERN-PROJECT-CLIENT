@@ -4,7 +4,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import SendIcon from "@mui/icons-material/Send";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
@@ -171,13 +171,9 @@ const SlideShow = () => {
     <LoadingScreen />
   ) : (
     <>
-      {!presentation.groupId ||
-      user?.myGroupIds?.includes(presentation.groupId) ||
-      user?.joinedGroupIds?.includes(presentation.groupId) ? (
+      {!presentation.groupId || user?.myGroupIds?.includes(presentation.groupId) || user?.joinedGroupIds?.includes(presentation.groupId) ? (
         <>
-          {user?._id &&
-          (presentation?.ownerId === user?._id ||
-            presentation?.collaborators?.includes(user?._id)) ? (
+          {user?._id && (presentation?.ownerId === user?._id || presentation?.collaborators?.includes(user?._id)) ? (
             <FullScreen handle={handle}>
               <ChatBox room={presentation?._id} owner={presentation?.ownerId} />
               <PresentButton />
@@ -190,16 +186,10 @@ const SlideShow = () => {
                   justifyContent: "center",
                   width: "100vw",
                   height: "100vh",
-                  marginLeft: 0
+                  marginLeft: 0,
                 }}
               >
-                <Grid
-                  item
-                  xl={8}
-                  md={7}
-                  xs={12}
-                  className={styles.presentationSlideCol}
-                >
+                <Grid item xl={8} md={7} xs={12} className={styles.presentationSlideCol}>
                   <div className={styles.buttonWrapper}>
                     {index > 0 && (
                       <Button
@@ -248,27 +238,17 @@ const SlideShow = () => {
                       </Button>
                     )}
 
-                    <Button
-                      startIcon={<QuestionMark />}
-                      className="custom-button-outlined"
-                      variant="outlined"
-                      onClick={() => setOpenQuestion(true)}
-                    >
+                    <Button startIcon={<QuestionMark />} className="custom-button-outlined" variant="outlined" onClick={() => setOpenQuestion(true)}>
                       Questions
                     </Button>
-                    <Button
-                      startIcon={<EventNoteIcon />}
-                      className="custom-button-outlined"
-                      variant="outlined"
-                      onClick={() => setOpenHistory(true)}
-                    >
+                    <Button startIcon={<EventNoteIcon />} className="custom-button-outlined" variant="outlined" onClick={() => setOpenHistory(true)}>
                       Submissions
                     </Button>
                     <Button
                       startIcon={<CancelPresentationIcon />}
                       variant="outlined"
                       onClick={async () => {
-                        await clearChat(presentation?._id)
+                        await clearChat(presentation?._id);
                         await updatePresentationDetail({ isPresent: false });
                         socket.emit("clientStopPresent", presentation?._id);
                         router.push(`/presentation/${presentation._id}`);
@@ -288,58 +268,20 @@ const SlideShow = () => {
                     )}
                   </div>
                   {slides[index].type === "Multiple Choice" && (
-                    <MultipleChoicePresentation
-                      width="90%"
-                      height="60vh"
-                      options={slides[index].content.options}
-                      question={slides[index].content.question}
-                    />
+                    <MultipleChoicePresentation width="90%" height="60vh" options={slides[index].content.options} question={slides[index].content.question} />
                   )}
-                  {slides[index].type === "Heading" && (
-                    <HeadingPresentation
-                      heading={slides[index].content.heading}
-                      subHeading={slides[index].content.subHeading}
-                    />
-                  )}
-                  {slides[index].type === "Paragraph" && (
-                    <ParagraphPresentation
-                      heading={slides[index].content.heading}
-                      paragraph={slides[index].content.paragraph}
-                    />
-                  )}
+                  {slides[index].type === "Heading" && <HeadingPresentation heading={slides[index].content.heading} subHeading={slides[index].content.subHeading} />}
+                  {slides[index].type === "Paragraph" && <ParagraphPresentation heading={slides[index].content.heading} paragraph={slides[index].content.paragraph} />}
                 </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  md={5}
-                  xl={4}
-                  className={styles.previewPresentationSlideCol}
-                >
-                  {index + 1 < slides.length && (
-                    <h2 className={styles.previewTitle}>Preview next slide:</h2>
-                  )}
+                <Grid item xs={12} md={5} xl={4} className={styles.previewPresentationSlideCol}>
+                  {index + 1 < slides.length && <h2 className={styles.previewTitle}>Preview next slide:</h2>}
                   {index + 1 < slides.length ? (
                     <>
                       {slides[index + 1].type === "Multiple Choice" && (
-                        <MultipleChoicePresentation
-                          width="90%"
-                          height="60vh"
-                          options={slides[index + 1].content.options}
-                          question={slides[index + 1].content.question}
-                        />
+                        <MultipleChoicePresentation width="90%" height="60vh" options={slides[index + 1].content.options} question={slides[index + 1].content.question} />
                       )}
-                      {slides[index + 1].type === "Heading" && (
-                        <HeadingPresentation
-                          heading={slides[index + 1].content.heading}
-                          subHeading={slides[index + 1].content.subHeading}
-                        />
-                      )}
-                      {slides[index + 1].type === "Paragraph" && (
-                        <ParagraphPresentation
-                          heading={slides[index + 1].content.heading}
-                          paragraph={slides[index + 1].content.paragraph}
-                        />
-                      )}
+                      {slides[index + 1].type === "Heading" && <HeadingPresentation heading={slides[index + 1].content.heading} subHeading={slides[index + 1].content.subHeading} />}
+                      {slides[index + 1].type === "Paragraph" && <ParagraphPresentation heading={slides[index + 1].content.heading} paragraph={slides[index + 1].content.paragraph} />}
                     </>
                   ) : (
                     <p style={{ textAlign: "center" }}>
@@ -354,13 +296,13 @@ const SlideShow = () => {
               <ChatBox room={presentation?._id} owner={presentation?.ownerId} />
               <PresentButton />
               <Tooltip title="Open box question">
-                <IconButton color="primary" size="large" onClick={ () => setOpenQuestion(true) }>
+                <IconButton color="primary" size="large" onClick={() => setOpenQuestion(true)}>
                   <LiveHelpIcon />
                 </IconButton>
               </Tooltip>
               <div className={styles.userVoteViewWrapper}>
                 {isAnswered ? (
-                  <div>Thank you for you answer</div>
+                  <MultipleChoicePresentation options={slides[index].content.options} question={slides[index].content.question} />
                 ) : (
                   <div
                     style={{
@@ -369,18 +311,8 @@ const SlideShow = () => {
                       gap: "30px",
                     }}
                   >
-                    {slides[viewIndex].type === "Heading" && (
-                      <HeadingPresentation
-                        heading={slides[viewIndex].content.heading}
-                        subHeading={slides[viewIndex].content.subHeading}
-                      />
-                    )}
-                    {slides[viewIndex].type === "Paragraph" && (
-                      <HeadingPresentation
-                        heading={slides[viewIndex].content.heading}
-                        paragraph={slides[viewIndex].content.paragraph}
-                      />
-                    )}
+                    {slides[viewIndex].type === "Heading" && <HeadingPresentation heading={slides[viewIndex].content.heading} subHeading={slides[viewIndex].content.subHeading} />}
+                    {slides[viewIndex].type === "Paragraph" && <HeadingPresentation heading={slides[viewIndex].content.heading} paragraph={slides[viewIndex].content.paragraph} />}
                     {slides[viewIndex].type === "Multiple Choice" && (
                       <>
                         <h1>{slides[viewIndex]?.content?.question}</h1>
@@ -413,9 +345,7 @@ const SlideShow = () => {
                           <Dialog open={openInputAnonymousName}>
                             <form>
                               <DialogContent>
-                                <DialogContentText>
-                                  Please enter your name to continue
-                                </DialogContentText>
+                                <DialogContentText>Please enter your name to continue</DialogContentText>
                                 <TextField
                                   autoFocus
                                   margin="dense"
@@ -424,9 +354,7 @@ const SlideShow = () => {
                                   type="text"
                                   fullWidth
                                   variant="standard"
-                                  onChange={(e) =>
-                                    setAnonymousName(e.target.value)
-                                  }
+                                  onChange={(e) => setAnonymousName(e.target.value)}
                                   required
                                 />
                               </DialogContent>
@@ -434,8 +362,7 @@ const SlideShow = () => {
                                 <Button
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    if (anonymousName)
-                                      setOpenInputAnonymousName(false);
+                                    if (anonymousName) setOpenInputAnonymousName(false);
                                   }}
                                   type="submit"
                                   variant="contained"
@@ -457,11 +384,7 @@ const SlideShow = () => {
               <span>This presentation has not been started yet.</span>
             </div>
           )}
-          <Drawer
-            anchor="right"
-            open={openHistory}
-            onClose={() => setOpenHistory(false)}
-          >
+          <Drawer anchor="right" open={openHistory} onClose={() => setOpenHistory(false)}>
             <div
               style={{
                 width: "30vw",
@@ -473,28 +396,20 @@ const SlideShow = () => {
                 padding: "20px",
               }}
             >
-              <h3 style={{ textAlign: "left", width: "100%" }}>
-                All submissions:
-              </h3>
+              <h3 style={{ textAlign: "left", width: "100%" }}>All submissions:</h3>
               <ul style={{ padding: 20 }}>
                 {history
                   ?.filter((item) => item.slideId === slides[viewIndex]?.id)
                   ?.map((history) => (
                     <li key={history.time} style={{ marginBottom: 10 }}>
-                      <b>{history.userName}</b> choose option{" "}
-                      <b>{history.option}</b> at{" "}
-                      <b>{new Date(history.time).toLocaleTimeString()}</b>
+                      <b>{history.userName}</b> choose option <b>{history.option}</b> at <b>{new Date(history.time).toLocaleTimeString()}</b>
                     </li>
                   ))}
               </ul>
             </div>
           </Drawer>
 
-          <Drawer
-            anchor="right"
-            open={openQuestion}
-            onClose={() => setOpenQuestion(false)}
-          >
+          <Drawer anchor="right" open={openQuestion} onClose={() => setOpenQuestion(false)}>
             <div
               style={{
                 width: "30vw",
@@ -506,9 +421,7 @@ const SlideShow = () => {
                 padding: "20px",
               }}
             >
-              <h3 style={{ textAlign: "left", width: "100%" }}>
-                Questions from viewers:
-              </h3>
+              <h3 style={{ textAlign: "left", width: "100%" }}>Questions from viewers:</h3>
 
               {Array.isArray(questionList) &&
                 questionList.length > 0 &&
@@ -536,12 +449,7 @@ const SlideShow = () => {
                       </Tooltip>
                     )}
 
-                    <TextField
-                      disabled
-                      id="outlined-disabled"
-                      label={question?.userName || "Username"}
-                      defaultValue={question?.content || "question"}
-                    />
+                    <TextField disabled id="outlined-disabled" label={question?.userName || "Username"} defaultValue={question?.content || "question"} />
                     <IconButton
                       onClick={() => {
                         const updatedQuestionList = [...questionList];
@@ -568,15 +476,7 @@ const SlideShow = () => {
                 <div style={{ width: "100%", textAlign: "left" }}>
                   <h3>Send your question:</h3>
                   <div className={styles.fullWidth}>
-                    <TextField
-                      id="outlined-basic"
-                      variant="outlined"
-                      multiline
-                      maxRows={5}
-                      minRows={3}
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                    />
+                    <TextField id="outlined-basic" variant="outlined" multiline maxRows={5} minRows={3} value={question} onChange={(e) => setQuestion(e.target.value)} />
                     <IconButton
                       onClick={() => {
                         socket.emit("clientSendQuestion", {

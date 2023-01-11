@@ -63,7 +63,6 @@ export default function ChatBox({ room, owner }) {
 
     useEffect(() => {
         socket.on('messageToNotify', data => {
-            console.log('OPEN TOAST', openChatBox)
           /* Checking if the user is the same as the data.name. If it is not, it will show a toast message. */
           if (user?.name !== data.name && !openChatBox) {
             customToast("INFO", <CustomNotifyComponent content={"A new messenger is comming !!!"} onChatClick={toggleDrawer(true)}/>)
