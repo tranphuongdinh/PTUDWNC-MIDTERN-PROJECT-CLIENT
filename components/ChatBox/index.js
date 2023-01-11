@@ -110,7 +110,7 @@ export default function ChatBox({ room, owner }) {
     const sendMessage = async () => {
         if (chatValue !== '') {
             const newChats = {
-                name: user.name,
+                name: user?.name || "Anonymous",
                 message: chatValue,
                 time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
                 room
