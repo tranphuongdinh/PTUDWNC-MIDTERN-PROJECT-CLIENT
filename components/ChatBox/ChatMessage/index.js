@@ -14,7 +14,7 @@ const ChatMessage = ({messageList, user, lastMessRef, messageLatestRef}) => {
                                 <div
                                     key={index}
                                     className={styles.message}
-                                    id={user.name === messageContent.name ? styles.you : styles.other}
+                                    id={user?.name === messageContent.name ? styles.you : styles.other}
                                     ref={lastMessRef}
                                 >
                                     <div>
@@ -39,7 +39,7 @@ const ChatMessage = ({messageList, user, lastMessRef, messageLatestRef}) => {
                             <div
                                 key={index}
                                 className={styles.message}
-                                id={user.name === messageContent.name ? styles.you : styles.other}
+                                id={user?.name === messageContent.name ? styles.you : styles.other}
                             >
                                 <div>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
