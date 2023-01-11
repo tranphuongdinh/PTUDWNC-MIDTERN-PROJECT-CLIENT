@@ -19,7 +19,7 @@ const ChatMessage = ({messageList, user, lastMessRef, messageLatestRef}) => {
                                 >
                                     <div>
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                                            {user.name !== messageContent.name && <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            {user?.name !== messageContent.name && <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <Avatar sx={{ width: 20, height: 20, marginX: 'auto' }}>{messageContent.name[0]}</Avatar>
                                             </div>}
                                             <div className={styles.message_content}>
@@ -43,7 +43,7 @@ const ChatMessage = ({messageList, user, lastMessRef, messageLatestRef}) => {
                             >
                                 <div>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        {user.name !== messageContent.name && <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        {user?.name !== messageContent.name && <div style={{ display: 'flex', flexDirection: 'column' }}>
                                             <Avatar sx={{ width: 20, height: 20, marginX: 'auto' }}>{messageContent.name[0]}</Avatar>
                                         </div>}
                                         <div className={styles.message_content}>
