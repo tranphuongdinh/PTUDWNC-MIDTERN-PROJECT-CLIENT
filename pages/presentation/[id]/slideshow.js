@@ -4,7 +4,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import SendIcon from "@mui/icons-material/Send";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
@@ -353,18 +353,11 @@ const SlideShow = () => {
             <FullScreen handle={handle}>
               <ChatBox room={presentation?._id} owner={presentation?.ownerId} />
               <PresentButton />
-              <Button
-                className="custom-button"
-                variant="contained"
-                sx={{
-                  position: "absolute",
-                  right: "10px",
-                  bottom: "10px",
-                }}
-                onClick={() => setOpenQuestion(true)}
-              >
-                Open Question
-              </Button>
+              <Tooltip title="Open box question">
+                <IconButton color="primary" size="large" onClick={ () => setOpenQuestion(true) }>
+                  <LiveHelpIcon />
+                </IconButton>
+              </Tooltip>
               <div className={styles.userVoteViewWrapper}>
                 {isAnswered ? (
                   <div>Thank you for you answer</div>
