@@ -10,6 +10,8 @@ import { clearChat, getChatPaging, saveChat } from "../../client/presentation";
 import ChatMessage from "./ChatMessage";
 import useMessageLoading from "./useMessageLoading";
 import { IconButton, Tooltip } from "@mui/material";
+import { CustomNotifyComponent } from "../CustomNotify";
+import { customToast } from "../../utils";
 
 export default function ChatBox({ room, owner }) {
     const [openChatBox, setOpenChatBox] = useState(false);
@@ -43,19 +45,12 @@ export default function ChatBox({ room, owner }) {
             }
 
             if (!entries[0].isIntersecting) {
-                // while (allTimeout--) {
-                //     if (allTimeout !== 0) {
-                //         clearTimeout(allTimeout);
-                //     }
-                // }
                 const timeoutToClear = localStorage.getItem('timeout')
                 clearTimeout(timeoutToClear)
                 setIsWaiting(false)
             }
         })
         if (node) observer.current.observe(node)
-
-
 
     }, [isLoading, hasNextPage])
 
@@ -65,6 +60,17 @@ export default function ChatBox({ room, owner }) {
         }
         setOpenChatBox(open);
     };
+
+    useEffect(() => {
+        socket.on('messageToNotify', data => {
+            console.log('OPEN TOAST', openChatBox)
+          /* Checking if the user is the same as the data.name. If it is not, it will show a toast message. */
+          if (user.name !== data.name && !openChatBox) {
+            customToast("INFO", <CustomNotifyComponent content={"A new messenger is comming !!!"} onChatClick={toggleDrawer(true)}/>)
+          }
+        })
+        return () => { socket.off('messageToNotify') }
+      }, [socket, openChatBox])
 
     useEffect(() => {
         // create a interval and get the id

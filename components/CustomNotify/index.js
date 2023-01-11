@@ -1,7 +1,7 @@
 import { Button, Link } from "@mui/material";
 import InputIcon from '@mui/icons-material/Input';
 
-export const CustomNotifyComponent = ({ closeToast, toastProps, content }) => {
+export const CustomNotifyComponent = ({ closeToast, toastProps, content, onChatClick }) => {
 
     const buttonSX = {
         "&:hover": {
@@ -27,11 +27,11 @@ export const CustomNotifyComponent = ({ closeToast, toastProps, content }) => {
         <div>
             {content}
             <br /><br />
-            <div style={{ display: 'flex', gap: 70, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: 70, justifyContent: 'center', alignItems: 'center' }}>
                 <Button variant="contained" sx={buttonSX} onClick={closeToast}>Close</Button>
-                <Link href="http://www.google.com" target="_blank" >
+                <Button onClick={onChatClick} >
                     <InputIcon sx={iconSX} />
-                </Link>
+                </Button>
             </div>
         </div>
     )
