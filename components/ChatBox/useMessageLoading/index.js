@@ -15,7 +15,6 @@ export default function useMessageLoading(pageNumber, presentationId) {
 
         getChatPaging(pageNumber, presentationId)
             .then(data => {
-                // console.log(data)
                 setIsResults(prev => [... new Set([...data.message.map(mess => JSON.parse(mess)), ...prev])])
                 setHasNextPage(Boolean(data.message.length))
                 setIsLoading(false)

@@ -102,7 +102,7 @@ export default function GroupDetailPage() {
           if (inviteLink) setInviteLink(inviteLink);
         }
 
-        const [userListRes, presentationListRes] = await Promise.all([getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]), getPresentationByIds([])])
+        const [userListRes, presentationListRes] = await Promise.all([getUserByIds([groupInfo.ownerId, ...groupInfo.memberIds, ...groupInfo.coOwnerIds]), getPresentationByIds([])]);
 
         const userListMap = {};
 
@@ -333,13 +333,13 @@ export default function GroupDetailPage() {
         </TableContainer>
       </Grid>
 
-      {group.currentPresentation && (
+      {group?.currentPresentation && (
         <>
           <Grid item xs={12}>
             <h1>Current presentations</h1>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6} lg={4}>
             <div className={styles.card}>
               <span>
                 Name: <b>{group.currentPresentation?.name}</b>
@@ -347,9 +347,16 @@ export default function GroupDetailPage() {
               <p>
                 Status: <span>{group.currentPresentation?.isPresent ? <Chip label="Presenting" color="success" /> : <Chip label="Not started" color="error" />}</span>
               </p>
-              {group.currentPresentation?.isPresent && <Button variant="contained" onClick={() => {
-                window.location.href = `/presentation/${group.currentPresentation._id}/slideshow`
-              }}>Join</Button>}
+              {group.currentPresentation?.isPresent && (
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    window.location.href = `/presentation/${group.currentPresentation._id}/slideshow`;
+                  }}
+                >
+                  Join
+                </Button>
+              )}
             </div>
           </Grid>
         </>
@@ -375,11 +382,11 @@ export default function GroupDetailPage() {
         <DialogTitle id="alert-dialog-title">Please confirm to delete this group</DialogTitle>
 
         <DialogActions>
-          <Button variant="contained" color="error" onClick={handleDeleteGroup}>
-            Delete
-          </Button>
-          <Button variant="contained" color="primary" onClick={() => setOpenConfirmDelete(false)} autoFocus>
+          <Button className="custom-button-outlined" variant="outlined" onClick={() => setOpenConfirmDelete(false)}>
             Cancel
+          </Button>
+          <Button color="error" variant="contained" type="submit" onClick={handleDeleteGroup}>
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

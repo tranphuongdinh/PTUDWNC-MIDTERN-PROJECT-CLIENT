@@ -158,15 +158,6 @@ const SlideShow = () => {
     setQuestionList([...tmp]);
   };
 
-  // useEffect(() => {
-  //   const tmp = [...questionList];
-  //   tmp.sort((a, b) => a.answered - b.answered || a.vote - b.vote);
-
-  //   setRenderQuestionList([...tmp]);
-
-  //   console.log('update list', tmp);
-  // }, [questionList]);
-
   return isLoading || isLoadingAuth ? (
     <LoadingScreen />
   ) : (
