@@ -31,22 +31,25 @@ export default function ChatBox({ room, owner }) {
         if (observer.current) observer.current.disconnect()
         observer.current = new IntersectionObserver(entries => {
             messageLatestRef.current?.scrollIntoView({ behavior: 'smooth' })
+
             if (hasNextPage)
                 setIsWaiting(true)
-            let allTimeout
-            if (entries[0].isIntersecting && hasNextPage) {
-                allTimeout = setTimeout(() => {
-                    setPageNumber(prevPage => prevPage + 1)
 
+            if (entries[0].isIntersecting && hasNextPage) {
+                const allTimeout = setTimeout(() => {
+                    setPageNumber(prevPage => prevPage + 1)
                 }, 3000)
+                localStorage.setItem('timeout', allTimeout)
             }
 
             if (!entries[0].isIntersecting) {
-                while (allTimeout--) {
-                    if (allTimeout !== 0) {
-                        clearTimeout(allTimeout);
-                    }
-                }
+                // while (allTimeout--) {
+                //     if (allTimeout !== 0) {
+                //         clearTimeout(allTimeout);
+                //     }
+                // }
+                const timeoutToClear = localStorage.getItem('timeout')
+                clearTimeout(timeoutToClear)
                 setIsWaiting(false)
             }
         })
@@ -98,13 +101,6 @@ export default function ChatBox({ room, owner }) {
         return () => { socket.off('receiveMessage') }
     }, [socket])
 
-    const clearMessage = async () => {
-        try {
-            await clearChat(room)
-        } catch (error) {
-        }
-    }
-
     const sendMessage = async () => {
         if (chatValue !== '') {
             const newChats = {
@@ -124,7 +120,7 @@ export default function ChatBox({ room, owner }) {
         <div>
             <Tooltip title="Open chatbox">
                 <IconButton color="primary" size="large" variant="contained" onClick={toggleDrawer(true)}>
-                    <ChatIcon/>
+                    <ChatIcon />
                 </IconButton>
             </Tooltip>
             <Drawer
@@ -136,8 +132,7 @@ export default function ChatBox({ room, owner }) {
                     <div className={styles.chat_header}>
                         <p>Live Chat</p>
                     </div>
-                    <div style={{ display: 'flex', padding: 20, justifyContent: 'center', borderLeft: "1px solid #000" }}>
-                        <Button variant="outlined" className={styles.message_more} onClick={clearMessage}>Clear</Button>
+                    <div style={{ display: 'flex', height: '40px', justifyContent: 'center' }}>
                         {isWaiting && <img src="/images/spinner.svg" alt="LOADING..." />}
                     </div>
                     <ChatMessage messageList={messageList} user={user} lastMessRef={lastMessRef} messageLatestRef={messageLatestRef} />

@@ -13,7 +13,7 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import Drawer from "@mui/material/Drawer";
 import TextField from "@mui/material/TextField";
 import { useContext, useEffect } from "react";
-import { getPresentationDetail, getQuestionList, updatePresentation } from "../../../client/presentation";
+import { clearChat, getPresentationDetail, getQuestionList, updatePresentation } from "../../../client/presentation";
 import LoadingScreen from "../../../components/LoadingScreen";
 import HeadingPresentation from "../../../components/Presentation/Heading";
 import MultipleChoicePresentation from "../../../components/Presentation/MultipleChoice";
@@ -268,6 +268,7 @@ const SlideShow = () => {
                       startIcon={<CancelPresentationIcon />}
                       variant="outlined"
                       onClick={async () => {
+                        await clearChat(presentation?._id)
                         await updatePresentationDetail({ isPresent: false });
                         socket.emit("clientStopPresent", presentation?._id);
                         router.push(`/presentation/${presentation._id}`);
