@@ -17,6 +17,8 @@ NEXT_PUBLIC_WS_DOMAIN = http://localhost:1400
 NEXT_PUBLIC_SENTRY_DSN = your_sentry_dsn
 ```
 
+If you run the development server, please go to the [server repository](https://github.com/tranphuongdinh/PTUDWNC-MIDTERN-PROJECT-SERVER) to run the local server.
+
 Run the development server:
 
 ```bash
