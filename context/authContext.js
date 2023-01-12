@@ -80,7 +80,7 @@ const AuthContextProvider = ({ children }) => {
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
     }
-  }, []);
+  }, [router.asPath]);
 
   useEffect(() => {
     socket.on("startPresent", async (data) => {

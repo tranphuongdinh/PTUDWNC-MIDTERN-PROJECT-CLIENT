@@ -9,7 +9,7 @@ import { Container } from "@mui/system";
 const AppLayout = ({ children }) => {
   const { isAuthenticated, logout, user } = useContext(AuthContext);
 
-  const checkNotLoggedIn = window?.location?.href?.includes("active");
+  const checkNotLoggedIn = window?.location?.href?.includes("active") || window?.location?.href?.includes("invite");
   const isShowing = window.location.href.includes("slideshow");
   if (!isAuthenticated || checkNotLoggedIn || !user || isShowing) {
     return <>{children}</>;

@@ -207,7 +207,7 @@ export default function GroupDetailPage() {
               Cancel
             </Button>
             <Button className="custom-button" variant="contained" type="submit">
-              Invite
+              Add
             </Button>
           </DialogActions>
         </form>

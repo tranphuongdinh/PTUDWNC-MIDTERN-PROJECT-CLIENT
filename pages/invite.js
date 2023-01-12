@@ -3,6 +3,7 @@ import React, { useContext, useEffect } from "react";
 import { inviteToGroup } from "../client/group";
 import { AuthContext } from "../context/authContext";
 import { customToast } from "../utils";
+import LoadingScreen from "../components/LoadingScreen";
 
 const InvitePage = () => {
   const router = useRouter();
@@ -27,7 +28,7 @@ const InvitePage = () => {
     handleInvite(groupId, code);
   }, []);
 
-  return <></>;
+  return LoadingScreen;
 };
 
 export default InvitePage;
